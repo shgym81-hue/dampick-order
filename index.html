@@ -463,11 +463,6 @@
         표시하지 않습니다.
       </p>
 
-      <div class="demo-guide">
-        화면 테스트는 닉네임에
-        <strong>담픽1234</strong>를 입력하고<br>
-        주문 조회하기를 눌러주세요.
-      </div>
 
     </section>
 
@@ -565,18 +560,6 @@
           닉네임에 '담픽1234'를 입력하면
           데이터베이스 연결 전에도 시험 주문이 표시됩니다.
         */
-        if (nickname === "담픽1234") {
-          const demoOrders =
-            createDemoOrders();
-
-          showMessage(
-            "담픽1234 고객님의 시험 주문을 불러왔습니다.",
-            "success"
-          );
-
-          renderOrders(demoOrders);
-          return;
-        }
 
         /*
           Supabase 연결정보를 아직 넣지 않은 경우에는
