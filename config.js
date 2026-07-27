@@ -10,10 +10,10 @@
 */
 
 const SUPABASE_URL =
-  "여기에_SUPABASE_PROJECT_URL_입력";
+  "https://vkdqpyvurozfvdetbino.supabase.co";
 
 const SUPABASE_PUBLIC_KEY =
-  "여기에_SUPABASE_PUBLISHABLE_OR_ANON_KEY_입력";
+  "sb_publishable_K6Nnwo2TiceSP9FpM3l7oA_eT3C3qJT";
 
 if (
   SUPABASE_URL.includes("여기에_") ||
