@@ -2,9 +2,18 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="담픽 고객 주문조회">
-  <title>담픽 주문조회</title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="담픽 공동구매 주문조회"
+  >
+
+  <title>담픽 공동구매 주문조회</title>
 
   <style>
     * {
@@ -12,32 +21,36 @@
     }
 
     :root {
-      --main: #ef4f87;
-      --main-dark: #d63d72;
+      --main: #ef3f7f;
+      --main-dark: #d92d69;
       --main-light: #fff0f5;
-      --text: #242424;
-      --sub: #777777;
-      --border: #e9e9e9;
-      --success: #167647;
-      --warning: #c97800;
+      --text: #252525;
+      --subtext: #777777;
+      --border: #e8e8e8;
+      --success: #17864b;
+      --warning: #d47b00;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Arial, "Noto Sans KR", sans-serif;
+      font-family:
+        Arial,
+        "Noto Sans KR",
+        sans-serif;
       color: var(--text);
-      background: linear-gradient(
-        180deg,
-        #fff0f5 0%,
-        #fff9fb 55%,
-        #ffffff 100%
-      );
+      background:
+        linear-gradient(
+          180deg,
+          #fff0f5 0%,
+          #fff9fb 50%,
+          #ffffff 100%
+        );
     }
 
     button,
     input {
-      font: inherit;
+      font-family: inherit;
     }
 
     .page {
@@ -49,11 +62,11 @@
     }
 
     .brand {
-      margin-bottom: 25px;
+      margin-bottom: 27px;
       text-align: center;
     }
 
-    .brand h1 {
+    .brand-title {
       margin: 0;
       color: var(--main);
       font-size: 38px;
@@ -61,73 +74,95 @@
       letter-spacing: -1px;
     }
 
-    .brand h1 span {
+    .brand-title span {
       margin-left: 5px;
       color: var(--main-dark);
       font-size: 19px;
     }
 
-    .brand p {
-      margin: 8px 0 0;
-      color: var(--sub);
+    .brand-slogan {
+      margin: 9px 0 0;
+      color: var(--subtext);
       font-size: 14px;
+      font-weight: 700;
+      line-height: 1.55;
     }
 
     .card {
       padding: 28px 22px;
-      border: 1px solid rgba(239, 79, 135, 0.12);
+      border: 1px solid rgba(239, 63, 127, 0.12);
       border-radius: 23px;
       background: #ffffff;
-      box-shadow: 0 14px 38px rgba(129, 61, 85, 0.12);
+      box-shadow:
+        0 14px 38px rgba(129, 61, 85, 0.12);
     }
 
-    .card h2 {
+    .card-title {
       margin: 0;
       text-align: center;
-      font-size: 25px;
+      font-size: 26px;
       font-weight: 900;
+      letter-spacing: -0.7px;
     }
 
     .description {
-      margin: 11px 0 26px;
-      color: var(--sub);
+      margin: 12px 0 27px;
+      color: var(--subtext);
       text-align: center;
       font-size: 14px;
-      line-height: 1.65;
+      line-height: 1.7;
     }
 
-    label {
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 9px;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
-    input {
+    .field input {
       width: 100%;
-      height: 55px;
+      height: 56px;
       padding: 0 15px;
       border: 1px solid var(--border);
       border-radius: 13px;
-      outline: none;
+      background: #ffffff;
+      color: var(--text);
       font-size: 17px;
+      outline: none;
+      transition: 0.2s;
     }
 
-    input:focus {
+    .field input::placeholder {
+      color: #b4b4b4;
+    }
+
+    .field input:focus {
       border-color: var(--main);
-      box-shadow: 0 0 0 4px rgba(239, 79, 135, 0.12);
+      box-shadow:
+        0 0 0 4px rgba(239, 63, 127, 0.12);
     }
 
     .lookup-button {
       width: 100%;
-      height: 56px;
-      margin-top: 18px;
+      height: 58px;
+      margin-top: 2px;
       border: 0;
       border-radius: 14px;
       color: #ffffff;
-      background: linear-gradient(135deg, var(--main), var(--main-dark));
-      box-shadow: 0 9px 20px rgba(239, 79, 135, 0.25);
-      font-size: 17px;
+      background:
+        linear-gradient(
+          135deg,
+          var(--main),
+          var(--main-dark)
+        );
+      box-shadow:
+        0 9px 20px rgba(239, 63, 127, 0.26);
+      font-size: 18px;
       font-weight: 900;
       cursor: pointer;
     }
@@ -153,10 +188,10 @@
       background: #fff0f2;
     }
 
-    .message.info {
+    .message.success {
       display: block;
-      color: #245f8f;
-      background: #edf7ff;
+      color: #176a3e;
+      background: #eaf8ef;
     }
 
     .results {
@@ -172,8 +207,8 @@
     }
 
     .order-head {
-      padding: 16px;
-      border-radius: 14px;
+      padding: 17px;
+      border-radius: 15px;
       background: var(--main-light);
     }
 
@@ -185,93 +220,102 @@
 
     .order-number {
       margin: 0;
-      color: var(--sub);
+      color: var(--subtext);
       font-size: 13px;
     }
 
     .badges {
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 12px;
+      gap: 8px;
+      margin-top: 13px;
     }
 
     .badge {
       padding: 6px 10px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 900;
     }
 
     .badge.order {
       color: var(--warning);
-      background: #fff1d4;
+      background: #fff2d7;
     }
 
     .badge.payment {
       color: var(--success);
-      background: #e8f7ee;
+      background: #e7f7ed;
     }
 
     .section-title {
-      margin: 22px 0 10px;
+      margin: 24px 0 11px;
       font-size: 16px;
       font-weight: 900;
     }
 
     .product-list,
-    .info-list {
+    .information {
       overflow: hidden;
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 15px;
+      background: #ffffff;
     }
 
     .product-row {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
-      padding: 15px;
+      gap: 14px;
+      padding: 16px;
       border-bottom: 1px solid #eeeeee;
     }
 
     .product-row:last-child,
-    .info-row:last-child {
+    .information-row:last-child {
       border-bottom: 0;
     }
 
     .product-name {
       margin: 0 0 5px;
-      font-weight: 800;
+      font-size: 15px;
+      font-weight: 900;
     }
 
-    .product-meta {
+    .product-option {
       margin: 0;
-      color: var(--sub);
+      color: var(--subtext);
       font-size: 13px;
     }
 
     .product-price {
       flex-shrink: 0;
-      font-weight: 800;
+      text-align: right;
+      font-size: 14px;
+      font-weight: 900;
     }
 
-    .total {
+    .total-box {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-top: 11px;
-      padding: 16px;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding: 17px;
       border-radius: 14px;
       color: #ffffff;
       background: #292929;
     }
 
-    .total strong {
-      color: #ff8eb5;
-      font-size: 21px;
+    .total-label {
+      font-size: 14px;
     }
 
-    .info-row {
+    .total-price {
+      color: #ff8eb5;
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+    .information-row {
       display: flex;
       padding: 14px 15px;
       border-bottom: 1px solid #eeeeee;
@@ -279,38 +323,55 @@
       line-height: 1.5;
     }
 
-    .info-label {
+    .information-label {
       width: 95px;
       flex-shrink: 0;
-      color: var(--sub);
+      color: var(--subtext);
     }
 
-    .info-value {
+    .information-value {
       flex: 1;
-      font-weight: 700;
+      font-weight: 800;
+      word-break: keep-all;
     }
 
-    .notice {
-      padding: 15px;
+    .notice-box {
+      padding: 16px;
       border-radius: 14px;
-      color: #665000;
-      background: #fff8dc;
+      color: #634d00;
+      background: #fff8dd;
       font-size: 14px;
-      line-height: 1.7;
+      line-height: 1.75;
       white-space: pre-wrap;
     }
 
     .privacy-note {
-      margin-top: 18px;
-      color: #999999;
+      margin: 21px 0 0;
+      color: #9a9a9a;
       text-align: center;
       font-size: 12px;
-      line-height: 1.6;
+      line-height: 1.7;
+    }
+
+    .demo-guide {
+      margin-top: 16px;
+      padding: 13px;
+      border: 1px dashed #efb0c7;
+      border-radius: 12px;
+      color: #8b5268;
+      background: #fffafd;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .demo-guide strong {
+      color: var(--main-dark);
     }
 
     .admin-link {
       display: block;
-      margin-top: 24px;
+      margin-top: 26px;
       color: #aaaaaa;
       text-align: center;
       text-decoration: none;
@@ -328,7 +389,7 @@
         padding-left: 18px;
       }
 
-      .brand h1 {
+      .brand-title {
         font-size: 33px;
       }
     }
@@ -336,62 +397,102 @@
 </head>
 
 <body>
+
   <main class="page">
+
     <header class="brand">
-      <h1>DAMPICK <span>담픽</span></h1>
-      <p>이걸 함께 담다, 담픽.</p>
+
+      <h1 class="brand-title">
+        DAMPICK
+        <span>담픽</span>
+      </h1>
+
+      <p class="brand-slogan">
+        모일수록 더 좋아진다,<br>
+        담픽 공동구매
+      </p>
+
     </header>
 
     <section class="card">
-      <h2>내 주문 조회</h2>
+
+      <h2 class="card-title">
+        내 주문 조회
+      </h2>
 
       <p class="description">
-        주문할 때 사용한 고객 이름을 입력하면<br>
+        주문할 때 사용한 닉네임을 입력하면<br>
         등록된 주문상품을 확인할 수 있습니다.
       </p>
 
-      <label for="customerName">고객 이름</label>
+      <div class="field">
 
-      <input
-        id="customerName"
-        type="text"
-        placeholder="예: 김승현"
-        autocomplete="name"
-      >
+        <label for="nickname">
+          닉네임
+        </label>
+
+        <input
+          type="text"
+          id="nickname"
+          placeholder="예: 담픽1234"
+          autocomplete="off"
+        >
+
+      </div>
 
       <button
-        id="lookupButton"
-        class="lookup-button"
         type="button"
+        class="lookup-button"
+        id="lookupButton"
       >
         주문 조회하기
       </button>
 
-      <div id="message" class="message"></div>
-      <div id="results" class="results"></div>
+      <div
+        class="message"
+        id="message"
+      ></div>
+
+      <section
+        class="results"
+        id="results"
+      ></section>
 
       <p class="privacy-note">
-        이름만으로 조회하는 방식이므로 전화번호, 주소 등 민감한 개인정보는 표시하지 않습니다.
+        닉네임만으로 조회하는 방식이므로
+        전화번호, 주소 등 민감한 개인정보는
+        표시하지 않습니다.
       </p>
+
+      <div class="demo-guide">
+        화면 테스트는 닉네임에
+        <strong>담픽1234</strong>를 입력하고<br>
+        주문 조회하기를 눌러주세요.
+      </div>
+
     </section>
 
-    <a class="admin-link" href="./admin.html">
+    <a
+      class="admin-link"
+      href="./admin.html"
+    >
       관리자 페이지
     </a>
+
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     /*
-      아래 두 줄을 Supabase 프로젝트의 실제 정보로 바꾸세요.
+      실제 고객 주문을 연결할 때 아래 두 값을
+      Supabase 프로젝트 정보로 바꿉니다.
 
       Supabase에서 확인하는 위치:
       Project Settings → API
 
-      주의:
-      service_role 키는 절대로 넣지 마세요.
-      anon key 또는 publishable key만 넣으세요.
+      브라우저에는 anon key 또는 publishable key만 넣으세요.
+      service_role key는 절대로 넣으면 안 됩니다.
     */
 
     const SUPABASE_URL =
@@ -400,13 +501,21 @@
     const SUPABASE_ANON_KEY =
       "여기에_SUPABASE_ANON_KEY_입력";
 
-    const sb = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
+    let supabaseClient = null;
 
-    const nameInput =
-      document.getElementById("customerName");
+    if (
+      !SUPABASE_URL.includes("여기에_") &&
+      !SUPABASE_ANON_KEY.includes("여기에_")
+    ) {
+      supabaseClient =
+        window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_ANON_KEY
+        );
+    }
+
+    const nicknameInput =
+      document.getElementById("nickname");
 
     const lookupButton =
       document.getElementById("lookupButton");
@@ -419,45 +528,32 @@
 
     lookupButton.addEventListener(
       "click",
-      lookupOrders
+      lookupOrder
     );
 
-    nameInput.addEventListener(
+    nicknameInput.addEventListener(
       "keydown",
       function (event) {
         if (event.key === "Enter") {
-          lookupOrders();
+          lookupOrder();
         }
       }
     );
 
-    async function lookupOrders() {
-      const customerName =
-        nameInput.value.trim();
+    async function lookupOrder() {
+      const nickname =
+        nicknameInput.value.trim();
 
-      message.className = "message";
-      message.textContent = "";
+      clearMessage();
       results.innerHTML = "";
 
-      if (!customerName) {
+      if (!nickname) {
         showMessage(
-          "고객 이름을 입력해주세요.",
+          "닉네임을 입력해주세요.",
           "error"
         );
 
-        nameInput.focus();
-        return;
-      }
-
-      if (
-        SUPABASE_URL.includes("여기에_") ||
-        SUPABASE_ANON_KEY.includes("여기에_")
-      ) {
-        showMessage(
-          "아직 Supabase 연결정보가 입력되지 않았습니다.",
-          "error"
-        );
-
+        nicknameInput.focus();
         return;
       }
 
@@ -466,11 +562,45 @@
         "주문을 확인하고 있습니다...";
 
       try {
+        /*
+          닉네임에 '담픽1234'를 입력하면
+          데이터베이스 연결 전에도 시험 주문이 표시됩니다.
+        */
+        if (nickname === "담픽1234") {
+          const demoOrders =
+            createDemoOrders();
+
+          showMessage(
+            "담픽1234 고객님의 시험 주문을 불러왔습니다.",
+            "success"
+          );
+
+          renderOrders(demoOrders);
+          return;
+        }
+
+        /*
+          Supabase 연결정보를 아직 넣지 않은 경우에는
+          '담픽1234' 시험 닉네임만 작동합니다.
+        */
+        if (!supabaseClient) {
+          showMessage(
+            "현재는 시험 닉네임 '담픽1234'만 조회할 수 있습니다. 실제 고객 주문은 Supabase 연결 후 이용할 수 있습니다.",
+            "error"
+          );
+
+          return;
+        }
+
+        /*
+          실제 데이터베이스에서는
+          lookup_orders_by_nickname 함수를 호출합니다.
+        */
         const { data, error } =
-          await sb.rpc(
-            "lookup_orders_by_name",
+          await supabaseClient.rpc(
+            "lookup_orders_by_nickname",
             {
-              p_customer_name: customerName
+              p_nickname: nickname
             }
           );
 
@@ -479,11 +609,13 @@
         }
 
         const orders =
-          Array.isArray(data) ? data : [];
+          Array.isArray(data)
+            ? data
+            : [];
 
         if (orders.length === 0) {
           showMessage(
-            "해당 이름으로 등록된 주문이 없습니다. 주문할 때 사용한 이름을 정확히 입력해주세요.",
+            "해당 닉네임으로 등록된 주문이 없습니다. 주문할 때 사용한 닉네임을 정확히 입력해주세요.",
             "error"
           );
 
@@ -491,21 +623,20 @@
         }
 
         showMessage(
-          customerName +
+          nickname +
           " 고객님의 주문 " +
           orders.length +
           "건을 찾았습니다.",
-          "info"
+          "success"
         );
 
-        results.innerHTML =
-          orders.map(renderOrder).join("");
+        renderOrders(orders);
 
       } catch (error) {
         console.error(error);
 
         showMessage(
-          "주문을 불러오지 못했습니다. Supabase 연결정보와 데이터베이스 설정을 확인해주세요.",
+          "주문정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
           "error"
         );
 
@@ -514,6 +645,53 @@
         lookupButton.textContent =
           "주문 조회하기";
       }
+    }
+
+    function createDemoOrders() {
+      return [
+        {
+          nickname: "담픽1234",
+          order_number: "DP-20260727-001",
+          order_status: "상품 준비 중",
+          payment_status: "입금 완료",
+          order_date: "2026-07-27",
+          pickup_date: "2026-07-30",
+          pickup_place: "○○아파트 관리동 앞",
+          notice:
+            "상품은 7월 30일 오후 5시부터 픽업 가능합니다.\n상품 수령 시 닉네임을 말씀해주세요.",
+          items: [
+            {
+              product_name: "프리미엄 수박",
+              quantity: 1,
+              unit_name: "개",
+              unit_price: 18000,
+              line_total: 18000
+            },
+            {
+              product_name: "무항생제 계란",
+              quantity: 2,
+              unit_name: "판",
+              unit_price: 8000,
+              line_total: 16000
+            }
+          ]
+        }
+      ];
+    }
+
+    function renderOrders(orders) {
+      results.innerHTML =
+        orders.map(renderOrder).join("");
+
+      setTimeout(
+        function () {
+          results.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        },
+        100
+      );
     }
 
     function renderOrder(order) {
@@ -538,21 +716,25 @@
           function (item) {
             return `
               <div class="product-row">
+
                 <div>
                   <p class="product-name">
                     ${escapeHtml(item.product_name)}
                   </p>
 
-                  <p class="product-meta">
+                  <p class="product-option">
+                    수량
                     ${escapeHtml(String(item.quantity))}
                     ${escapeHtml(item.unit_name || "개")}
-                    · 개당 ${formatPrice(item.unit_price)}
+                    · 개당
+                    ${formatPrice(item.unit_price)}
                   </p>
                 </div>
 
                 <div class="product-price">
                   ${formatPrice(item.line_total)}
                 </div>
+
               </div>
             `;
           }
@@ -564,7 +746,11 @@
           <div class="order-head">
 
             <p class="customer-name">
-              ${escapeHtml(order.customer_name)}
+              ${escapeHtml(
+                order.nickname ||
+                order.customer_name ||
+                "고객"
+              )}
               고객님의 주문
             </p>
 
@@ -595,48 +781,61 @@
             ${itemHtml}
           </div>
 
-          <div class="total">
-            <span>총 주문금액</span>
-            <strong>${formatPrice(totalAmount)}</strong>
+          <div class="total-box">
+
+            <span class="total-label">
+              총 주문금액
+            </span>
+
+            <strong class="total-price">
+              ${formatPrice(totalAmount)}
+            </strong>
+
           </div>
 
           <h3 class="section-title">
             픽업정보
           </h3>
 
-          <div class="info-list">
+          <div class="information">
 
-            <div class="info-row">
-              <span class="info-label">
+            <div class="information-row">
+
+              <span class="information-label">
                 주문일
               </span>
 
-              <span class="info-value">
+              <span class="information-value">
                 ${formatDate(order.order_date)}
               </span>
+
             </div>
 
-            <div class="info-row">
-              <span class="info-label">
+            <div class="information-row">
+
+              <span class="information-label">
                 픽업 예정일
               </span>
 
-              <span class="info-value">
+              <span class="information-value">
                 ${formatDate(order.pickup_date)}
               </span>
+
             </div>
 
-            <div class="info-row">
-              <span class="info-label">
+            <div class="information-row">
+
+              <span class="information-label">
                 픽업 장소
               </span>
 
-              <span class="info-value">
+              <span class="information-value">
                 ${escapeHtml(
                   order.pickup_place ||
                   "별도 안내"
                 )}
               </span>
+
             </div>
 
           </div>
@@ -648,7 +847,7 @@
                   담픽 안내
                 </h3>
 
-                <div class="notice">
+                <div class="notice-box">
                   ${escapeHtml(order.notice)}
                 </div>
               `
@@ -663,6 +862,11 @@
       message.textContent = text;
       message.className =
         "message " + type;
+    }
+
+    function clearMessage() {
+      message.textContent = "";
+      message.className = "message";
     }
 
     function formatPrice(value) {
@@ -700,5 +904,6 @@
         .replaceAll("'", "&#039;");
     }
   </script>
+
 </body>
 </html>
