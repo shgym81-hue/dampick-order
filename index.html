@@ -1,5 +1,3 @@
-# dampick-order
-단픽 고객 주문조회 및 관리자 주문관리
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -23,30 +21,29 @@
     }
 
     :root {
-      --main-color: #ef4f87;
-      --main-dark: #d93d72;
+      --main: #ef4f87;
+      --main-dark: #d63d72;
       --main-light: #fff0f5;
       --background: #fff7fa;
-      --text: #252525;
-      --sub-text: #777777;
-      --border: #e7e7e7;
-      --success: #198754;
-      --warning: #e78b00;
+      --text: #222222;
+      --subtext: #777777;
+      --border: #e8e8e8;
+      --success: #17864b;
+      --warning: #dc8200;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
       font-family:
-        "Pretendard",
-        "Noto Sans KR",
         Arial,
+        "Noto Sans KR",
         sans-serif;
       background:
         linear-gradient(
           180deg,
-          #fff1f6 0%,
-          #fffafb 48%,
+          #fff0f5 0%,
+          #fff8fb 50%,
           #ffffff 100%
         );
       color: var(--text);
@@ -62,56 +59,55 @@
       max-width: 500px;
       min-height: 100vh;
       margin: 0 auto;
-      padding: 38px 18px 50px;
+      padding: 36px 18px 50px;
     }
 
     .brand {
+      margin-bottom: 26px;
       text-align: center;
-      margin-bottom: 28px;
     }
 
-    .brand-name {
+    .brand-title {
       margin: 0;
+      color: var(--main);
       font-size: 38px;
       font-weight: 900;
       letter-spacing: -1px;
-      color: var(--main-color);
     }
 
-    .brand-korean {
+    .brand-title span {
       margin-left: 5px;
-      font-size: 17px;
-      font-weight: 800;
       color: var(--main-dark);
+      font-size: 18px;
     }
 
     .brand-slogan {
       margin: 7px 0 0;
+      color: var(--subtext);
       font-size: 14px;
-      color: var(--sub-text);
     }
 
     .card {
       padding: 28px 22px;
-      background: rgba(255, 255, 255, 0.96);
-      border: 1px solid rgba(239, 79, 135, 0.1);
+      background: #ffffff;
+      border: 1px solid rgba(239, 79, 135, 0.12);
       border-radius: 23px;
       box-shadow:
-        0 15px 40px rgba(145, 70, 96, 0.12);
+        0 14px 38px rgba(129, 61, 85, 0.12);
     }
 
     .card-title {
       margin: 0;
       text-align: center;
       font-size: 25px;
-      font-weight: 850;
+      font-weight: 900;
       letter-spacing: -0.7px;
     }
 
     .card-description {
       margin: 11px 0 27px;
+      color: var(--subtext);
       text-align: center;
-      color: var(--sub-text);
       font-size: 14px;
       line-height: 1.65;
     }
@@ -141,11 +137,11 @@
     }
 
     .field input::placeholder {
-      color: #b5b5b5;
+      color: #b8b8b8;
     }
 
     .field input:focus {
-      border-color: var(--main-color);
+      border-color: var(--main);
       box-shadow:
         0 0 0 4px rgba(239, 79, 135, 0.12);
     }
@@ -159,24 +155,20 @@
       background:
         linear-gradient(
           135deg,
-          var(--main-color),
+          var(--main),
           var(--main-dark)
         );
       color: #ffffff;
       font-size: 17px;
-      font-weight: 850;
+      font-weight: 900;
       cursor: pointer;
       box-shadow:
         0 9px 20px rgba(239, 79, 135, 0.25);
-      transition: 0.2s;
     }
 
-    .lookup-button:hover {
-      transform: translateY(-1px);
-    }
-
-    .lookup-button:active {
-      transform: translateY(1px);
+    .lookup-button:disabled {
+      opacity: 0.65;
+      cursor: wait;
     }
 
     .message {
@@ -192,13 +184,13 @@
     .message.error {
       display: block;
       background: #fff0f2;
-      color: #be294d;
+      color: #bd294d;
     }
 
-    .message.info {
+    .message.success {
       display: block;
-      background: #eef7ff;
-      color: #236396;
+      background: #eaf8ef;
+      color: #176a3e;
     }
 
     .order-result {
@@ -212,28 +204,28 @@
 
     .customer-box {
       padding: 17px;
+      border: 1px solid rgba(239, 79, 135, 0.18);
       border-radius: 15px;
       background: var(--main-light);
-      border: 1px solid rgba(239, 79, 135, 0.18);
     }
 
     .customer-name {
       margin: 0 0 6px;
       font-size: 18px;
-      font-weight: 850;
+      font-weight: 900;
     }
 
     .order-number {
       margin: 0;
-      color: var(--sub-text);
+      color: var(--subtext);
       font-size: 13px;
     }
 
     .status-line {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       margin-top: 13px;
-      flex-wrap: wrap;
     }
 
     .status {
@@ -247,7 +239,7 @@
     }
 
     .status.order {
-      background: #fff3d9;
+      background: #fff2d7;
       color: var(--warning);
     }
 
@@ -259,7 +251,7 @@
     .section-title {
       margin: 25px 0 11px;
       font-size: 16px;
-      font-weight: 850;
+      font-weight: 900;
     }
 
     .product-list {
@@ -289,7 +281,7 @@
 
     .product-option {
       margin: 0;
-      color: var(--sub-text);
+      color: var(--subtext);
       font-size: 13px;
     }
 
@@ -316,9 +308,9 @@
     }
 
     .total-price {
+      color: #ff8eb5;
       font-size: 21px;
       font-weight: 900;
-      color: #ff8bb3;
     }
 
     .information {
@@ -341,9 +333,9 @@
     }
 
     .information-label {
-      width: 92px;
+      width: 95px;
       flex-shrink: 0;
-      color: var(--sub-text);
+      color: var(--subtext);
     }
 
     .information-value {
@@ -362,14 +354,14 @@
     }
 
     .test-guide {
-      margin-top: 18px;
+      margin-top: 19px;
       padding: 14px;
       border: 1px dashed #e8a6be;
       border-radius: 13px;
       background: #fffafd;
       color: #855063;
       font-size: 13px;
-      line-height: 1.7;
+      line-height: 1.75;
     }
 
     .test-guide strong {
@@ -378,8 +370,8 @@
 
     .footer {
       margin-top: 25px;
-      text-align: center;
       color: #aaaaaa;
+      text-align: center;
       font-size: 12px;
       line-height: 1.6;
     }
@@ -395,7 +387,7 @@
         padding-left: 18px;
       }
 
-      .brand-name {
+      .brand-title {
         font-size: 33px;
       }
     }
@@ -408,9 +400,9 @@
 
     <header class="brand">
 
-      <h1 class="brand-name">
+      <h1 class="brand-title">
         DAMPICK
-        <span class="brand-korean">단픽</span>
+        <span>단픽</span>
       </h1>
 
       <p class="brand-slogan">
@@ -454,7 +446,7 @@
         <input
           type="password"
           id="lookupPin"
-          placeholder="조회번호 4자리"
+          placeholder="조회번호 숫자 4자리"
           inputmode="numeric"
           maxlength="4"
           autocomplete="off"
@@ -567,7 +559,6 @@
         <div class="information">
 
           <div class="information-row">
-
             <span class="information-label">
               주문일
             </span>
@@ -575,11 +566,9 @@
             <span class="information-value">
               2026년 7월 27일
             </span>
-
           </div>
 
           <div class="information-row">
-
             <span class="information-label">
               픽업 예정일
             </span>
@@ -587,11 +576,9 @@
             <span class="information-value">
               2026년 7월 30일
             </span>
-
           </div>
 
           <div class="information-row">
-
             <span class="information-label">
               픽업 장소
             </span>
@@ -599,7 +586,6 @@
             <span class="information-value">
               ○○아파트 관리동 앞
             </span>
-
           </div>
 
         </div>
@@ -618,7 +604,7 @@
 
       <div class="test-guide">
 
-        <strong>현재 시험용 아이디</strong><br>
+        <strong>시험용 조회 정보</strong><br>
 
         고객 아이디:
         <strong>DP-TEST01</strong><br>
@@ -626,7 +612,8 @@
         조회번호:
         <strong>1234</strong><br>
 
-        위 내용을 입력하면 시험 주문이 표시됩니다.
+        위 아이디와 번호를 입력하면
+        시험 주문내역이 표시됩니다.
 
       </div>
 
@@ -634,7 +621,7 @@
 
     <footer class="footer">
       © DAMPICK. All rights reserved.<br>
-      본 페이지는 단픽 주문조회 서비스입니다.
+      단픽 고객 주문조회 서비스
     </footer>
 
   </main>
@@ -711,7 +698,8 @@
       }
 
       lookupButton.disabled = true;
-      lookupButton.textContent = "주문을 확인하고 있습니다...";
+      lookupButton.textContent =
+        "주문을 확인하고 있습니다...";
 
       setTimeout(function () {
         if (
@@ -722,7 +710,7 @@
 
           showMessage(
             "주문정보를 정상적으로 불러왔습니다.",
-            "info"
+            "success"
           );
         } else {
           showMessage(
@@ -732,7 +720,8 @@
         }
 
         lookupButton.disabled = false;
-        lookupButton.textContent = "주문 조회하기";
+        lookupButton.textContent =
+          "주문 조회하기";
       }, 450);
     }
 
