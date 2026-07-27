@@ -2,18 +2,9 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <meta
-    name="description"
-    content="단픽 고객 주문조회 서비스"
-  >
-
-  <title>단픽 주문조회</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="담픽 고객 주문조회">
+  <title>담픽 주문조회</title>
 
   <style>
     * {
@@ -24,50 +15,45 @@
       --main: #ef4f87;
       --main-dark: #d63d72;
       --main-light: #fff0f5;
-      --background: #fff7fa;
-      --text: #222222;
-      --subtext: #777777;
-      --border: #e8e8e8;
-      --success: #17864b;
-      --warning: #dc8200;
+      --text: #242424;
+      --sub: #777777;
+      --border: #e9e9e9;
+      --success: #167647;
+      --warning: #c97800;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
-      font-family:
-        Arial,
-        "Noto Sans KR",
-        sans-serif;
-      background:
-        linear-gradient(
-          180deg,
-          #fff0f5 0%,
-          #fff8fb 50%,
-          #ffffff 100%
-        );
+      font-family: Arial, "Noto Sans KR", sans-serif;
       color: var(--text);
+      background: linear-gradient(
+        180deg,
+        #fff0f5 0%,
+        #fff9fb 55%,
+        #ffffff 100%
+      );
     }
 
     button,
     input {
-      font-family: inherit;
+      font: inherit;
     }
 
     .page {
       width: 100%;
-      max-width: 500px;
+      max-width: 520px;
       min-height: 100vh;
       margin: 0 auto;
-      padding: 36px 18px 50px;
+      padding: 34px 18px 50px;
     }
 
     .brand {
-      margin-bottom: 26px;
+      margin-bottom: 25px;
       text-align: center;
     }
 
-    .brand-title {
+    .brand h1 {
       margin: 0;
       color: var(--main);
       font-size: 38px;
@@ -75,95 +61,75 @@
       letter-spacing: -1px;
     }
 
-    .brand-title span {
+    .brand h1 span {
       margin-left: 5px;
       color: var(--main-dark);
-      font-size: 18px;
+      font-size: 19px;
     }
 
-    .brand-slogan {
-      margin: 7px 0 0;
-      color: var(--subtext);
+    .brand p {
+      margin: 8px 0 0;
+      color: var(--sub);
       font-size: 14px;
     }
 
     .card {
       padding: 28px 22px;
-      background: #ffffff;
       border: 1px solid rgba(239, 79, 135, 0.12);
       border-radius: 23px;
-      box-shadow:
-        0 14px 38px rgba(129, 61, 85, 0.12);
+      background: #ffffff;
+      box-shadow: 0 14px 38px rgba(129, 61, 85, 0.12);
     }
 
-    .card-title {
+    .card h2 {
       margin: 0;
       text-align: center;
       font-size: 25px;
       font-weight: 900;
-      letter-spacing: -0.7px;
     }
 
-    .card-description {
-      margin: 11px 0 27px;
-      color: var(--subtext);
+    .description {
+      margin: 11px 0 26px;
+      color: var(--sub);
       text-align: center;
       font-size: 14px;
       line-height: 1.65;
     }
 
-    .field {
-      margin-bottom: 18px;
-    }
-
-    .field label {
+    label {
       display: block;
       margin-bottom: 8px;
       font-size: 14px;
       font-weight: 800;
     }
 
-    .field input {
+    input {
       width: 100%;
-      height: 54px;
+      height: 55px;
       padding: 0 15px;
       border: 1px solid var(--border);
       border-radius: 13px;
-      background: #ffffff;
-      color: var(--text);
-      font-size: 17px;
       outline: none;
-      transition: 0.2s;
+      font-size: 17px;
     }
 
-    .field input::placeholder {
-      color: #b8b8b8;
-    }
-
-    .field input:focus {
+    input:focus {
       border-color: var(--main);
-      box-shadow:
-        0 0 0 4px rgba(239, 79, 135, 0.12);
+      box-shadow: 0 0 0 4px rgba(239, 79, 135, 0.12);
     }
 
     .lookup-button {
       width: 100%;
       height: 56px;
-      margin-top: 5px;
+      margin-top: 18px;
       border: 0;
       border-radius: 14px;
-      background:
-        linear-gradient(
-          135deg,
-          var(--main),
-          var(--main-dark)
-        );
       color: #ffffff;
+      background: linear-gradient(135deg, var(--main), var(--main-dark));
+      box-shadow: 0 9px 20px rgba(239, 79, 135, 0.25);
       font-size: 17px;
       font-weight: 900;
       cursor: pointer;
-      box-shadow:
-        0 9px 20px rgba(239, 79, 135, 0.25);
     }
 
     .lookup-button:disabled {
@@ -183,29 +149,31 @@
 
     .message.error {
       display: block;
-      background: #fff0f2;
       color: #bd294d;
+      background: #fff0f2;
     }
 
-    .message.success {
+    .message.info {
       display: block;
-      background: #eaf8ef;
-      color: #176a3e;
+      color: #245f8f;
+      background: #edf7ff;
     }
 
-    .order-result {
-      display: none;
-      margin-top: 22px;
+    .results {
+      margin-top: 24px;
     }
 
-    .order-result.show {
-      display: block;
+    .order-card {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #ffffff;
     }
 
-    .customer-box {
-      padding: 17px;
-      border: 1px solid rgba(239, 79, 135, 0.18);
-      border-radius: 15px;
+    .order-head {
+      padding: 16px;
+      border-radius: 14px;
       background: var(--main-light);
     }
 
@@ -217,110 +185,93 @@
 
     .order-number {
       margin: 0;
-      color: var(--subtext);
+      color: var(--sub);
       font-size: 13px;
     }
 
-    .status-line {
+    .badges {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 13px;
+      gap: 7px;
+      margin-top: 12px;
     }
 
-    .status {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      padding: 5px 10px;
+    .badge {
+      padding: 6px 10px;
       border-radius: 999px;
       font-size: 12px;
       font-weight: 800;
     }
 
-    .status.order {
-      background: #fff2d7;
+    .badge.order {
       color: var(--warning);
+      background: #fff1d4;
     }
 
-    .status.payment {
-      background: #e7f7ed;
+    .badge.payment {
       color: var(--success);
+      background: #e8f7ee;
     }
 
     .section-title {
-      margin: 25px 0 11px;
+      margin: 22px 0 10px;
       font-size: 16px;
       font-weight: 900;
     }
 
-    .product-list {
+    .product-list,
+    .info-list {
       overflow: hidden;
       border: 1px solid var(--border);
-      border-radius: 15px;
-      background: #ffffff;
+      border-radius: 14px;
     }
 
-    .product {
+    .product-row {
       display: flex;
       justify-content: space-between;
-      gap: 14px;
-      padding: 16px;
+      gap: 12px;
+      padding: 15px;
       border-bottom: 1px solid #eeeeee;
     }
 
-    .product:last-child {
+    .product-row:last-child,
+    .info-row:last-child {
       border-bottom: 0;
     }
 
     .product-name {
       margin: 0 0 5px;
-      font-size: 15px;
       font-weight: 800;
     }
 
-    .product-option {
+    .product-meta {
       margin: 0;
-      color: var(--subtext);
+      color: var(--sub);
       font-size: 13px;
     }
 
     .product-price {
       flex-shrink: 0;
-      text-align: right;
-      font-size: 14px;
       font-weight: 800;
     }
 
-    .total-box {
+    .total {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-top: 12px;
-      padding: 17px;
+      align-items: center;
+      margin-top: 11px;
+      padding: 16px;
       border-radius: 14px;
-      background: #292929;
       color: #ffffff;
+      background: #292929;
     }
 
-    .total-label {
-      font-size: 14px;
-    }
-
-    .total-price {
+    .total strong {
       color: #ff8eb5;
       font-size: 21px;
-      font-weight: 900;
     }
 
-    .information {
-      overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      background: #ffffff;
-    }
-
-    .information-row {
+    .info-row {
       display: flex;
       padding: 14px 15px;
       border-bottom: 1px solid #eeeeee;
@@ -328,52 +279,42 @@
       line-height: 1.5;
     }
 
-    .information-row:last-child {
-      border-bottom: 0;
-    }
-
-    .information-label {
+    .info-label {
       width: 95px;
       flex-shrink: 0;
-      color: var(--subtext);
+      color: var(--sub);
     }
 
-    .information-value {
+    .info-value {
       flex: 1;
       font-weight: 700;
-      word-break: keep-all;
     }
 
-    .notice-box {
-      padding: 16px;
+    .notice {
+      padding: 15px;
       border-radius: 14px;
-      background: #fff8dd;
-      color: #634d00;
+      color: #665000;
+      background: #fff8dc;
       font-size: 14px;
       line-height: 1.7;
+      white-space: pre-wrap;
     }
 
-    .test-guide {
-      margin-top: 19px;
-      padding: 14px;
-      border: 1px dashed #e8a6be;
-      border-radius: 13px;
-      background: #fffafd;
-      color: #855063;
-      font-size: 13px;
-      line-height: 1.75;
-    }
-
-    .test-guide strong {
-      color: var(--main-dark);
-    }
-
-    .footer {
-      margin-top: 25px;
-      color: #aaaaaa;
+    .privacy-note {
+      margin-top: 18px;
+      color: #999999;
       text-align: center;
       font-size: 12px;
       line-height: 1.6;
+    }
+
+    .admin-link {
+      display: block;
+      margin-top: 24px;
+      color: #aaaaaa;
+      text-align: center;
+      text-decoration: none;
+      font-size: 12px;
     }
 
     @media (max-width: 380px) {
@@ -387,7 +328,7 @@
         padding-left: 18px;
       }
 
-      .brand-title {
+      .brand h1 {
         font-size: 33px;
       }
     }
@@ -395,243 +336,77 @@
 </head>
 
 <body>
-
   <main class="page">
-
     <header class="brand">
-
-      <h1 class="brand-title">
-        DAMPICK
-        <span>단픽</span>
-      </h1>
-
-      <p class="brand-slogan">
-        픽하는 순간 취향이 밝아진다
-      </p>
-
+      <h1>DAMPICK <span>담픽</span></h1>
+      <p>이걸 함께 담다, 담픽.</p>
     </header>
 
     <section class="card">
+      <h2>내 주문 조회</h2>
 
-      <h2 class="card-title">
-        내 주문 조회
-      </h2>
-
-      <p class="card-description">
-        고객 아이디와 조회번호를 입력하면<br>
-        주문하신 상품을 확인할 수 있습니다.
+      <p class="description">
+        주문할 때 사용한 고객 이름을 입력하면<br>
+        등록된 주문상품을 확인할 수 있습니다.
       </p>
 
-      <div class="field">
+      <label for="customerName">고객 이름</label>
 
-        <label for="customerId">
-          고객 아이디
-        </label>
-
-        <input
-          type="text"
-          id="customerId"
-          placeholder="예: DP-TEST01"
-          autocomplete="off"
-        >
-
-      </div>
-
-      <div class="field">
-
-        <label for="lookupPin">
-          조회번호
-        </label>
-
-        <input
-          type="password"
-          id="lookupPin"
-          placeholder="조회번호 숫자 4자리"
-          inputmode="numeric"
-          maxlength="4"
-          autocomplete="off"
-        >
-
-      </div>
+      <input
+        id="customerName"
+        type="text"
+        placeholder="예: 김승현"
+        autocomplete="name"
+      >
 
       <button
-        type="button"
-        class="lookup-button"
         id="lookupButton"
+        class="lookup-button"
+        type="button"
       >
         주문 조회하기
       </button>
 
-      <div
-        class="message"
-        id="message"
-      ></div>
+      <div id="message" class="message"></div>
+      <div id="results" class="results"></div>
 
-      <section
-        class="order-result"
-        id="orderResult"
-      >
-
-        <div class="customer-box">
-
-          <p class="customer-name">
-            김○○ 고객님의 주문
-          </p>
-
-          <p class="order-number">
-            주문번호: DP-20260727-001
-          </p>
-
-          <div class="status-line">
-
-            <span class="status order">
-              상품 준비 중
-            </span>
-
-            <span class="status payment">
-              입금 완료
-            </span>
-
-          </div>
-
-        </div>
-
-        <h3 class="section-title">
-          주문 상품
-        </h3>
-
-        <div class="product-list">
-
-          <div class="product">
-
-            <div>
-              <p class="product-name">
-                프리미엄 수박
-              </p>
-
-              <p class="product-option">
-                대과 · 수량 1개
-              </p>
-            </div>
-
-            <div class="product-price">
-              18,000원
-            </div>
-
-          </div>
-
-          <div class="product">
-
-            <div>
-              <p class="product-name">
-                무항생제 계란
-              </p>
-
-              <p class="product-option">
-                30구 · 수량 2판
-              </p>
-            </div>
-
-            <div class="product-price">
-              16,000원
-            </div>
-
-          </div>
-
-        </div>
-
-        <div class="total-box">
-
-          <span class="total-label">
-            총 주문금액
-          </span>
-
-          <strong class="total-price">
-            34,000원
-          </strong>
-
-        </div>
-
-        <h3 class="section-title">
-          픽업정보
-        </h3>
-
-        <div class="information">
-
-          <div class="information-row">
-            <span class="information-label">
-              주문일
-            </span>
-
-            <span class="information-value">
-              2026년 7월 27일
-            </span>
-          </div>
-
-          <div class="information-row">
-            <span class="information-label">
-              픽업 예정일
-            </span>
-
-            <span class="information-value">
-              2026년 7월 30일
-            </span>
-          </div>
-
-          <div class="information-row">
-            <span class="information-label">
-              픽업 장소
-            </span>
-
-            <span class="information-value">
-              ○○아파트 관리동 앞
-            </span>
-          </div>
-
-        </div>
-
-        <h3 class="section-title">
-          단픽 안내
-        </h3>
-
-        <div class="notice-box">
-          상품은 7월 30일 오후 5시부터
-          픽업 가능합니다.
-          상품 수령 시 주문자 성함을 말씀해주세요.
-        </div>
-
-      </section>
-
-      <div class="test-guide">
-
-        <strong>시험용 조회 정보</strong><br>
-
-        고객 아이디:
-        <strong>DP-TEST01</strong><br>
-
-        조회번호:
-        <strong>1234</strong><br>
-
-        위 아이디와 번호를 입력하면
-        시험 주문내역이 표시됩니다.
-
-      </div>
-
+      <p class="privacy-note">
+        이름만으로 조회하는 방식이므로 전화번호, 주소 등 민감한 개인정보는 표시하지 않습니다.
+      </p>
     </section>
 
-    <footer class="footer">
-      © DAMPICK. All rights reserved.<br>
-      단픽 고객 주문조회 서비스
-    </footer>
-
+    <a class="admin-link" href="./admin.html">
+      관리자 페이지
+    </a>
   </main>
 
-  <script>
-    const customerIdInput =
-      document.getElementById("customerId");
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    const lookupPinInput =
-      document.getElementById("lookupPin");
+  <script>
+    /*
+      아래 두 줄을 Supabase 프로젝트의 실제 정보로 바꾸세요.
+
+      Supabase에서 확인하는 위치:
+      Project Settings → API
+
+      주의:
+      service_role 키는 절대로 넣지 마세요.
+      anon key 또는 publishable key만 넣으세요.
+    */
+
+    const SUPABASE_URL =
+      "여기에_SUPABASE_PROJECT_URL_입력";
+
+    const SUPABASE_ANON_KEY =
+      "여기에_SUPABASE_ANON_KEY_입력";
+
+    const sb = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const nameInput =
+      document.getElementById("customerName");
 
     const lookupButton =
       document.getElementById("lookupButton");
@@ -639,61 +414,50 @@
     const message =
       document.getElementById("message");
 
-    const orderResult =
-      document.getElementById("orderResult");
+    const results =
+      document.getElementById("results");
 
     lookupButton.addEventListener(
       "click",
-      lookupOrder
+      lookupOrders
     );
 
-    customerIdInput.addEventListener(
+    nameInput.addEventListener(
       "keydown",
       function (event) {
         if (event.key === "Enter") {
-          lookupPinInput.focus();
+          lookupOrders();
         }
       }
     );
 
-    lookupPinInput.addEventListener(
-      "keydown",
-      function (event) {
-        if (event.key === "Enter") {
-          lookupOrder();
-        }
-      }
-    );
+    async function lookupOrders() {
+      const customerName =
+        nameInput.value.trim();
 
-    function lookupOrder() {
-      const customerId =
-        customerIdInput.value
-          .trim()
-          .toUpperCase();
+      message.className = "message";
+      message.textContent = "";
+      results.innerHTML = "";
 
-      const lookupPin =
-        lookupPinInput.value.trim();
-
-      hideMessage();
-      hideOrder();
-
-      if (!customerId) {
+      if (!customerName) {
         showMessage(
-          "고객 아이디를 입력해주세요.",
+          "고객 이름을 입력해주세요.",
           "error"
         );
 
-        customerIdInput.focus();
+        nameInput.focus();
         return;
       }
 
-      if (!/^[0-9]{4}$/.test(lookupPin)) {
+      if (
+        SUPABASE_URL.includes("여기에_") ||
+        SUPABASE_ANON_KEY.includes("여기에_")
+      ) {
         showMessage(
-          "조회번호 숫자 4자리를 입력해주세요.",
+          "아직 Supabase 연결정보가 입력되지 않았습니다.",
           "error"
         );
 
-        lookupPinInput.focus();
         return;
       }
 
@@ -701,28 +465,198 @@
       lookupButton.textContent =
         "주문을 확인하고 있습니다...";
 
-      setTimeout(function () {
-        if (
-          customerId === "DP-TEST01" &&
-          lookupPin === "1234"
-        ) {
-          showOrder();
+      try {
+        const { data, error } =
+          await sb.rpc(
+            "lookup_orders_by_name",
+            {
+              p_customer_name: customerName
+            }
+          );
 
-          showMessage(
-            "주문정보를 정상적으로 불러왔습니다.",
-            "success"
-          );
-        } else {
-          showMessage(
-            "고객 아이디 또는 조회번호가 일치하지 않습니다.",
-            "error"
-          );
+        if (error) {
+          throw error;
         }
 
+        const orders =
+          Array.isArray(data) ? data : [];
+
+        if (orders.length === 0) {
+          showMessage(
+            "해당 이름으로 등록된 주문이 없습니다. 주문할 때 사용한 이름을 정확히 입력해주세요.",
+            "error"
+          );
+
+          return;
+        }
+
+        showMessage(
+          customerName +
+          " 고객님의 주문 " +
+          orders.length +
+          "건을 찾았습니다.",
+          "info"
+        );
+
+        results.innerHTML =
+          orders.map(renderOrder).join("");
+
+      } catch (error) {
+        console.error(error);
+
+        showMessage(
+          "주문을 불러오지 못했습니다. Supabase 연결정보와 데이터베이스 설정을 확인해주세요.",
+          "error"
+        );
+
+      } finally {
         lookupButton.disabled = false;
         lookupButton.textContent =
           "주문 조회하기";
-      }, 450);
+      }
+    }
+
+    function renderOrder(order) {
+      const items =
+        Array.isArray(order.items)
+          ? order.items
+          : [];
+
+      const totalAmount =
+        items.reduce(
+          function (sum, item) {
+            return (
+              sum +
+              Number(item.line_total || 0)
+            );
+          },
+          0
+        );
+
+      const itemHtml =
+        items.map(
+          function (item) {
+            return `
+              <div class="product-row">
+                <div>
+                  <p class="product-name">
+                    ${escapeHtml(item.product_name)}
+                  </p>
+
+                  <p class="product-meta">
+                    ${escapeHtml(String(item.quantity))}
+                    ${escapeHtml(item.unit_name || "개")}
+                    · 개당 ${formatPrice(item.unit_price)}
+                  </p>
+                </div>
+
+                <div class="product-price">
+                  ${formatPrice(item.line_total)}
+                </div>
+              </div>
+            `;
+          }
+        ).join("");
+
+      return `
+        <article class="order-card">
+
+          <div class="order-head">
+
+            <p class="customer-name">
+              ${escapeHtml(order.customer_name)}
+              고객님의 주문
+            </p>
+
+            <p class="order-number">
+              주문번호:
+              ${escapeHtml(order.order_number)}
+            </p>
+
+            <div class="badges">
+
+              <span class="badge order">
+                ${escapeHtml(order.order_status)}
+              </span>
+
+              <span class="badge payment">
+                ${escapeHtml(order.payment_status)}
+              </span>
+
+            </div>
+
+          </div>
+
+          <h3 class="section-title">
+            주문 상품
+          </h3>
+
+          <div class="product-list">
+            ${itemHtml}
+          </div>
+
+          <div class="total">
+            <span>총 주문금액</span>
+            <strong>${formatPrice(totalAmount)}</strong>
+          </div>
+
+          <h3 class="section-title">
+            픽업정보
+          </h3>
+
+          <div class="info-list">
+
+            <div class="info-row">
+              <span class="info-label">
+                주문일
+              </span>
+
+              <span class="info-value">
+                ${formatDate(order.order_date)}
+              </span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">
+                픽업 예정일
+              </span>
+
+              <span class="info-value">
+                ${formatDate(order.pickup_date)}
+              </span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">
+                픽업 장소
+              </span>
+
+              <span class="info-value">
+                ${escapeHtml(
+                  order.pickup_place ||
+                  "별도 안내"
+                )}
+              </span>
+            </div>
+
+          </div>
+
+          ${
+            order.notice
+              ? `
+                <h3 class="section-title">
+                  담픽 안내
+                </h3>
+
+                <div class="notice">
+                  ${escapeHtml(order.notice)}
+                </div>
+              `
+              : ""
+          }
+
+        </article>
+      `;
     }
 
     function showMessage(text, type) {
@@ -731,26 +665,40 @@
         "message " + type;
     }
 
-    function hideMessage() {
-      message.textContent = "";
-      message.className = "message";
+    function formatPrice(value) {
+      return (
+        Number(value || 0)
+          .toLocaleString("ko-KR") +
+        "원"
+      );
     }
 
-    function showOrder() {
-      orderResult.classList.add("show");
+    function formatDate(value) {
+      if (!value) {
+        return "미정";
+      }
 
-      setTimeout(function () {
-        orderResult.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      }, 100);
+      const parts =
+        String(value).split("-");
+
+      return (
+        parts[0] +
+        "년 " +
+        Number(parts[1]) +
+        "월 " +
+        Number(parts[2]) +
+        "일"
+      );
     }
 
-    function hideOrder() {
-      orderResult.classList.remove("show");
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
   </script>
-
 </body>
 </html>
