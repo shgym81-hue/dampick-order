@@ -336,6 +336,179 @@
       font-weight: 900;
     }
 
+    .order-card.completed {
+      border-color: #9bd6b7;
+      background: #f6fff9;
+    }
+
+    .order-status-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 5px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      color: #555;
+      background: #f1f1f1;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .order-status-badge.completed {
+      color: #176a3e;
+      background: #e4f7eb;
+    }
+
+    .order-item-edit-list {
+      display: grid;
+      gap: 7px;
+      margin: 12px 0;
+    }
+
+    .order-item-edit-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: start;
+      gap: 9px;
+      padding: 10px;
+      border: 1px solid #ededed;
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .order-item-edit-row input {
+      width: 19px;
+      height: 19px;
+      margin-top: 1px;
+    }
+
+    .order-action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .button.success {
+      background: var(--success);
+    }
+
+    .button.light {
+      color: #333;
+      background: #ececec;
+    }
+
+    .sales-tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .sales-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 14px;
+    }
+
+    .summary-box {
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .summary-box strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 18px;
+    }
+
+    .calendar-weekdays,
+    .sales-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .calendar-weekdays {
+      margin-top: 17px;
+      color: #777;
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .sales-calendar {
+      margin-top: 6px;
+    }
+
+    .calendar-empty,
+    .calendar-day {
+      min-height: 74px;
+      border-radius: 10px;
+    }
+
+    .calendar-day {
+      padding: 7px 5px;
+      border: 1px solid var(--border);
+      background: #fff;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .calendar-day.has-sales {
+      border-color: #ef9fba;
+      background: #fff5f8;
+    }
+
+    .calendar-day.selected {
+      border: 2px solid var(--main);
+    }
+
+    .calendar-date-number {
+      display: block;
+      font-weight: 900;
+    }
+
+    .calendar-sales-amount {
+      display: block;
+      margin-top: 7px;
+      color: var(--main-dark);
+      font-size: 11px;
+      font-weight: 900;
+      word-break: keep-all;
+    }
+
+    .daily-sales-detail {
+      margin-top: 15px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fafafa;
+    }
+
+    .daily-sales-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .daily-sales-row:last-child {
+      border-bottom: 0;
+    }
+
+    .excel-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
     @media (max-width: 720px) {
       .grid,
       .grid-3,
@@ -346,6 +519,21 @@
       .topbar {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .order-action-grid,
+      .sales-summary,
+      .sales-tools {
+        grid-template-columns: 1fr;
+      }
+
+      .calendar-empty,
+      .calendar-day {
+        min-height: 65px;
+      }
+
+      .calendar-sales-amount {
+        font-size: 10px;
       }
     }
   </style>
@@ -745,8 +933,8 @@
         <h2>4. 등록된 회원 주문</h2>
 
         <p class="section-description">
-          주문한 회원의 닉네임을 검색하거나 전체 주문 목록을
-          접었다 펼칠 수 있습니다.
+          주문한 회원을 검색하고, 선택한 상품만 취소하거나
+          픽업 완료·전체 삭제를 처리할 수 있습니다.
         </p>
 
         <div class="order-tools">
@@ -784,10 +972,101 @@
           class="list"
         ></div>
       </section>
+
+      <!-- 월별 매출 -->
+      <section class="card">
+        <h2>5. 월별 픽업 완료 매출</h2>
+
+        <p class="section-description">
+          픽업 완료 처리된 주문만 매출에 포함됩니다.
+          날짜를 누르면 그날 고객별 주문금액을 확인할 수 있습니다.
+        </p>
+
+        <div class="sales-tools">
+          <div>
+            <label for="salesMonth">
+              확인할 달
+            </label>
+
+            <input
+              id="salesMonth"
+              type="month"
+            >
+          </div>
+
+          <button
+            id="goCurrentMonthButton"
+            class="button secondary"
+            type="button"
+          >
+            이번 달 보기
+          </button>
+        </div>
+
+        <div class="sales-summary">
+          <div class="summary-box">
+            <span class="muted">월 매출</span>
+            <strong id="monthlySalesTotal">0원</strong>
+          </div>
+
+          <div class="summary-box">
+            <span class="muted">완료 고객</span>
+            <strong id="monthlyCustomerCount">0명</strong>
+          </div>
+
+          <div class="summary-box">
+            <span class="muted">완료 주문</span>
+            <strong id="monthlyOrderCount">0건</strong>
+          </div>
+        </div>
+
+        <div class="calendar-weekdays">
+          <div>일</div>
+          <div>월</div>
+          <div>화</div>
+          <div>수</div>
+          <div>목</div>
+          <div>금</div>
+          <div>토</div>
+        </div>
+
+        <div
+          id="salesCalendar"
+          class="sales-calendar"
+        ></div>
+
+        <div
+          id="dailySalesDetail"
+          class="daily-sales-detail"
+        >
+          <div class="muted">
+            달력에서 날짜를 누르면 해당 날짜의 매출이 표시됩니다.
+          </div>
+        </div>
+
+        <div class="excel-actions">
+          <button
+            id="downloadMonthlyExcelButton"
+            class="button"
+            type="button"
+          >
+            선택 월 매출 엑셀
+          </button>
+
+          <button
+            id="downloadAllExcelButton"
+            class="button secondary"
+            type="button"
+          >
+            전체 주문 엑셀
+          </button>
+        </div>
+      </section>
     </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="./config.js"></script>
 
   <script>
@@ -811,6 +1090,7 @@
     let orders = [];
     let memberListOpen = false;
     let orderListOpen = false;
+    let selectedSalesDate = "";
 
     document
       .getElementById("loginButton")
@@ -936,6 +1216,44 @@
 
           renderOrders();
         }
+      );
+
+    document
+      .getElementById("salesMonth")
+      .addEventListener(
+        "change",
+        function () {
+          selectedSalesDate = "";
+          renderSalesCalendar();
+        }
+      );
+
+    document
+      .getElementById("goCurrentMonthButton")
+      .addEventListener(
+        "click",
+        function () {
+          document
+            .getElementById("salesMonth")
+            .value = getCurrentMonthKey();
+
+          selectedSalesDate = "";
+          renderSalesCalendar();
+        }
+      );
+
+    document
+      .getElementById("downloadMonthlyExcelButton")
+      .addEventListener(
+        "click",
+        downloadMonthlySalesExcel
+      );
+
+    document
+      .getElementById("downloadAllExcelButton")
+      .addEventListener(
+        "click",
+        downloadAllOrdersExcel
       );
 
     start();
@@ -1071,6 +1389,7 @@
             payment_status,
             order_status,
             notice,
+            completed_at,
             created_at,
             customers(nickname),
             order_items(
@@ -1094,6 +1413,7 @@
 
       orders = data || [];
       renderOrders();
+      renderSalesCalendar();
     }
 
     async function addCustomer(event) {
@@ -1912,6 +2232,172 @@
       return nicknameSet.size;
     }
 
+    function calculateOrderTotal(order) {
+      return (order.order_items || [])
+        .reduce(
+          function (sum, item) {
+            return (
+              sum +
+              Number(item.line_total || 0)
+            );
+          },
+          0
+        );
+    }
+
+    function isPickupCompleted(order) {
+      return (
+        order.order_status === "픽업 완료" &&
+        Boolean(order.completed_at)
+      );
+    }
+
+    async function cancelSelectedOrderItems(
+      orderId,
+      orderNumber
+    ) {
+      const order =
+        orders.find(
+          function (row) {
+            return row.id === orderId;
+          }
+        );
+
+      if (!order) {
+        return;
+      }
+
+      if (isPickupCompleted(order)) {
+        alert(
+          "픽업 완료된 주문은 먼저 완료 취소를 해주세요."
+        );
+        return;
+      }
+
+      const checked =
+        Array.from(
+          document.querySelectorAll(
+            '[data-order-id="' +
+            orderId +
+            '"]:checked'
+          )
+        );
+
+      const itemIds =
+        checked.map(
+          function (checkbox) {
+            return checkbox.dataset.itemId;
+          }
+        );
+
+      if (!itemIds.length) {
+        alert(
+          "취소할 상품의 체크박스를 먼저 선택해주세요."
+        );
+        return;
+      }
+
+      const allItems =
+        order.order_items || [];
+
+      if (itemIds.length >= allItems.length) {
+        const deleteAll =
+          confirm(
+            "모든 상품을 선택했습니다. 주문 전체를 삭제할까요?"
+          );
+
+        if (!deleteAll) {
+          return;
+        }
+
+        await deleteOrder(
+          orderId,
+          orderNumber
+        );
+        return;
+      }
+
+      const accepted =
+        confirm(
+          "선택한 " +
+          itemIds.length +
+          "개 상품을 이 주문에서 취소할까요?"
+        );
+
+      if (!accepted) {
+        return;
+      }
+
+      const { error } =
+        await sb
+          .from("order_items")
+          .delete()
+          .in("id", itemIds);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(
+        appMessage,
+        "선택한 상품을 취소했습니다. 최종 결제금액이 다시 계산되었습니다.",
+        "success"
+      );
+
+      await loadOrders();
+    }
+
+    async function togglePickupComplete(
+      orderId,
+      completed
+    ) {
+      const accepted =
+        confirm(
+          completed
+            ? "픽업 완료 처리를 취소할까요? 이 주문은 매출에서 제외됩니다."
+            : "이 주문을 픽업 완료로 처리할까요? 완료 날짜의 매출에 포함됩니다."
+        );
+
+      if (!accepted) {
+        return;
+      }
+
+      const updateValues =
+        completed
+          ? {
+              order_status: "픽업 가능",
+              completed_at: null
+            }
+          : {
+              order_status: "픽업 완료",
+              payment_status: "입금 완료",
+              completed_at:
+                new Date().toISOString()
+            };
+
+      const { error } =
+        await sb
+          .from("orders")
+          .update(updateValues)
+          .eq("id", orderId);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(
+        appMessage,
+        completed
+          ? "픽업 완료를 취소했습니다."
+          : "픽업 완료 처리했습니다. 매출 달력에 반영되었습니다.",
+        "success"
+      );
+
+      await loadOrders();
+    }
+
     function renderOrders() {
       const target =
         document.getElementById(
@@ -2031,20 +2517,13 @@
               order.order_items || [];
 
             const total =
-              items.reduce(
-                function (sum, item) {
-                  return (
-                    sum +
-                    Number(
-                      item.line_total || 0
-                    )
-                  );
-                },
-                0
-              );
+              calculateOrderTotal(order);
+
+            const completed =
+              isPickupCompleted(order);
 
             return `
-              <article class="order-card">
+              <article class="order-card ${completed ? "completed" : ""}">
 
                 <div class="order-head">
 
@@ -2063,36 +2542,50 @@
                       ·
                       ${escapeHtml(order.payment_status)}
                     </div>
-                  </div>
 
-                  <button
-                    class="button danger small"
-                    type="button"
-                    onclick='deleteOrder(
-                      ${JSON.stringify(order.id)},
-                      ${JSON.stringify(order.order_number)}
-                    )'
-                  >
-                    주문 삭제
-                  </button>
+                    <span class="order-status-badge ${completed ? "completed" : ""}">
+                      ${completed
+                        ? "픽업 완료 · 매출 반영"
+                        : "진행 중 주문"}
+                    </span>
+                  </div>
 
                 </div>
 
-                <ul class="order-items">
+                <div class="muted">
+                  취소할 상품만 체크한 뒤
+                  ‘선택 상품 취소’를 누르세요.
+                </div>
+
+                <div class="order-item-edit-list">
                   ${items.map(
                     function (item) {
                       return `
-                        <li>
-                          ${escapeHtml(item.product_name)}
-                          ${item.quantity}
-                          ${escapeHtml(item.unit_name)}
-                          ·
-                          ${formatPrice(item.line_total)}
-                        </li>
+                        <label class="order-item-edit-row">
+                          <input
+                            type="checkbox"
+                            data-order-id="${escapeHtml(order.id)}"
+                            data-item-id="${escapeHtml(item.id)}"
+                            ${completed ? "disabled" : ""}
+                          >
+
+                          <span>
+                            <strong>
+                              ${escapeHtml(item.product_name)}
+                            </strong>
+                            <br>
+                            <span class="muted">
+                              ${item.quantity}
+                              ${escapeHtml(item.unit_name)}
+                              · 단가 ${formatPrice(item.unit_price)}
+                              · 합계 ${formatPrice(item.line_total)}
+                            </span>
+                          </span>
+                        </label>
                       `;
                     }
                   ).join("")}
-                </ul>
+                </div>
 
                 <div class="order-total">
                   최종 결제금액:
@@ -2103,16 +2596,601 @@
                   주문일
                   ${escapeHtml(order.order_date || "-")}
                   /
-                  픽업일
+                  픽업 예정일
                   ${escapeHtml(order.pickup_date || "미정")}
                   /
                   ${escapeHtml(order.pickup_place || "장소 미정")}
+                  ${completed
+                    ? (
+                        " / 완료일 " +
+                        escapeHtml(
+                          formatDateTime(order.completed_at)
+                        )
+                      )
+                    : ""}
+                </div>
+
+                <div class="order-action-grid">
+                  <button
+                    class="button light small"
+                    type="button"
+                    onclick='cancelSelectedOrderItems(
+                      ${JSON.stringify(order.id)},
+                      ${JSON.stringify(order.order_number)}
+                    )'
+                    ${completed ? "disabled" : ""}
+                  >
+                    선택 상품 취소
+                  </button>
+
+                  <button
+                    class="button ${completed ? "secondary" : "success"} small"
+                    type="button"
+                    onclick='togglePickupComplete(
+                      ${JSON.stringify(order.id)},
+                      ${completed}
+                    )'
+                  >
+                    ${completed
+                      ? "완료 취소"
+                      : "픽업 완료"}
+                  </button>
+
+                  <button
+                    class="button danger small"
+                    type="button"
+                    onclick='deleteOrder(
+                      ${JSON.stringify(order.id)},
+                      ${JSON.stringify(order.order_number)}
+                    )'
+                  >
+                    전체 주문 삭제
+                  </button>
                 </div>
 
               </article>
             `;
           }
         ).join("");
+    }
+
+    function getCurrentMonthKey() {
+      const now = new Date();
+
+      return (
+        now.getFullYear() +
+        "-" +
+        String(now.getMonth() + 1)
+          .padStart(2, "0")
+      );
+    }
+
+    function toLocalDateKey(value) {
+      if (!value) {
+        return "";
+      }
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "";
+      }
+
+      return (
+        date.getFullYear() +
+        "-" +
+        String(date.getMonth() + 1)
+          .padStart(2, "0") +
+        "-" +
+        String(date.getDate())
+          .padStart(2, "0")
+      );
+    }
+
+    function formatDateTime(value) {
+      if (!value) {
+        return "-";
+      }
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "-";
+      }
+
+      return date.toLocaleString(
+        "ko-KR",
+        {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        }
+      );
+    }
+
+    function getCompletedOrdersForMonth(monthKey) {
+      return orders.filter(
+        function (order) {
+          return (
+            isPickupCompleted(order) &&
+            toLocalDateKey(
+              order.completed_at
+            ).startsWith(monthKey)
+          );
+        }
+      );
+    }
+
+    function renderSalesCalendar() {
+      const monthInput =
+        document.getElementById(
+          "salesMonth"
+        );
+
+      if (!monthInput.value) {
+        monthInput.value =
+          getCurrentMonthKey();
+      }
+
+      const monthKey =
+        monthInput.value;
+
+      const monthOrders =
+        getCompletedOrdersForMonth(
+          monthKey
+        );
+
+      const totalSales =
+        monthOrders.reduce(
+          function (sum, order) {
+            return (
+              sum +
+              calculateOrderTotal(order)
+            );
+          },
+          0
+        );
+
+      document
+        .getElementById("monthlySalesTotal")
+        .textContent =
+          formatPrice(totalSales);
+
+      document
+        .getElementById("monthlyCustomerCount")
+        .textContent =
+          getUniqueOrderCustomerCount(
+            monthOrders
+          ) + "명";
+
+      document
+        .getElementById("monthlyOrderCount")
+        .textContent =
+          monthOrders.length + "건";
+
+      const dailyMap = {};
+
+      monthOrders.forEach(
+        function (order) {
+          const dateKey =
+            toLocalDateKey(
+              order.completed_at
+            );
+
+          if (!dailyMap[dateKey]) {
+            dailyMap[dateKey] = {
+              total: 0,
+              orders: []
+            };
+          }
+
+          dailyMap[dateKey].total +=
+            calculateOrderTotal(order);
+
+          dailyMap[dateKey].orders.push(
+            order
+          );
+        }
+      );
+
+      const parts =
+        monthKey.split("-");
+
+      const year = Number(parts[0]);
+      const monthIndex =
+        Number(parts[1]) - 1;
+
+      const firstDay =
+        new Date(year, monthIndex, 1);
+
+      const daysInMonth =
+        new Date(
+          year,
+          monthIndex + 1,
+          0
+        ).getDate();
+
+      const calendar =
+        document.getElementById(
+          "salesCalendar"
+        );
+
+      let html = "";
+
+      for (
+        let blank = 0;
+        blank < firstDay.getDay();
+        blank += 1
+      ) {
+        html +=
+          '<div class="calendar-empty"></div>';
+      }
+
+      for (
+        let day = 1;
+        day <= daysInMonth;
+        day += 1
+      ) {
+        const dateKey =
+          monthKey +
+          "-" +
+          String(day).padStart(2, "0");
+
+        const dayData =
+          dailyMap[dateKey];
+
+        html += `
+          <button
+            class="calendar-day ${dayData ? "has-sales" : ""} ${selectedSalesDate === dateKey ? "selected" : ""}"
+            type="button"
+            onclick='showDailySales(
+              ${JSON.stringify(dateKey)}
+            )'
+          >
+            <span class="calendar-date-number">
+              ${day}
+            </span>
+            ${dayData
+              ? (
+                  '<span class="calendar-sales-amount">' +
+                  formatPrice(dayData.total) +
+                  '<br>' +
+                  dayData.orders.length +
+                  '건</span>'
+                )
+              : ""}
+          </button>
+        `;
+      }
+
+      calendar.innerHTML = html;
+
+      if (
+        selectedSalesDate &&
+        selectedSalesDate.startsWith(
+          monthKey
+        )
+      ) {
+        renderDailySalesDetail(
+          selectedSalesDate
+        );
+      } else {
+        document
+          .getElementById(
+            "dailySalesDetail"
+          )
+          .innerHTML =
+            '<div class="muted">' +
+            '달력에서 날짜를 누르면 해당 날짜의 매출이 표시됩니다.' +
+            '</div>';
+      }
+    }
+
+    function showDailySales(dateKey) {
+      selectedSalesDate = dateKey;
+      renderSalesCalendar();
+    }
+
+    function renderDailySalesDetail(dateKey) {
+      const dayOrders =
+        orders.filter(
+          function (order) {
+            return (
+              isPickupCompleted(order) &&
+              toLocalDateKey(
+                order.completed_at
+              ) === dateKey
+            );
+          }
+        );
+
+      const target =
+        document.getElementById(
+          "dailySalesDetail"
+        );
+
+      if (!dayOrders.length) {
+        target.innerHTML =
+          '<strong>' +
+          escapeHtml(dateKey) +
+          '</strong>' +
+          '<div class="muted" style="margin-top:8px;">' +
+          '이 날짜에 완료된 매출이 없습니다.' +
+          '</div>';
+        return;
+      }
+
+      const total =
+        dayOrders.reduce(
+          function (sum, order) {
+            return (
+              sum +
+              calculateOrderTotal(order)
+            );
+          },
+          0
+        );
+
+      target.innerHTML =
+        '<strong>' +
+        escapeHtml(dateKey) +
+        ' 매출 · ' +
+        formatPrice(total) +
+        '</strong>' +
+        dayOrders.map(
+          function (order) {
+            return `
+              <div class="daily-sales-row">
+                <div>
+                  <strong>
+                    ${escapeHtml(
+                      order.customers?.nickname ||
+                      "회원 없음"
+                    )}
+                  </strong>
+                  <div class="muted">
+                    ${escapeHtml(order.order_number)}
+                  </div>
+                </div>
+                <strong>
+                  ${formatPrice(
+                    calculateOrderTotal(order)
+                  )}
+                </strong>
+              </div>
+            `;
+          }
+        ).join("");
+    }
+
+    function makeOrderExportRows(orderRows) {
+      const rows = [];
+
+      orderRows.forEach(
+        function (order) {
+          const items =
+            order.order_items || [];
+
+          const orderTotal =
+            calculateOrderTotal(order);
+
+          if (!items.length) {
+            rows.push({
+              "완료일": toLocalDateKey(order.completed_at),
+              "고객 닉네임": order.customers?.nickname || "",
+              "주문번호": order.order_number || "",
+              "상품명": "",
+              "수량": "",
+              "단위": "",
+              "단가": "",
+              "상품금액": "",
+              "최종 주문금액": orderTotal,
+              "주문일": order.order_date || "",
+              "픽업 예정일": order.pickup_date || "",
+              "결제상태": order.payment_status || "",
+              "주문상태": order.order_status || ""
+            });
+            return;
+          }
+
+          items.forEach(
+            function (item) {
+              rows.push({
+                "완료일": toLocalDateKey(order.completed_at),
+                "고객 닉네임": order.customers?.nickname || "",
+                "주문번호": order.order_number || "",
+                "상품명": item.product_name || "",
+                "수량": Number(item.quantity || 0),
+                "단위": item.unit_name || "",
+                "단가": Number(item.unit_price || 0),
+                "상품금액": Number(item.line_total || 0),
+                "최종 주문금액": orderTotal,
+                "주문일": order.order_date || "",
+                "픽업 예정일": order.pickup_date || "",
+                "결제상태": order.payment_status || "",
+                "주문상태": order.order_status || ""
+              });
+            }
+          );
+        }
+      );
+
+      return rows;
+    }
+
+    function makeDailySummaryRows(orderRows) {
+      const map = {};
+
+      orderRows.forEach(
+        function (order) {
+          const dateKey =
+            toLocalDateKey(
+              order.completed_at
+            ) || "미완료";
+
+          if (!map[dateKey]) {
+            map[dateKey] = {
+              date: dateKey,
+              total: 0,
+              orders: 0,
+              customers: new Set()
+            };
+          }
+
+          map[dateKey].total +=
+            calculateOrderTotal(order);
+          map[dateKey].orders += 1;
+          map[dateKey].customers.add(
+            order.customers?.nickname ||
+            "회원 없음"
+          );
+        }
+      );
+
+      return Object.values(map)
+        .sort(
+          function (a, b) {
+            return a.date.localeCompare(b.date);
+          }
+        )
+        .map(
+          function (row) {
+            return {
+              "날짜": row.date,
+              "고객 수": row.customers.size,
+              "주문 건수": row.orders,
+              "총 매출": row.total
+            };
+          }
+        );
+    }
+
+    function makeCustomerSummaryRows(orderRows) {
+      const map = {};
+
+      orderRows.forEach(
+        function (order) {
+          const nickname =
+            order.customers?.nickname ||
+            "회원 없음";
+
+          if (!map[nickname]) {
+            map[nickname] = {
+              nickname,
+              orders: 0,
+              total: 0
+            };
+          }
+
+          map[nickname].orders += 1;
+          map[nickname].total +=
+            calculateOrderTotal(order);
+        }
+      );
+
+      return Object.values(map)
+        .sort(
+          function (a, b) {
+            return b.total - a.total;
+          }
+        )
+        .map(
+          function (row) {
+            return {
+              "고객 닉네임": row.nickname,
+              "주문 건수": row.orders,
+              "최종 주문금액 합계": row.total
+            };
+          }
+        );
+    }
+
+    function downloadWorkbook(
+      orderRows,
+      fileName
+    ) {
+      if (!window.XLSX) {
+        alert(
+          "엑셀 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요."
+        );
+        return;
+      }
+
+      if (!orderRows.length) {
+        alert(
+          "다운로드할 주문 내역이 없습니다."
+        );
+        return;
+      }
+
+      const workbook =
+        XLSX.utils.book_new();
+
+      const detailSheet =
+        XLSX.utils.json_to_sheet(
+          makeOrderExportRows(orderRows)
+        );
+
+      const dailySheet =
+        XLSX.utils.json_to_sheet(
+          makeDailySummaryRows(orderRows)
+        );
+
+      const customerSheet =
+        XLSX.utils.json_to_sheet(
+          makeCustomerSummaryRows(orderRows)
+        );
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        detailSheet,
+        "주문 상세"
+      );
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        dailySheet,
+        "날짜별 합계"
+      );
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        customerSheet,
+        "고객별 합계"
+      );
+
+      XLSX.writeFile(
+        workbook,
+        fileName
+      );
+    }
+
+    function downloadMonthlySalesExcel() {
+      const monthKey =
+        document
+          .getElementById("salesMonth")
+          .value ||
+        getCurrentMonthKey();
+
+      downloadWorkbook(
+        getCompletedOrdersForMonth(
+          monthKey
+        ),
+        "담픽_" +
+        monthKey +
+        "_픽업완료매출.xlsx"
+      );
+    }
+
+    function downloadAllOrdersExcel() {
+      downloadWorkbook(
+        orders,
+        "담픽_전체주문_" +
+        toLocalDateKey(new Date()) +
+        ".xlsx"
+      );
     }
 
     function setToday() {
@@ -2126,6 +3204,19 @@
       document
         .getElementById("pickupPlace")
         .value = "담픽 매장";
+
+      const salesMonth =
+        document.getElementById(
+          "salesMonth"
+        );
+
+      if (
+        salesMonth &&
+        !salesMonth.value
+      ) {
+        salesMonth.value =
+          getCurrentMonthKey();
+      }
     }
 
     function makeOrderNumber() {
