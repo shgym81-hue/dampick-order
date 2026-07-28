@@ -214,24 +214,28 @@
       margin-top: 15px;
     }
 
-    .member-tools {
+    .member-tools,
+    .order-tools {
       display: grid;
       gap: 9px;
       margin-top: 15px;
     }
 
-    .member-tools .button {
+    .member-tools .button,
+    .order-tools .button {
       width: 100%;
     }
 
-    #customerList {
+    #customerList,
+    #orderList {
       display: none;
-      max-height: 430px;
+      max-height: 620px;
       overflow-y: auto;
       padding-right: 2px;
     }
 
-    #customerList.open {
+    #customerList.open,
+    #orderList.open {
       display: grid;
     }
 
@@ -740,6 +744,41 @@
       <section class="card">
         <h2>4. 등록된 회원 주문</h2>
 
+        <p class="section-description">
+          주문한 회원의 닉네임을 검색하거나 전체 주문 목록을
+          접었다 펼칠 수 있습니다.
+        </p>
+
+        <div class="order-tools">
+          <div>
+            <label for="orderListSearch">
+              주문 회원 검색
+            </label>
+
+            <input
+              id="orderListSearch"
+              type="search"
+              placeholder="주문한 회원 닉네임을 입력하세요"
+              autocomplete="off"
+            >
+          </div>
+
+          <button
+            id="orderListToggle"
+            class="button secondary"
+            type="button"
+          >
+            주문 목록 펼치기 ▼ (0명 / 0건)
+          </button>
+
+          <div
+            id="orderListInfo"
+            class="muted"
+          >
+            주문 목록은 처음에는 접혀 있습니다.
+          </div>
+        </div>
+
         <div
           id="orderList"
           class="list"
@@ -769,7 +808,9 @@
 
     let customers = [];
     let products = [];
+    let orders = [];
     let memberListOpen = false;
+    let orderListOpen = false;
 
     document
       .getElementById("loginButton")
@@ -864,6 +905,36 @@
                 selectedOption.textContent
                   .trim();
           }
+        }
+      );
+
+    document
+      .getElementById("orderListSearch")
+      .addEventListener(
+        "input",
+        function () {
+          if (
+            document
+              .getElementById("orderListSearch")
+              .value
+              .trim()
+          ) {
+            orderListOpen = true;
+          }
+
+          renderOrders();
+        }
+      );
+
+    document
+      .getElementById("orderListToggle")
+      .addEventListener(
+        "click",
+        function () {
+          orderListOpen =
+            !orderListOpen;
+
+          renderOrders();
         }
       );
 
@@ -1021,7 +1092,8 @@
         return;
       }
 
-      renderOrders(data || []);
+      orders = data || [];
+      renderOrders();
     }
 
     async function addCustomer(event) {
@@ -1823,11 +1895,116 @@
           formatPrice(total);
     }
 
-    function renderOrders(orders) {
+    function getUniqueOrderCustomerCount(orderRows) {
+      const nicknameSet =
+        new Set(
+          orderRows
+            .map(
+              function (order) {
+                return String(
+                  order.customers?.nickname || ""
+                ).trim();
+              }
+            )
+            .filter(Boolean)
+        );
+
+      return nicknameSet.size;
+    }
+
+    function renderOrders() {
       const target =
         document.getElementById(
           "orderList"
         );
+
+      const searchInput =
+        document.getElementById(
+          "orderListSearch"
+        );
+
+      const toggleButton =
+        document.getElementById(
+          "orderListToggle"
+        );
+
+      const info =
+        document.getElementById(
+          "orderListInfo"
+        );
+
+      const keyword =
+        searchInput.value
+          .trim()
+          .toLocaleLowerCase("ko-KR");
+
+      const filteredOrders =
+        orders.filter(
+          function (order) {
+            const nickname =
+              String(
+                order.customers?.nickname || ""
+              )
+                .toLocaleLowerCase(
+                  "ko-KR"
+                );
+
+            return (
+              !keyword ||
+              nickname.includes(keyword)
+            );
+          }
+        );
+
+      const totalCustomerCount =
+        getUniqueOrderCustomerCount(orders);
+
+      const filteredCustomerCount =
+        getUniqueOrderCustomerCount(
+          filteredOrders
+        );
+
+      target.classList.toggle(
+        "open",
+        orderListOpen
+      );
+
+      toggleButton.textContent =
+        orderListOpen
+          ? (
+              "주문 목록 접기 ▲ (" +
+              totalCustomerCount +
+              "명 / " +
+              orders.length +
+              "건)"
+            )
+          : (
+              "주문 목록 펼치기 ▼ (" +
+              totalCustomerCount +
+              "명 / " +
+              orders.length +
+              "건)"
+            );
+
+      if (keyword) {
+        info.textContent =
+          "검색 결과 " +
+          filteredCustomerCount +
+          "명 · " +
+          filteredOrders.length +
+          "건 / 전체 " +
+          totalCustomerCount +
+          "명 · " +
+          orders.length +
+          "건";
+      } else {
+        info.textContent =
+          "주문 회원 " +
+          totalCustomerCount +
+          "명 · 전체 주문 " +
+          orders.length +
+          "건";
+      }
 
       if (!orders.length) {
         target.innerHTML =
@@ -1838,8 +2015,17 @@
         return;
       }
 
+      if (!filteredOrders.length) {
+        target.innerHTML =
+          '<div class="muted">' +
+          '일치하는 주문 회원이 없습니다.' +
+          '</div>';
+
+        return;
+      }
+
       target.innerHTML =
-        orders.map(
+        filteredOrders.map(
           function (order) {
             const items =
               order.order_items || [];
