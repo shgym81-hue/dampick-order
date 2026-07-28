@@ -1704,5 +1704,411 @@
 
     setToday();
   </script>
+  <script>
+(function () {
+
+  /*
+    고객 닉네임 선택창 찾기
+  */
+  function findCustomerSelect() {
+    return Array.from(
+      document.querySelectorAll("select")
+    ).find(function (select) {
+
+      return Array.from(select.options).some(
+        function (option) {
+          return option.textContent
+            .trim()
+            .includes("닉네임을 선택하세요");
+        }
+      );
+
+    });
+  }
+
+  /*
+    고객 닉네임 검색창 만들기
+  */
+  function setupCustomerNicknameSearch() {
+
+    const customerSelect =
+      findCustomerSelect();
+
+    if (
+      !customerSelect ||
+      document.getElementById(
+        "customerNicknameSearch"
+      )
+    ) {
+      return;
+    }
+
+    const searchInput =
+      document.createElement("input");
+
+    searchInput.type = "search";
+    searchInput.id =
+      "customerNicknameSearch";
+
+    searchInput.placeholder =
+      "고객 닉네임을 입력하세요";
+
+    searchInput.autocomplete = "off";
+    searchInput.style.marginBottom = "8px";
+
+    const resultBox =
+      document.createElement("div");
+
+    resultBox.id =
+      "customerNicknameResults";
+
+    Object.assign(
+      resultBox.style,
+      {
+        display: "none",
+        maxHeight: "220px",
+        overflowY: "auto",
+        marginBottom: "8px",
+        border: "1px solid #f0b6ca",
+        borderRadius: "12px",
+        background: "#ffffff"
+      }
+    );
+
+    customerSelect.parentNode.insertBefore(
+      searchInput,
+      customerSelect
+    );
+
+    customerSelect.parentNode.insertBefore(
+      resultBox,
+      customerSelect
+    );
+
+    let customers = [];
+
+    /*
+      현재 고객목록 저장
+    */
+    function syncCustomers() {
+
+      customers = Array.from(
+        customerSelect.options
+      )
+        .filter(function (option) {
+          return option.value;
+        })
+        .map(function (option) {
+          return {
+            id: option.value,
+            nickname:
+              option.textContent.trim()
+          };
+        });
+
+    }
+
+    syncCustomers();
+
+    /*
+      새로운 고객이 등록되었을 때
+      검색목록에도 자동 반영
+    */
+    const customerObserver =
+      new MutationObserver(function () {
+        syncCustomers();
+      });
+
+    customerObserver.observe(
+      customerSelect,
+      {
+        childList: true
+      }
+    );
+
+    /*
+      검색결과 표시
+    */
+    function renderSearchResults() {
+
+      const keyword =
+        searchInput.value
+          .trim()
+          .toLocaleLowerCase("ko-KR");
+
+      resultBox.replaceChildren();
+
+      /*
+        다른 고객을 검색하면
+        기존 선택값 해제
+      */
+      customerSelect.value = "";
+
+      if (!keyword) {
+        resultBox.style.display = "none";
+        return;
+      }
+
+      const matches =
+        customers
+          .filter(function (customer) {
+
+            return customer.nickname
+              .toLocaleLowerCase("ko-KR")
+              .includes(keyword);
+
+          })
+          .slice(0, 30);
+
+      resultBox.style.display = "block";
+
+      if (matches.length === 0) {
+
+        const emptyMessage =
+          document.createElement("div");
+
+        emptyMessage.textContent =
+          "일치하는 고객이 없습니다.";
+
+        emptyMessage.style.padding = "13px";
+        emptyMessage.style.color = "#888888";
+
+        resultBox.appendChild(
+          emptyMessage
+        );
+
+        return;
+      }
+
+      matches.forEach(function (customer) {
+
+        const button =
+          document.createElement("button");
+
+        button.type = "button";
+        button.textContent =
+          customer.nickname;
+
+        Object.assign(
+          button.style,
+          {
+            display: "block",
+            width: "100%",
+            padding: "13px",
+            border: "0",
+            borderBottom:
+              "1px solid #eeeeee",
+            background: "#ffffff",
+            textAlign: "left",
+            fontSize: "15px",
+            cursor: "pointer"
+          }
+        );
+
+        button.addEventListener(
+          "click",
+          function () {
+
+            customerSelect.value =
+              customer.id;
+
+            customerSelect.dispatchEvent(
+              new Event(
+                "change",
+                {
+                  bubbles: true
+                }
+              )
+            );
+
+            searchInput.value =
+              customer.nickname;
+
+            resultBox.style.display =
+              "none";
+
+          }
+        );
+
+        resultBox.appendChild(button);
+
+      });
+
+    }
+
+    searchInput.addEventListener(
+      "input",
+      renderSearchResults
+    );
+
+    searchInput.addEventListener(
+      "focus",
+      renderSearchResults
+    );
+
+    /*
+      기존 고객 선택창을 직접 선택했을 때도
+      검색창에 닉네임 표시
+    */
+    customerSelect.addEventListener(
+      "change",
+      function () {
+
+        const selectedOption =
+          customerSelect.options[
+            customerSelect.selectedIndex
+          ];
+
+        if (
+          selectedOption &&
+          selectedOption.value
+        ) {
+          searchInput.value =
+            selectedOption.textContent.trim();
+        }
+
+      }
+    );
+
+    /*
+      검색창 바깥을 누르면 결과창 닫기
+    */
+    document.addEventListener(
+      "click",
+      function (event) {
+
+        if (
+          event.target !== searchInput &&
+          !resultBox.contains(event.target)
+        ) {
+          resultBox.style.display = "none";
+        }
+
+      }
+    );
+
+  }
+
+  /*
+    픽업 장소를 담픽 매장으로 고정
+  */
+  function setupFixedPickupPlace() {
+
+    const pickupLabel =
+      Array.from(
+        document.querySelectorAll("label")
+      ).find(function (label) {
+
+        return label.textContent
+          .trim()
+          .includes("픽업 장소");
+
+      });
+
+    let pickupInput = null;
+
+    if (
+      pickupLabel &&
+      pickupLabel.htmlFor
+    ) {
+      pickupInput =
+        document.getElementById(
+          pickupLabel.htmlFor
+        );
+    }
+
+    if (!pickupInput) {
+
+      pickupInput =
+        Array.from(
+          document.querySelectorAll("input")
+        ).find(function (input) {
+
+          return (
+            input.placeholder &&
+            input.placeholder.includes(
+              "관리동 앞"
+            )
+          );
+
+        });
+
+    }
+
+    if (!pickupInput) {
+      return;
+    }
+
+    pickupInput.value =
+      "담픽 매장";
+
+    pickupInput.defaultValue =
+      "담픽 매장";
+
+    pickupInput.readOnly = true;
+
+    pickupInput.setAttribute(
+      "aria-readonly",
+      "true"
+    );
+
+    pickupInput.placeholder = "";
+
+  }
+
+  function initializeDampickAdmin() {
+    setupCustomerNicknameSearch();
+    setupFixedPickupPlace();
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeDampickAdmin
+    );
+
+  } else {
+
+    initializeDampickAdmin();
+
+  }
+
+  /*
+    로그인 후 관리자 화면이 늦게 나타나는 경우에도
+    자동으로 기능 적용
+  */
+  const pageObserver =
+    new MutationObserver(function () {
+      initializeDampickAdmin();
+    });
+
+  pageObserver.observe(
+    document.body,
+    {
+      childList: true,
+      subtree: true
+    }
+  );
+
+  /*
+    주문 저장 후 화면이 초기화되어도
+    픽업 장소를 다시 담픽 매장으로 설정
+  */
+  document.addEventListener(
+    "reset",
+    function () {
+      setTimeout(
+        setupFixedPickupPlace,
+        0
+      );
+    },
+    true
+  );
+
+})();
+</script>
 </body>
 </html>
