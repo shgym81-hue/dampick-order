@@ -214,6 +214,32 @@
       margin-top: 15px;
     }
 
+    .member-tools {
+      display: grid;
+      gap: 9px;
+      margin-top: 15px;
+    }
+
+    .member-tools .button {
+      width: 100%;
+    }
+
+    #customerList {
+      display: none;
+      max-height: 430px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    #customerList.open {
+      display: grid;
+    }
+
+    .search-info {
+      min-height: 18px;
+      margin-top: 6px;
+    }
+
     .list-row {
       display: flex;
       justify-content: space-between;
@@ -462,6 +488,36 @@
           </div>
         </form>
 
+        <div class="member-tools">
+          <div>
+            <label for="customerSearch">
+              등록 회원 검색
+            </label>
+
+            <input
+              id="customerSearch"
+              type="search"
+              placeholder="회원 닉네임을 입력하세요"
+              autocomplete="off"
+            >
+          </div>
+
+          <button
+            id="customerListToggle"
+            class="button secondary"
+            type="button"
+          >
+            회원 목록 펼치기 ▼ (0명)
+          </button>
+
+          <div
+            id="customerListInfo"
+            class="muted"
+          >
+            회원 목록은 처음에는 접혀 있습니다.
+          </div>
+        </div>
+
         <div
           id="customerList"
           class="list"
@@ -556,6 +612,20 @@
                 고객 닉네임
               </label>
 
+              <input
+                id="orderCustomerSearch"
+                type="search"
+                placeholder="닉네임을 검색하세요"
+                autocomplete="off"
+              >
+
+              <div
+                id="orderCustomerSearchInfo"
+                class="muted search-info"
+              >
+                닉네임 일부를 입력하면 아래 목록이 줄어듭니다.
+              </div>
+
               <select
                 id="orderCustomer"
                 required
@@ -597,7 +667,9 @@
               <input
                 id="pickupPlace"
                 type="text"
-                placeholder="예: 관리동 앞"
+                value="담픽 매장"
+                readonly
+                aria-readonly="true"
               >
             </div>
 
@@ -697,6 +769,7 @@
 
     let customers = [];
     let products = [];
+    let memberListOpen = false;
 
     document
       .getElementById("loginButton")
@@ -725,6 +798,73 @@
       .addEventListener(
         "submit",
         addOrder
+      );
+
+    document
+      .getElementById("customerSearch")
+      .addEventListener(
+        "input",
+        function () {
+          if (
+            document
+              .getElementById("customerSearch")
+              .value
+              .trim()
+          ) {
+            memberListOpen = true;
+          }
+
+          renderCustomers();
+        }
+      );
+
+    document
+      .getElementById("customerListToggle")
+      .addEventListener(
+        "click",
+        function () {
+          memberListOpen =
+            !memberListOpen;
+
+          renderCustomers();
+        }
+      );
+
+    document
+      .getElementById("orderCustomerSearch")
+      .addEventListener(
+        "input",
+        renderCustomerSelect
+      );
+
+    document
+      .getElementById("orderCustomer")
+      .addEventListener(
+        "change",
+        function () {
+          const select =
+            document.getElementById(
+              "orderCustomer"
+            );
+
+          const selectedOption =
+            select.options[
+              select.selectedIndex
+            ];
+
+          if (
+            selectedOption &&
+            selectedOption.value
+          ) {
+            document
+              .getElementById(
+                "orderCustomerSearch"
+              )
+              .value =
+                selectedOption.textContent
+                  .trim();
+          }
+        }
       );
 
     start();
@@ -929,6 +1069,12 @@
         " 회원을 등록했습니다.",
         "success"
       );
+
+      memberListOpen = true;
+
+      document
+        .getElementById("customerSearch")
+        .value = nickname;
 
       await loadCustomers();
     }
@@ -1149,7 +1295,19 @@
       }
 
       event.target.reset();
+
+      document
+        .getElementById("pickupPlace")
+        .value = "담픽 매장";
+
+      document
+        .getElementById(
+          "orderCustomerSearch"
+        )
+        .value = "";
+
       setToday();
+      renderCustomerSelect();
       renderProductChecks();
       updateTotalPreview();
 
@@ -1256,6 +1414,85 @@
           "customerList"
         );
 
+      const searchInput =
+        document.getElementById(
+          "customerSearch"
+        );
+
+      const toggleButton =
+        document.getElementById(
+          "customerListToggle"
+        );
+
+      const info =
+        document.getElementById(
+          "customerListInfo"
+        );
+
+      const keyword =
+        searchInput.value
+          .trim()
+          .toLocaleLowerCase("ko-KR");
+
+      const filteredCustomers =
+        customers.filter(
+          function (customer) {
+            const nickname =
+              String(
+                customer.nickname || ""
+              )
+                .toLocaleLowerCase(
+                  "ko-KR"
+                );
+
+            const memo =
+              String(
+                customer.memo || ""
+              )
+                .toLocaleLowerCase(
+                  "ko-KR"
+                );
+
+            return (
+              !keyword ||
+              nickname.includes(keyword) ||
+              memo.includes(keyword)
+            );
+          }
+        );
+
+      target.classList.toggle(
+        "open",
+        memberListOpen
+      );
+
+      toggleButton.textContent =
+        memberListOpen
+          ? (
+              "회원 목록 접기 ▲ (" +
+              customers.length +
+              "명)"
+            )
+          : (
+              "회원 목록 펼치기 ▼ (" +
+              customers.length +
+              "명)"
+            );
+
+      if (keyword) {
+        info.textContent =
+          "검색 결과 " +
+          filteredCustomers.length +
+          "명 / 전체 " +
+          customers.length +
+          "명";
+      } else {
+        info.textContent =
+          "전체 등록 회원 " +
+          customers.length +
+          "명";
+      }
+
       if (!customers.length) {
         target.innerHTML =
           '<div class="muted">' +
@@ -1265,8 +1502,17 @@
         return;
       }
 
+      if (!filteredCustomers.length) {
+        target.innerHTML =
+          '<div class="muted">' +
+          '일치하는 회원이 없습니다.' +
+          '</div>';
+
+        return;
+      }
+
       target.innerHTML =
-        customers.map(
+        filteredCustomers.map(
           function (customer) {
             return `
               <div class="list-row">
@@ -1307,11 +1553,42 @@
           "orderCustomer"
         );
 
+      const searchInput =
+        document.getElementById(
+          "orderCustomerSearch"
+        );
+
+      const info =
+        document.getElementById(
+          "orderCustomerSearchInfo"
+        );
+
+      const previousValue =
+        target.value;
+
+      const keyword =
+        searchInput.value
+          .trim()
+          .toLocaleLowerCase("ko-KR");
+
+      const matchedCustomers =
+        customers.filter(
+          function (customer) {
+            return String(
+              customer.nickname || ""
+            )
+              .toLocaleLowerCase(
+                "ko-KR"
+              )
+              .includes(keyword);
+          }
+        );
+
       target.innerHTML =
         '<option value="">' +
         '닉네임을 선택하세요' +
         '</option>' +
-        customers.map(
+        matchedCustomers.map(
           function (customer) {
             return `
               <option value="${customer.id}">
@@ -1320,6 +1597,44 @@
             `;
           }
         ).join("");
+
+      const previousStillExists =
+        matchedCustomers.some(
+          function (customer) {
+            return (
+              String(customer.id) ===
+              String(previousValue)
+            );
+          }
+        );
+
+      if (previousStillExists) {
+        target.value =
+          previousValue;
+      } else if (
+        keyword &&
+        matchedCustomers.length === 1
+      ) {
+        target.value =
+          matchedCustomers[0].id;
+      }
+
+      if (!keyword) {
+        info.textContent =
+          "전체 회원 " +
+          customers.length +
+          "명";
+      } else if (
+        matchedCustomers.length
+      ) {
+        info.textContent =
+          "검색 결과 " +
+          matchedCustomers.length +
+          "명";
+      } else {
+        info.textContent =
+          "일치하는 회원이 없습니다.";
+      }
     }
 
     function renderProducts() {
@@ -1621,6 +1936,10 @@
           new Date()
             .toISOString()
             .slice(0, 10);
+
+      document
+        .getElementById("pickupPlace")
+        .value = "담픽 매장";
     }
 
     function makeOrderNumber() {
@@ -1704,915 +2023,5 @@
 
     setToday();
   </script>
-  <script>
-(function () {
-
-  /*
-    고객 닉네임 선택창 찾기
-  */
-  function findCustomerSelect() {
-    return Array.from(
-      document.querySelectorAll("select")
-    ).find(function (select) {
-
-      return Array.from(select.options).some(
-        function (option) {
-          return option.textContent
-            .trim()
-            .includes("닉네임을 선택하세요");
-        }
-      );
-
-    });
-  }
-
-  /*
-    고객 닉네임 검색창 만들기
-  */
-  function setupCustomerNicknameSearch() {
-
-    const customerSelect =
-      findCustomerSelect();
-
-    if (
-      !customerSelect ||
-      document.getElementById(
-        "customerNicknameSearch"
-      )
-    ) {
-      return;
-    }
-
-    const searchInput =
-      document.createElement("input");
-
-    searchInput.type = "search";
-    searchInput.id =
-      "customerNicknameSearch";
-
-    searchInput.placeholder =
-      "고객 닉네임을 입력하세요";
-
-    searchInput.autocomplete = "off";
-    searchInput.style.marginBottom = "8px";
-
-    const resultBox =
-      document.createElement("div");
-
-    resultBox.id =
-      "customerNicknameResults";
-
-    Object.assign(
-      resultBox.style,
-      {
-        display: "none",
-        maxHeight: "220px",
-        overflowY: "auto",
-        marginBottom: "8px",
-        border: "1px solid #f0b6ca",
-        borderRadius: "12px",
-        background: "#ffffff"
-      }
-    );
-
-    customerSelect.parentNode.insertBefore(
-      searchInput,
-      customerSelect
-    );
-
-    customerSelect.parentNode.insertBefore(
-      resultBox,
-      customerSelect
-    );
-
-    let customers = [];
-
-    /*
-      현재 고객목록 저장
-    */
-    function syncCustomers() {
-
-      customers = Array.from(
-        customerSelect.options
-      )
-        .filter(function (option) {
-          return option.value;
-        })
-        .map(function (option) {
-          return {
-            id: option.value,
-            nickname:
-              option.textContent.trim()
-          };
-        });
-
-    }
-
-    syncCustomers();
-
-    /*
-      새로운 고객이 등록되었을 때
-      검색목록에도 자동 반영
-    */
-    const customerObserver =
-      new MutationObserver(function () {
-        syncCustomers();
-      });
-
-    customerObserver.observe(
-      customerSelect,
-      {
-        childList: true
-      }
-    );
-
-    /*
-      검색결과 표시
-    */
-    function renderSearchResults() {
-
-      const keyword =
-        searchInput.value
-          .trim()
-          .toLocaleLowerCase("ko-KR");
-
-      resultBox.replaceChildren();
-
-      /*
-        다른 고객을 검색하면
-        기존 선택값 해제
-      */
-      customerSelect.value = "";
-
-      if (!keyword) {
-        resultBox.style.display = "none";
-        return;
-      }
-
-      const matches =
-        customers
-          .filter(function (customer) {
-
-            return customer.nickname
-              .toLocaleLowerCase("ko-KR")
-              .includes(keyword);
-
-          })
-          .slice(0, 30);
-
-      resultBox.style.display = "block";
-
-      if (matches.length === 0) {
-
-        const emptyMessage =
-          document.createElement("div");
-
-        emptyMessage.textContent =
-          "일치하는 고객이 없습니다.";
-
-        emptyMessage.style.padding = "13px";
-        emptyMessage.style.color = "#888888";
-
-        resultBox.appendChild(
-          emptyMessage
-        );
-
-        return;
-      }
-
-      matches.forEach(function (customer) {
-
-        const button =
-          document.createElement("button");
-
-        button.type = "button";
-        button.textContent =
-          customer.nickname;
-
-        Object.assign(
-          button.style,
-          {
-            display: "block",
-            width: "100%",
-            padding: "13px",
-            border: "0",
-            borderBottom:
-              "1px solid #eeeeee",
-            background: "#ffffff",
-            textAlign: "left",
-            fontSize: "15px",
-            cursor: "pointer"
-          }
-        );
-
-        button.addEventListener(
-          "click",
-          function () {
-
-            customerSelect.value =
-              customer.id;
-
-            customerSelect.dispatchEvent(
-              new Event(
-                "change",
-                {
-                  bubbles: true
-                }
-              )
-            );
-
-            searchInput.value =
-              customer.nickname;
-
-            resultBox.style.display =
-              "none";
-
-          }
-        );
-
-        resultBox.appendChild(button);
-
-      });
-
-    }
-
-    searchInput.addEventListener(
-      "input",
-      renderSearchResults
-    );
-
-    searchInput.addEventListener(
-      "focus",
-      renderSearchResults
-    );
-
-    /*
-      기존 고객 선택창을 직접 선택했을 때도
-      검색창에 닉네임 표시
-    */
-    customerSelect.addEventListener(
-      "change",
-      function () {
-
-        const selectedOption =
-          customerSelect.options[
-            customerSelect.selectedIndex
-          ];
-
-        if (
-          selectedOption &&
-          selectedOption.value
-        ) {
-          searchInput.value =
-            selectedOption.textContent.trim();
-        }
-
-      }
-    );
-
-    /*
-      검색창 바깥을 누르면 결과창 닫기
-    */
-    document.addEventListener(
-      "click",
-      function (event) {
-
-        if (
-          event.target !== searchInput &&
-          !resultBox.contains(event.target)
-        ) {
-          resultBox.style.display = "none";
-        }
-
-      }
-    );
-
-  }
-
-  /*
-    픽업 장소를 담픽 매장으로 고정
-  */
-  function setupFixedPickupPlace() {
-
-    const pickupLabel =
-      Array.from(
-        document.querySelectorAll("label")
-      ).find(function (label) {
-
-        return label.textContent
-          .trim()
-          .includes("픽업 장소");
-
-      });
-
-    let pickupInput = null;
-
-    if (
-      pickupLabel &&
-      pickupLabel.htmlFor
-    ) {
-      pickupInput =
-        document.getElementById(
-          pickupLabel.htmlFor
-        );
-    }
-
-    if (!pickupInput) {
-
-      pickupInput =
-        Array.from(
-          document.querySelectorAll("input")
-        ).find(function (input) {
-
-          return (
-            input.placeholder &&
-            input.placeholder.includes(
-              "관리동 앞"
-            )
-          );
-
-        });
-
-    }
-
-    if (!pickupInput) {
-      return;
-    }
-
-    pickupInput.value =
-      "담픽 매장";
-
-    pickupInput.defaultValue =
-      "담픽 매장";
-
-    pickupInput.readOnly = true;
-
-    pickupInput.setAttribute(
-      "aria-readonly",
-      "true"
-    );
-
-    pickupInput.placeholder = "";
-
-  }
-
-  function initializeDampickAdmin() {
-    setupCustomerNicknameSearch();
-    setupFixedPickupPlace();
-  }
-
-  if (
-    document.readyState === "loading"
-  ) {
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      initializeDampickAdmin
-    );
-
-  } else {
-
-    initializeDampickAdmin();
-
-  }
-
-  /*
-    로그인 후 관리자 화면이 늦게 나타나는 경우에도
-    자동으로 기능 적용
-  */
-  const pageObserver =
-    new MutationObserver(function () {
-      initializeDampickAdmin();
-    });
-
-  pageObserver.observe(
-    document.body,
-    {
-      childList: true,
-      subtree: true
-    }
-  );
-
-  /*
-    주문 저장 후 화면이 초기화되어도
-    픽업 장소를 다시 담픽 매장으로 설정
-  */
-  document.addEventListener(
-    "reset",
-    function () {
-      setTimeout(
-        setupFixedPickupPlace,
-        0
-      );
-    },
-    true
-  );
-
-})();
-</script>
-  <style>
-  /* 회원 검색 및 접기·펼치기 영역 */
-  #dampickMemberControls {
-    margin-top: 14px;
-    margin-bottom: 12px;
-  }
-
-  #dampickMemberSearch {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 13px 14px;
-    margin-bottom: 9px;
-    border: 1px solid #e3a8ba;
-    border-radius: 10px;
-    background: #ffffff;
-    font-size: 15px;
-    outline: none;
-  }
-
-  #dampickMemberSearch:focus {
-    border-color: #df4d7a;
-    box-shadow: 0 0 0 2px rgba(223, 77, 122, 0.12);
-  }
-
-  #dampickMemberToggle {
-    width: 100%;
-    padding: 12px 14px;
-    border: none;
-    border-radius: 10px;
-    background: #df4d7a;
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  #dampickMemberToggle:active {
-    transform: scale(0.99);
-  }
-
-  #dampickMemberResultInfo {
-    margin-top: 8px;
-    color: #777777;
-    font-size: 13px;
-  }
-
-  #dampickMemberListBox {
-    display: none;
-    margin-top: 10px;
-  }
-
-  #dampickMemberEmpty {
-    display: none;
-    padding: 20px 12px;
-    border: 1px solid #eeeeee;
-    border-radius: 10px;
-    background: #fafafa;
-    color: #777777;
-    text-align: center;
-    font-size: 14px;
-  }
-</style>
-
-<script>
-(function () {
-  let memberSection = null;
-  let memberListBox = null;
-  let searchInput = null;
-  let toggleButton = null;
-  let resultInfo = null;
-  let emptyMessage = null;
-  let isMemberListOpen = false;
-
-  /*
-   * 글자의 앞뒤 공백을 없애서 비교합니다.
-   */
-  function cleanText(value) {
-    return String(value || "")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
-
-  /*
-   * 화면에서 '회원 닉네임 관리' 제목을 찾습니다.
-   */
-  function findMemberHeading() {
-    const elements = Array.from(
-      document.querySelectorAll("h1, h2, h3, h4, strong, div")
-    );
-
-    return elements.find(function (element) {
-      const text = cleanText(element.textContent);
-
-      return (
-        text === "1. 회원 닉네임 관리" ||
-        text === "회원 닉네임 관리"
-      );
-    });
-  }
-
-  /*
-   * '회원 닉네임 등록' 버튼을 찾습니다.
-   */
-  function findRegisterButton() {
-    return Array.from(
-      document.querySelectorAll("button")
-    ).find(function (button) {
-      return cleanText(button.textContent)
-        .includes("회원 닉네임 등록");
-    });
-  }
-
-  /*
-   * 제목과 회원 등록 버튼이 함께 들어 있는 영역을 찾습니다.
-   */
-  function findMemberSection() {
-    const heading = findMemberHeading();
-    const registerButton = findRegisterButton();
-
-    if (!heading || !registerButton) {
-      return null;
-    }
-
-    let current = registerButton.parentElement;
-
-    while (current && current !== document.body) {
-      if (current.contains(heading)) {
-        return current;
-      }
-
-      current = current.parentElement;
-    }
-
-    return heading.parentElement;
-  }
-
-  /*
-   * 삭제 버튼이 들어 있는 회원 카드 한 개를 찾습니다.
-   */
-  function findMemberCard(deleteButton) {
-    let card = deleteButton.parentElement;
-
-    if (!card) {
-      return null;
-    }
-
-    /*
-     * 삭제 버튼 바로 위가 너무 작은 영역이면
-     * 한 단계 위의 카드 영역을 사용합니다.
-     */
-    if (
-      cleanText(card.textContent) ===
-      cleanText(deleteButton.textContent)
-    ) {
-      card = card.parentElement;
-    }
-
-    return card;
-  }
-
-  /*
-   * 기존 회원 카드와 새로 등록된 회원 카드를
-   * 접기·펼치기 목록 안으로 옮깁니다.
-   */
-  function collectMemberCards() {
-    if (!memberSection || !memberListBox) {
-      return;
-    }
-
-    const deleteButtons = Array.from(
-      memberSection.querySelectorAll("button")
-    ).filter(function (button) {
-      return cleanText(button.textContent) === "삭제";
-    });
-
-    deleteButtons.forEach(function (deleteButton) {
-      const card = findMemberCard(deleteButton);
-
-      if (!card) {
-        return;
-      }
-
-      if (card.closest("#dampickMemberListBox")) {
-        return;
-      }
-
-      if (card.id === "dampickMemberControls") {
-        return;
-      }
-
-      card.setAttribute(
-        "data-dampick-member-card",
-        "true"
-      );
-
-      memberListBox.appendChild(card);
-    });
-
-    updateMemberView();
-  }
-
-  /*
-   * 회원 카드에서 검색에 사용할 글자를 가져옵니다.
-   * 닉네임과 관리자 메모가 함께 검색됩니다.
-   */
-  function getMemberSearchText(card) {
-    return cleanText(card.textContent)
-      .replace(/삭제/g, "")
-      .toLocaleLowerCase("ko-KR");
-  }
-
-  /*
-   * 현재 회원 수를 가져옵니다.
-   */
-  function getAllMemberCards() {
-    if (!memberListBox) {
-      return [];
-    }
-
-    return Array.from(
-      memberListBox.querySelectorAll(
-        '[data-dampick-member-card="true"]'
-      )
-    );
-  }
-
-  /*
-   * 펼치기 버튼 글자를 변경합니다.
-   */
-  function updateToggleButton(totalCount) {
-    if (!toggleButton) {
-      return;
-    }
-
-    if (isMemberListOpen) {
-      toggleButton.textContent =
-        "회원 목록 접기 ▲ (" +
-        totalCount +
-        "명)";
-    } else {
-      toggleButton.textContent =
-        "회원 목록 펼치기 ▼ (" +
-        totalCount +
-        "명)";
-    }
-  }
-
-  /*
-   * 검색어에 맞춰 회원 목록을 표시합니다.
-   */
-  function updateMemberView() {
-    if (
-      !memberListBox ||
-      !searchInput ||
-      !resultInfo ||
-      !emptyMessage
-    ) {
-      return;
-    }
-
-    const cards = getAllMemberCards();
-    const keyword = searchInput.value
-      .trim()
-      .toLocaleLowerCase("ko-KR");
-
-    let visibleCount = 0;
-
-    cards.forEach(function (card) {
-      const memberText =
-        getMemberSearchText(card);
-
-      const matched =
-        !keyword ||
-        memberText.includes(keyword);
-
-      card.style.display =
-        matched ? "" : "none";
-
-      if (matched) {
-        visibleCount += 1;
-      }
-    });
-
-    /*
-     * 검색어를 입력하면 회원 목록을 자동으로 펼칩니다.
-     */
-    if (keyword) {
-      isMemberListOpen = true;
-    }
-
-    memberListBox.style.display =
-      isMemberListOpen ? "block" : "none";
-
-    emptyMessage.style.display =
-      isMemberListOpen &&
-      visibleCount === 0
-        ? "block"
-        : "none";
-
-    if (keyword) {
-      resultInfo.textContent =
-        "검색 결과: " +
-        visibleCount +
-        "명 / 전체 " +
-        cards.length +
-        "명";
-    } else {
-      resultInfo.textContent =
-        "전체 등록 회원: " +
-        cards.length +
-        "명";
-    }
-
-    updateToggleButton(cards.length);
-  }
-
-  /*
-   * 검색창과 펼치기 버튼을 만듭니다.
-   */
-  function createMemberControls() {
-    if (
-      document.getElementById(
-        "dampickMemberControls"
-      )
-    ) {
-      return;
-    }
-
-    memberSection = findMemberSection();
-
-    const registerButton =
-      findRegisterButton();
-
-    if (!memberSection || !registerButton) {
-      return;
-    }
-
-    const controls =
-      document.createElement("div");
-
-    controls.id =
-      "dampickMemberControls";
-
-    searchInput =
-      document.createElement("input");
-
-    searchInput.id =
-      "dampickMemberSearch";
-
-    searchInput.type = "search";
-
-    searchInput.placeholder =
-      "회원 닉네임을 입력하세요";
-
-    searchInput.autocomplete = "off";
-
-    toggleButton =
-      document.createElement("button");
-
-    toggleButton.id =
-      "dampickMemberToggle";
-
-    toggleButton.type = "button";
-
-    toggleButton.textContent =
-      "회원 목록 펼치기 ▼";
-
-    resultInfo =
-      document.createElement("div");
-
-    resultInfo.id =
-      "dampickMemberResultInfo";
-
-    resultInfo.textContent =
-      "전체 등록 회원을 확인할 수 있습니다.";
-
-    controls.appendChild(searchInput);
-    controls.appendChild(toggleButton);
-    controls.appendChild(resultInfo);
-
-    memberListBox =
-      document.createElement("div");
-
-    memberListBox.id =
-      "dampickMemberListBox";
-
-    emptyMessage =
-      document.createElement("div");
-
-    emptyMessage.id =
-      "dampickMemberEmpty";
-
-    emptyMessage.textContent =
-      "일치하는 회원 닉네임이 없습니다.";
-
-    memberListBox.appendChild(
-      emptyMessage
-    );
-
-    /*
-     * 회원 등록 버튼 다음에 검색 영역을 넣습니다.
-     */
-    registerButton.insertAdjacentElement(
-      "afterend",
-      controls
-    );
-
-    controls.insertAdjacentElement(
-      "afterend",
-      memberListBox
-    );
-
-    /*
-     * 펼치기·접기 버튼
-     */
-    toggleButton.addEventListener(
-      "click",
-      function () {
-        isMemberListOpen =
-          !isMemberListOpen;
-
-        updateMemberView();
-      }
-    );
-
-    /*
-     * 닉네임 검색
-     */
-    searchInput.addEventListener(
-      "input",
-      function () {
-        updateMemberView();
-      }
-    );
-
-    /*
-     * 검색창 오른쪽 X를 눌러
-     * 검색어를 지웠을 때도 반영합니다.
-     */
-    searchInput.addEventListener(
-      "search",
-      function () {
-        updateMemberView();
-      }
-    );
-
-    collectMemberCards();
-
-    /*
-     * 회원을 새로 등록하면 새 카드도
-     * 자동으로 목록 안으로 이동시킵니다.
-     */
-    const observer =
-      new MutationObserver(function () {
-        collectMemberCards();
-      });
-
-    observer.observe(
-      memberSection,
-      {
-        childList: true,
-        subtree: true
-      }
-    );
-  }
-
-  /*
-   * 관리자 화면이 완전히 열린 후 실행합니다.
-   */
-  function initializeMemberManager() {
-    createMemberControls();
-  }
-
-  if (
-    document.readyState === "loading"
-  ) {
-    document.addEventListener(
-      "DOMContentLoaded",
-      initializeMemberManager
-    );
-  } else {
-    initializeMemberManager();
-  }
-
-  /*
-   * Supabase 데이터가 늦게 불러와지는 경우를 대비해
-   * 여러 번 확인합니다.
-   */
-  setTimeout(
-    initializeMemberManager,
-    500
-  );
-
-  setTimeout(
-    initializeMemberManager,
-    1500
-  );
-
-  setTimeout(
-    initializeMemberManager,
-    3000
-  );
-})();
-</script>
 </body>
 </html>
