@@ -2110,5 +2110,509 @@
 
 })();
 </script>
+  <style>
+  /* 회원 검색 및 접기·펼치기 영역 */
+  #dampickMemberControls {
+    margin-top: 14px;
+    margin-bottom: 12px;
+  }
+
+  #dampickMemberSearch {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px 14px;
+    margin-bottom: 9px;
+    border: 1px solid #e3a8ba;
+    border-radius: 10px;
+    background: #ffffff;
+    font-size: 15px;
+    outline: none;
+  }
+
+  #dampickMemberSearch:focus {
+    border-color: #df4d7a;
+    box-shadow: 0 0 0 2px rgba(223, 77, 122, 0.12);
+  }
+
+  #dampickMemberToggle {
+    width: 100%;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 10px;
+    background: #df4d7a;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  #dampickMemberToggle:active {
+    transform: scale(0.99);
+  }
+
+  #dampickMemberResultInfo {
+    margin-top: 8px;
+    color: #777777;
+    font-size: 13px;
+  }
+
+  #dampickMemberListBox {
+    display: none;
+    margin-top: 10px;
+  }
+
+  #dampickMemberEmpty {
+    display: none;
+    padding: 20px 12px;
+    border: 1px solid #eeeeee;
+    border-radius: 10px;
+    background: #fafafa;
+    color: #777777;
+    text-align: center;
+    font-size: 14px;
+  }
+</style>
+
+<script>
+(function () {
+  let memberSection = null;
+  let memberListBox = null;
+  let searchInput = null;
+  let toggleButton = null;
+  let resultInfo = null;
+  let emptyMessage = null;
+  let isMemberListOpen = false;
+
+  /*
+   * 글자의 앞뒤 공백을 없애서 비교합니다.
+   */
+  function cleanText(value) {
+    return String(value || "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  /*
+   * 화면에서 '회원 닉네임 관리' 제목을 찾습니다.
+   */
+  function findMemberHeading() {
+    const elements = Array.from(
+      document.querySelectorAll("h1, h2, h3, h4, strong, div")
+    );
+
+    return elements.find(function (element) {
+      const text = cleanText(element.textContent);
+
+      return (
+        text === "1. 회원 닉네임 관리" ||
+        text === "회원 닉네임 관리"
+      );
+    });
+  }
+
+  /*
+   * '회원 닉네임 등록' 버튼을 찾습니다.
+   */
+  function findRegisterButton() {
+    return Array.from(
+      document.querySelectorAll("button")
+    ).find(function (button) {
+      return cleanText(button.textContent)
+        .includes("회원 닉네임 등록");
+    });
+  }
+
+  /*
+   * 제목과 회원 등록 버튼이 함께 들어 있는 영역을 찾습니다.
+   */
+  function findMemberSection() {
+    const heading = findMemberHeading();
+    const registerButton = findRegisterButton();
+
+    if (!heading || !registerButton) {
+      return null;
+    }
+
+    let current = registerButton.parentElement;
+
+    while (current && current !== document.body) {
+      if (current.contains(heading)) {
+        return current;
+      }
+
+      current = current.parentElement;
+    }
+
+    return heading.parentElement;
+  }
+
+  /*
+   * 삭제 버튼이 들어 있는 회원 카드 한 개를 찾습니다.
+   */
+  function findMemberCard(deleteButton) {
+    let card = deleteButton.parentElement;
+
+    if (!card) {
+      return null;
+    }
+
+    /*
+     * 삭제 버튼 바로 위가 너무 작은 영역이면
+     * 한 단계 위의 카드 영역을 사용합니다.
+     */
+    if (
+      cleanText(card.textContent) ===
+      cleanText(deleteButton.textContent)
+    ) {
+      card = card.parentElement;
+    }
+
+    return card;
+  }
+
+  /*
+   * 기존 회원 카드와 새로 등록된 회원 카드를
+   * 접기·펼치기 목록 안으로 옮깁니다.
+   */
+  function collectMemberCards() {
+    if (!memberSection || !memberListBox) {
+      return;
+    }
+
+    const deleteButtons = Array.from(
+      memberSection.querySelectorAll("button")
+    ).filter(function (button) {
+      return cleanText(button.textContent) === "삭제";
+    });
+
+    deleteButtons.forEach(function (deleteButton) {
+      const card = findMemberCard(deleteButton);
+
+      if (!card) {
+        return;
+      }
+
+      if (card.closest("#dampickMemberListBox")) {
+        return;
+      }
+
+      if (card.id === "dampickMemberControls") {
+        return;
+      }
+
+      card.setAttribute(
+        "data-dampick-member-card",
+        "true"
+      );
+
+      memberListBox.appendChild(card);
+    });
+
+    updateMemberView();
+  }
+
+  /*
+   * 회원 카드에서 검색에 사용할 글자를 가져옵니다.
+   * 닉네임과 관리자 메모가 함께 검색됩니다.
+   */
+  function getMemberSearchText(card) {
+    return cleanText(card.textContent)
+      .replace(/삭제/g, "")
+      .toLocaleLowerCase("ko-KR");
+  }
+
+  /*
+   * 현재 회원 수를 가져옵니다.
+   */
+  function getAllMemberCards() {
+    if (!memberListBox) {
+      return [];
+    }
+
+    return Array.from(
+      memberListBox.querySelectorAll(
+        '[data-dampick-member-card="true"]'
+      )
+    );
+  }
+
+  /*
+   * 펼치기 버튼 글자를 변경합니다.
+   */
+  function updateToggleButton(totalCount) {
+    if (!toggleButton) {
+      return;
+    }
+
+    if (isMemberListOpen) {
+      toggleButton.textContent =
+        "회원 목록 접기 ▲ (" +
+        totalCount +
+        "명)";
+    } else {
+      toggleButton.textContent =
+        "회원 목록 펼치기 ▼ (" +
+        totalCount +
+        "명)";
+    }
+  }
+
+  /*
+   * 검색어에 맞춰 회원 목록을 표시합니다.
+   */
+  function updateMemberView() {
+    if (
+      !memberListBox ||
+      !searchInput ||
+      !resultInfo ||
+      !emptyMessage
+    ) {
+      return;
+    }
+
+    const cards = getAllMemberCards();
+    const keyword = searchInput.value
+      .trim()
+      .toLocaleLowerCase("ko-KR");
+
+    let visibleCount = 0;
+
+    cards.forEach(function (card) {
+      const memberText =
+        getMemberSearchText(card);
+
+      const matched =
+        !keyword ||
+        memberText.includes(keyword);
+
+      card.style.display =
+        matched ? "" : "none";
+
+      if (matched) {
+        visibleCount += 1;
+      }
+    });
+
+    /*
+     * 검색어를 입력하면 회원 목록을 자동으로 펼칩니다.
+     */
+    if (keyword) {
+      isMemberListOpen = true;
+    }
+
+    memberListBox.style.display =
+      isMemberListOpen ? "block" : "none";
+
+    emptyMessage.style.display =
+      isMemberListOpen &&
+      visibleCount === 0
+        ? "block"
+        : "none";
+
+    if (keyword) {
+      resultInfo.textContent =
+        "검색 결과: " +
+        visibleCount +
+        "명 / 전체 " +
+        cards.length +
+        "명";
+    } else {
+      resultInfo.textContent =
+        "전체 등록 회원: " +
+        cards.length +
+        "명";
+    }
+
+    updateToggleButton(cards.length);
+  }
+
+  /*
+   * 검색창과 펼치기 버튼을 만듭니다.
+   */
+  function createMemberControls() {
+    if (
+      document.getElementById(
+        "dampickMemberControls"
+      )
+    ) {
+      return;
+    }
+
+    memberSection = findMemberSection();
+
+    const registerButton =
+      findRegisterButton();
+
+    if (!memberSection || !registerButton) {
+      return;
+    }
+
+    const controls =
+      document.createElement("div");
+
+    controls.id =
+      "dampickMemberControls";
+
+    searchInput =
+      document.createElement("input");
+
+    searchInput.id =
+      "dampickMemberSearch";
+
+    searchInput.type = "search";
+
+    searchInput.placeholder =
+      "회원 닉네임을 입력하세요";
+
+    searchInput.autocomplete = "off";
+
+    toggleButton =
+      document.createElement("button");
+
+    toggleButton.id =
+      "dampickMemberToggle";
+
+    toggleButton.type = "button";
+
+    toggleButton.textContent =
+      "회원 목록 펼치기 ▼";
+
+    resultInfo =
+      document.createElement("div");
+
+    resultInfo.id =
+      "dampickMemberResultInfo";
+
+    resultInfo.textContent =
+      "전체 등록 회원을 확인할 수 있습니다.";
+
+    controls.appendChild(searchInput);
+    controls.appendChild(toggleButton);
+    controls.appendChild(resultInfo);
+
+    memberListBox =
+      document.createElement("div");
+
+    memberListBox.id =
+      "dampickMemberListBox";
+
+    emptyMessage =
+      document.createElement("div");
+
+    emptyMessage.id =
+      "dampickMemberEmpty";
+
+    emptyMessage.textContent =
+      "일치하는 회원 닉네임이 없습니다.";
+
+    memberListBox.appendChild(
+      emptyMessage
+    );
+
+    /*
+     * 회원 등록 버튼 다음에 검색 영역을 넣습니다.
+     */
+    registerButton.insertAdjacentElement(
+      "afterend",
+      controls
+    );
+
+    controls.insertAdjacentElement(
+      "afterend",
+      memberListBox
+    );
+
+    /*
+     * 펼치기·접기 버튼
+     */
+    toggleButton.addEventListener(
+      "click",
+      function () {
+        isMemberListOpen =
+          !isMemberListOpen;
+
+        updateMemberView();
+      }
+    );
+
+    /*
+     * 닉네임 검색
+     */
+    searchInput.addEventListener(
+      "input",
+      function () {
+        updateMemberView();
+      }
+    );
+
+    /*
+     * 검색창 오른쪽 X를 눌러
+     * 검색어를 지웠을 때도 반영합니다.
+     */
+    searchInput.addEventListener(
+      "search",
+      function () {
+        updateMemberView();
+      }
+    );
+
+    collectMemberCards();
+
+    /*
+     * 회원을 새로 등록하면 새 카드도
+     * 자동으로 목록 안으로 이동시킵니다.
+     */
+    const observer =
+      new MutationObserver(function () {
+        collectMemberCards();
+      });
+
+    observer.observe(
+      memberSection,
+      {
+        childList: true,
+        subtree: true
+      }
+    );
+  }
+
+  /*
+   * 관리자 화면이 완전히 열린 후 실행합니다.
+   */
+  function initializeMemberManager() {
+    createMemberControls();
+  }
+
+  if (
+    document.readyState === "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeMemberManager
+    );
+  } else {
+    initializeMemberManager();
+  }
+
+  /*
+   * Supabase 데이터가 늦게 불러와지는 경우를 대비해
+   * 여러 번 확인합니다.
+   */
+  setTimeout(
+    initializeMemberManager,
+    500
+  );
+
+  setTimeout(
+    initializeMemberManager,
+    1500
+  );
+
+  setTimeout(
+    initializeMemberManager,
+    3000
+  );
+})();
+</script>
 </body>
 </html>
