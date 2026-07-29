@@ -25,7 +25,7 @@
       --main-dark: #d92d69;
       --main-light: #fff0f5;
       --text: #252525;
-      --subtext: #777777;
+      --subtext: #777;
       --border: #e8e8e8;
       --success: #17864b;
       --warning: #d47b00;
@@ -44,13 +44,13 @@
           180deg,
           #fff0f5 0%,
           #fff9fb 50%,
-          #ffffff 100%
+          #fff 100%
         );
     }
 
     button,
     input {
-      font-family: inherit;
+      font: inherit;
     }
 
     .page {
@@ -92,7 +92,7 @@
       padding: 28px 22px;
       border: 1px solid rgba(239, 63, 127, 0.12);
       border-radius: 23px;
-      background: #ffffff;
+      background: #fff;
       box-shadow:
         0 14px 38px rgba(129, 61, 85, 0.12);
     }
@@ -130,15 +130,11 @@
       padding: 0 15px;
       border: 1px solid var(--border);
       border-radius: 13px;
-      background: #ffffff;
+      background: #fff;
       color: var(--text);
       font-size: 17px;
       outline: none;
       transition: 0.2s;
-    }
-
-    .field input::placeholder {
-      color: #b4b4b4;
     }
 
     .field input:focus {
@@ -150,10 +146,9 @@
     .lookup-button {
       width: 100%;
       height: 58px;
-      margin-top: 2px;
       border: 0;
       border-radius: 14px;
-      color: #ffffff;
+      color: #fff;
       background:
         linear-gradient(
           135deg,
@@ -203,7 +198,7 @@
       padding: 18px;
       border: 1px solid var(--border);
       border-radius: 18px;
-      background: #ffffff;
+      background: #fff;
     }
 
     .order-head {
@@ -259,7 +254,7 @@
       overflow: hidden;
       border: 1px solid var(--border);
       border-radius: 15px;
-      background: #ffffff;
+      background: #fff;
     }
 
     .product-row {
@@ -267,7 +262,7 @@
       justify-content: space-between;
       gap: 14px;
       padding: 16px;
-      border-bottom: 1px solid #eeeeee;
+      border-bottom: 1px solid #eee;
     }
 
     .product-row:last-child,
@@ -285,6 +280,18 @@
       margin: 0;
       color: var(--subtext);
       font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .pickup-date {
+      display: inline-block;
+      margin-top: 7px;
+      padding: 5px 8px;
+      border-radius: 8px;
+      color: var(--main-dark);
+      background: var(--main-light);
+      font-size: 12px;
+      font-weight: 900;
     }
 
     .product-price {
@@ -301,12 +308,8 @@
       margin-top: 12px;
       padding: 17px;
       border-radius: 14px;
-      color: #ffffff;
+      color: #fff;
       background: #292929;
-    }
-
-    .total-label {
-      font-size: 14px;
     }
 
     .total-price {
@@ -318,7 +321,7 @@
     .information-row {
       display: flex;
       padding: 14px 15px;
-      border-bottom: 1px solid #eeeeee;
+      border-bottom: 1px solid #eee;
       font-size: 14px;
       line-height: 1.5;
     }
@@ -332,7 +335,6 @@
     .information-value {
       flex: 1;
       font-weight: 800;
-      word-break: keep-all;
     }
 
     .notice-box {
@@ -353,26 +355,10 @@
       line-height: 1.7;
     }
 
-    .demo-guide {
-      margin-top: 16px;
-      padding: 13px;
-      border: 1px dashed #efb0c7;
-      border-radius: 12px;
-      color: #8b5268;
-      background: #fffafd;
-      text-align: center;
-      font-size: 12px;
-      line-height: 1.65;
-    }
-
-    .demo-guide strong {
-      color: var(--main-dark);
-    }
-
     .admin-link {
       display: block;
       margin-top: 26px;
-      color: #aaaaaa;
+      color: #aaa;
       text-align: center;
       text-decoration: none;
       font-size: 12px;
@@ -397,11 +383,8 @@
 </head>
 
 <body>
-
   <main class="page">
-
     <header class="brand">
-
       <h1 class="brand-title">
         DAMPICK
         <span>담픽</span>
@@ -411,59 +394,53 @@
         모일수록 더 좋아진다,<br>
         담픽 공동구매
       </p>
-
     </header>
 
     <section class="card">
-
       <h2 class="card-title">
         내 주문 조회
       </h2>
 
       <p class="description">
-        닉네임을 입력하면 주문 상품을 확인할 수 있습니다.
+        닉네임을 입력하면 주문 상품과 상품별 픽업 날짜를
+        바로 확인할 수 있습니다.
       </p>
 
       <div class="field">
-
         <label for="nickname">
           닉네임
         </label>
 
         <input
-          type="text"
           id="nickname"
+          type="text"
           placeholder="예: 담픽1234"
           autocomplete="off"
         >
-
       </div>
 
       <button
-        type="button"
-        class="lookup-button"
         id="lookupButton"
+        class="lookup-button"
+        type="button"
       >
         주문 조회하기
       </button>
 
       <div
-        class="message"
         id="message"
+        class="message"
       ></div>
 
       <section
-        class="results"
         id="results"
+        class="results"
       ></section>
 
       <p class="privacy-note">
-        닉네임만으로 조회하는 방식이므로
-        전화번호, 주소 등 민감한 개인정보는
-        표시하지 않습니다.
+        닉네임만으로 조회하며 전화번호와 주소 같은
+        민감한 개인정보는 표시하지 않습니다.
       </p>
-
-
     </section>
 
     <a
@@ -472,41 +449,14 @@
     >
       관리자 페이지
     </a>
-
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.js"></script>
 
   <script>
-    /*
-      실제 고객 주문을 연결할 때 아래 두 값을
-      Supabase 프로젝트 정보로 바꿉니다.
-
-      Supabase에서 확인하는 위치:
-      Project Settings → API
-
-      브라우저에는 anon key 또는 publishable key만 넣으세요.
-      service_role key는 절대로 넣으면 안 됩니다.
-    */
-
-    const SUPABASE_URL =
-      "https://vkdqpyvurozfvdetbino.supabase.co";
-
-    const SUPABASE_ANON_KEY =
-      "sb_publishable_K6Nnwo2TiceSP9FpM3l7oA_eT3C3qJT";
-
-    let supabaseClient = null;
-
-    if (
-      !SUPABASE_URL.includes("여기에_") &&
-      !SUPABASE_ANON_KEY.includes("여기에_")
-    ) {
-      supabaseClient =
-        window.supabase.createClient(
-          SUPABASE_URL,
-          SUPABASE_ANON_KEY
-        );
-    }
+    const sb =
+      window.dampickSupabase;
 
     const nicknameInput =
       document.getElementById("nickname");
@@ -551,35 +501,22 @@
         return;
       }
 
+      if (!sb) {
+        showMessage(
+          "담픽 데이터베이스 연결정보를 불러오지 못했습니다.",
+          "error"
+        );
+
+        return;
+      }
+
       lookupButton.disabled = true;
       lookupButton.textContent =
         "주문을 확인하고 있습니다...";
 
       try {
-        /*
-          닉네임에 '담픽1234'를 입력하면
-          데이터베이스 연결 전에도 시험 주문이 표시됩니다.
-        */
-
-        /*
-          Supabase 연결정보를 아직 넣지 않은 경우에는
-          '담픽1234' 시험 닉네임만 작동합니다.
-        */
-        if (!supabaseClient) {
-          showMessage(
-            "현재는 시험 닉네임 '담픽1234'만 조회할 수 있습니다. 실제 고객 주문은 Supabase 연결 후 이용할 수 있습니다.",
-            "error"
-          );
-
-          return;
-        }
-
-        /*
-          실제 데이터베이스에서는
-          lookup_orders_by_nickname 함수를 호출합니다.
-        */
         const { data, error } =
-          await supabaseClient.rpc(
+          await sb.rpc(
             "lookup_orders_by_nickname",
             {
               p_nickname: nickname
@@ -590,14 +527,12 @@
           throw error;
         }
 
-        const orders =
-          Array.isArray(data)
-            ? data
-            : [];
+        const orderRows =
+          normalizeOrders(data);
 
-        if (orders.length === 0) {
+        if (!orderRows.length) {
           showMessage(
-            "해당 닉네임으로 등록된 주문이 없습니다. 주문할 때 사용한 닉네임을 정확히 입력해주세요.",
+            "해당 닉네임으로 등록된 주문이 없습니다. 닉네임을 정확히 확인해주세요.",
             "error"
           );
 
@@ -607,18 +542,18 @@
         showMessage(
           nickname +
           " 고객님의 주문 " +
-          orders.length +
+          orderRows.length +
           "건을 찾았습니다.",
           "success"
         );
 
-        renderOrders(orders);
+        renderOrders(orderRows);
 
       } catch (error) {
         console.error(error);
 
         showMessage(
-          "주문정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
+          "주문정보를 불러오지 못했습니다. 관리자에게 문의해주세요.",
           "error"
         );
 
@@ -629,43 +564,34 @@
       }
     }
 
-    function createDemoOrders() {
-      return [
-        {
-          nickname: "담픽1234",
-          order_number: "DP-20260727-001",
-          order_status: "상품 준비 중",
-          payment_status: "입금 완료",
-          order_date: "2026-07-27",
-          pickup_date: "2026-07-30",
-          pickup_place: "○○아파트 관리동 앞",
-          notice:
-            "상품은 7월 30일 오후 5시부터 픽업 가능합니다.\n상품 수령 시 닉네임을 말씀해주세요.",
-          items: [
-            {
-              product_name: "프리미엄 수박",
-              quantity: 1,
-              unit_name: "개",
-              unit_price: 18000,
-              line_total: 18000
-            },
-            {
-              product_name: "무항생제 계란",
-              quantity: 2,
-              unit_name: "판",
-              unit_price: 8000,
-              line_total: 16000
-            }
-          ]
+    function normalizeOrders(data) {
+      if (Array.isArray(data)) {
+        return data;
+      }
+
+      if (typeof data === "string") {
+        try {
+          const parsed =
+            JSON.parse(data);
+
+          return Array.isArray(parsed)
+            ? parsed
+            : [];
+        } catch (error) {
+          return [];
         }
-      ];
+      }
+
+      return [];
     }
 
-    function renderOrders(orders) {
+    function renderOrders(orderRows) {
       results.innerHTML =
-        orders.map(renderOrder).join("");
+        orderRows
+          .map(renderOrder)
+          .join("");
 
-      setTimeout(
+      window.setTimeout(
         function () {
           results.scrollIntoView({
             behavior: "smooth",
@@ -698,7 +624,6 @@
           function (item) {
             return `
               <div class="product-row">
-
                 <div>
                   <p class="product-name">
                     ${escapeHtml(item.product_name)}
@@ -711,12 +636,16 @@
                     · 개당
                     ${formatPrice(item.unit_price)}
                   </p>
+
+                  <span class="pickup-date">
+                    픽업 날짜:
+                    ${formatDate(item.pickup_date)}
+                  </span>
                 </div>
 
                 <div class="product-price">
                   ${formatPrice(item.line_total)}
                 </div>
-
               </div>
             `;
           }
@@ -724,13 +653,10 @@
 
       return `
         <article class="order-card">
-
           <div class="order-head">
-
             <p class="customer-name">
               ${escapeHtml(
                 order.nickname ||
-                order.customer_name ||
                 "고객"
               )}
               고객님의 주문
@@ -742,7 +668,6 @@
             </p>
 
             <div class="badges">
-
               <span class="badge order">
                 ${escapeHtml(order.order_status)}
               </span>
@@ -750,9 +675,7 @@
               <span class="badge payment">
                 ${escapeHtml(order.payment_status)}
               </span>
-
             </div>
-
           </div>
 
           <h3 class="section-title">
@@ -764,25 +687,19 @@
           </div>
 
           <div class="total-box">
-
-            <span class="total-label">
-              총 주문금액
-            </span>
+            <span>총 주문금액</span>
 
             <strong class="total-price">
               ${formatPrice(totalAmount)}
             </strong>
-
           </div>
 
           <h3 class="section-title">
-            픽업정보
+            주문정보
           </h3>
 
           <div class="information">
-
             <div class="information-row">
-
               <span class="information-label">
                 주문일
               </span>
@@ -790,36 +707,7 @@
               <span class="information-value">
                 ${formatDate(order.order_date)}
               </span>
-
             </div>
-
-            <div class="information-row">
-
-              <span class="information-label">
-                픽업 예정일
-              </span>
-
-              <span class="information-value">
-                ${formatDate(order.pickup_date)}
-              </span>
-
-            </div>
-
-            <div class="information-row">
-
-              <span class="information-label">
-                픽업 장소
-              </span>
-
-              <span class="information-value">
-                ${escapeHtml(
-                  order.pickup_place ||
-                  "별도 안내"
-                )}
-              </span>
-
-            </div>
-
           </div>
 
           ${
@@ -835,7 +723,6 @@
               `
               : ""
           }
-
         </article>
       `;
     }
@@ -865,10 +752,16 @@
       }
 
       const parts =
-        String(value).split("-");
+        String(value)
+          .slice(0, 10)
+          .split("-");
+
+      if (parts.length !== 3) {
+        return escapeHtml(value);
+      }
 
       return (
-        parts[0] +
+        Number(parts[0]) +
         "년 " +
         Number(parts[1]) +
         "월 " +
@@ -886,6 +779,5 @@
         .replaceAll("'", "&#039;");
     }
   </script>
-
 </body>
 </html>
