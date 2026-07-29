@@ -775,7 +775,7 @@
         <h2>2. 공동구매 상품 관리</h2>
 
         <p class="section-description">
-          공동구매 상품이 바뀔 때마다 새 상품을 등록하고,
+          상품명·가격·단위·픽업 날짜를 함께 등록합니다.
           판매가 끝난 상품은 비활성화합니다.
         </p>
 
@@ -825,6 +825,18 @@
             >
           </div>
 
+          <div>
+            <label for="newProductPickupDate">
+              픽업 날짜
+            </label>
+
+            <input
+              id="newProductPickupDate"
+              type="date"
+              required
+            >
+          </div>
+
           <div class="full">
             <button
               class="button"
@@ -846,8 +858,8 @@
         <h2>3. 회원 주문 등록</h2>
 
         <p class="section-description">
-          고객 닉네임을 선택한 뒤 주문한 상품을 클릭하고
-          수량을 입력하면 최종 결제금액이 자동 계산됩니다.
+          고객 닉네임과 상품을 선택하면 상품에 등록된
+          픽업 날짜가 주문과 고객 화면에 자동으로 연결됩니다.
         </p>
 
         <form id="orderForm">
@@ -891,31 +903,6 @@
                 id="orderDate"
                 type="date"
                 required
-              >
-            </div>
-
-            <div>
-              <label for="pickupDate">
-                픽업 예정일
-              </label>
-
-              <input
-                id="pickupDate"
-                type="date"
-              >
-            </div>
-
-            <div>
-              <label for="pickupPlace">
-                픽업 장소
-              </label>
-
-              <input
-                id="pickupPlace"
-                type="text"
-                value="담픽 매장"
-                readonly
-                aria-readonly="true"
               >
             </div>
 
@@ -1438,8 +1425,6 @@
             id,
             order_number,
             order_date,
-            pickup_date,
-            pickup_place,
             payment_status,
             order_status,
             notice,
@@ -1452,7 +1437,8 @@
               quantity,
               unit_name,
               unit_price,
-              line_total
+              line_total,
+              pickup_date
             )
           `)
           .order(
@@ -1547,10 +1533,16 @@
           .value
           .trim();
 
+      const pickupDate =
+        document
+          .getElementById("newProductPickupDate")
+          .value;
+
       if (
         !name ||
         unitPrice < 0 ||
-        !unitName
+        !unitName ||
+        !pickupDate
       ) {
         return;
       }
@@ -1561,7 +1553,8 @@
           .insert({
             name,
             unit_price: unitPrice,
-            unit_name: unitName
+            unit_name: unitName,
+            pickup_date: pickupDate
           });
 
       if (error) {
@@ -1665,15 +1658,6 @@
               document
                 .getElementById("orderDate")
                 .value,
-            pickup_date:
-              document
-                .getElementById("pickupDate")
-                .value || null,
-            pickup_place:
-              document
-                .getElementById("pickupPlace")
-                .value
-                .trim(),
             payment_status:
               document
                 .getElementById("paymentStatus")
@@ -1715,7 +1699,9 @@
               unit_name:
                 selection.product.unit_name,
               unit_price:
-                selection.product.unit_price
+                selection.product.unit_price,
+              pickup_date:
+                selection.product.pickup_date
             };
           }
         );
@@ -1741,10 +1727,6 @@
       }
 
       event.target.reset();
-
-      document
-        .getElementById("pickupPlace")
-        .value = "담픽 매장";
 
       document
         .getElementById(
@@ -2113,6 +2095,9 @@
                     ${formatPrice(product.unit_price)}
                     /
                     ${escapeHtml(product.unit_name)}
+                    <br>
+                    픽업 날짜:
+                    ${formatDate(product.pickup_date)}
                   </div>
                 </div>
 
@@ -2171,6 +2156,9 @@
                     ${formatPrice(product.unit_price)}
                     /
                     ${escapeHtml(product.unit_name)}
+                    <br>
+                    픽업 날짜:
+                    ${formatDate(product.pickup_date)}
                   </span>
                 </span>
 
@@ -2633,6 +2621,9 @@
                               ${escapeHtml(item.unit_name)}
                               · 단가 ${formatPrice(item.unit_price)}
                               · 합계 ${formatPrice(item.line_total)}
+                              <br>
+                              픽업 날짜:
+                              ${formatDate(item.pickup_date)}
                             </span>
                           </span>
                         </label>
@@ -2648,12 +2639,7 @@
 
                 <div class="muted">
                   주문일
-                  ${escapeHtml(order.order_date || "-")}
-                  /
-                  픽업 예정일
-                  ${escapeHtml(order.pickup_date || "미정")}
-                  /
-                  ${escapeHtml(order.pickup_place || "장소 미정")}
+                  ${formatDate(order.order_date)}
                   ${completed
                     ? (
                         " / 완료일 " +
@@ -2738,6 +2724,30 @@
         "-" +
         String(date.getDate())
           .padStart(2, "0")
+      );
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return "미정";
+      }
+
+      const parts =
+        String(value)
+          .slice(0, 10)
+          .split("-");
+
+      if (parts.length !== 3) {
+        return escapeHtml(value);
+      }
+
+      return (
+        Number(parts[0]) +
+        "년 " +
+        Number(parts[1]) +
+        "월 " +
+        Number(parts[2]) +
+        "일"
       );
     }
 
@@ -3042,7 +3052,7 @@
               "상품금액": "",
               "최종 주문금액": orderTotal,
               "주문일": order.order_date || "",
-              "픽업 예정일": order.pickup_date || "",
+              "상품 픽업일": "",
               "결제상태": order.payment_status || "",
               "주문상태": order.order_status || ""
             });
@@ -3062,7 +3072,7 @@
                 "상품금액": Number(item.line_total || 0),
                 "최종 주문금액": orderTotal,
                 "주문일": order.order_date || "",
-                "픽업 예정일": order.pickup_date || "",
+                "상품 픽업일": item.pickup_date || "",
                 "결제상태": order.payment_status || "",
                 "주문상태": order.order_status || ""
               });
@@ -3254,10 +3264,6 @@
           new Date()
             .toISOString()
             .slice(0, 10);
-
-      document
-        .getElementById("pickupPlace")
-        .value = "담픽 매장";
 
       const salesMonth =
         document.getElementById(
