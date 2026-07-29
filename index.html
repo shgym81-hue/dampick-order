@@ -585,9 +585,68 @@
       return [];
     }
 
+    function getPickupDateSortValue(value) {
+      if (!value) {
+        return Number.POSITIVE_INFINITY;
+      }
+
+      const date =
+        new Date(value + "T00:00:00");
+
+      if (Number.isNaN(date.getTime())) {
+        return Number.POSITIVE_INFINITY;
+      }
+
+      return date.getTime();
+    }
+
+    function getEarliestPickupDateValue(order) {
+      const items =
+        Array.isArray(order.items)
+          ? order.items
+          : [];
+
+      if (!items.length) {
+        return Number.POSITIVE_INFINITY;
+      }
+
+      return items.reduce(
+        function (earliest, item) {
+          return Math.min(
+            earliest,
+            getPickupDateSortValue(
+              item.pickup_date
+            )
+          );
+        },
+        Number.POSITIVE_INFINITY
+      );
+    }
+
     function renderOrders(orderRows) {
+      const sortedOrders =
+        [...orderRows].sort(
+          function (a, b) {
+            const aDate =
+              getEarliestPickupDateValue(a);
+
+            const bDate =
+              getEarliestPickupDateValue(b);
+
+            if (aDate !== bDate) {
+              return aDate - bDate;
+            }
+
+            return String(
+              a.order_number || ""
+            ).localeCompare(
+              String(b.order_number || "")
+            );
+          }
+        );
+
       results.innerHTML =
-        orderRows
+        sortedOrders
           .map(renderOrder)
           .join("");
 
@@ -605,7 +664,32 @@
     function renderOrder(order) {
       const items =
         Array.isArray(order.items)
-          ? order.items
+          ? [...order.items].sort(
+              function (a, b) {
+                const aDate =
+                  getPickupDateSortValue(
+                    a.pickup_date
+                  );
+
+                const bDate =
+                  getPickupDateSortValue(
+                    b.pickup_date
+                  );
+
+                if (aDate !== bDate) {
+                  return aDate - bDate;
+                }
+
+                return String(
+                  a.product_name || ""
+                ).localeCompare(
+                  String(
+                    b.product_name || ""
+                  ),
+                  "ko-KR"
+                );
+              }
+            )
           : [];
 
       const totalAmount =
