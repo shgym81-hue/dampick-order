@@ -847,5 +847,23 @@
         .replaceAll("'", "&#039;");
     }
   </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.documentElement.lang = 'ko';
+
+  const koreanFields = document.querySelectorAll(
+    'input[type="text"], input[type="search"], textarea'
+  );
+
+  koreanFields.forEach(function (field) {
+    field.setAttribute('lang', 'ko');
+    field.setAttribute('inputmode', 'text');
+    field.setAttribute('autocomplete', 'off');
+    field.setAttribute('autocapitalize', 'off');
+    field.setAttribute('spellcheck', 'false');
+  });
+});
+</script>
+  
 </body>
 </html>
