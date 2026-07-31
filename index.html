@@ -607,6 +607,14 @@
       box-shadow: 0 13px 30px rgba(133, 35, 75, 0.08);
     }
 
+    .results .order-card:first-child {
+      margin-top: 0;
+    }
+
+    .merged-order-card .customer-name {
+      margin-bottom: 0;
+    }
+
     .order-head {
       position: relative;
       overflow: hidden;
@@ -1398,100 +1406,176 @@
       return date.getTime();
     }
 
-    function getEarliestPickupDateValue(order) {
-      const items =
-        Array.isArray(order.items)
-          ? order.items
-          : [];
+    function mergeOrderItems(orderRows) {
+      const itemMap =
+        new Map();
 
-      if (!items.length) {
-        return Number.POSITIVE_INFINITY;
-      }
+      orderRows.forEach(
+        function (order) {
+          const items =
+            Array.isArray(order.items)
+              ? order.items
+              : [];
 
-      return items.reduce(
-        function (earliest, item) {
-          return Math.min(
-            earliest,
-            getPickupDateSortValue(
-              item.pickup_date
-            )
+          items.forEach(
+            function (item) {
+              const productName =
+                String(
+                  item.product_name || "상품"
+                ).trim();
+
+              const pickupDate =
+                item.pickup_date
+                  ? String(
+                      item.pickup_date
+                    ).slice(0, 10)
+                  : "";
+
+              const unitName =
+                String(
+                  item.unit_name || "개"
+                ).trim();
+
+              const unitPrice =
+                Number(
+                  item.unit_price || 0
+                );
+
+              const quantity =
+                Math.max(
+                  0,
+                  Number(
+                    item.quantity || 0
+                  )
+                );
+
+              /*
+                같은 상품이라도 픽업 날짜, 단위, 가격이 다르면
+                서로 다른 상품으로 표시합니다.
+              */
+              const itemKey =
+                [
+                  productName,
+                  pickupDate,
+                  unitName,
+                  unitPrice
+                ].join("|");
+
+              if (!itemMap.has(itemKey)) {
+                itemMap.set(
+                  itemKey,
+                  {
+                    product_name:
+                      productName,
+                    pickup_date:
+                      pickupDate,
+                    unit_name:
+                      unitName,
+                    unit_price:
+                      unitPrice,
+                    quantity: 0,
+                    line_total: 0
+                  }
+                );
+              }
+
+              const mergedItem =
+                itemMap.get(itemKey);
+
+              mergedItem.quantity +=
+                quantity;
+
+              mergedItem.line_total +=
+                Number(
+                  item.line_total ??
+                  quantity * unitPrice
+                );
+            }
           );
-        },
-        Number.POSITIVE_INFINITY
+        }
+      );
+
+      return Array.from(
+        itemMap.values()
+      ).sort(
+        function (a, b) {
+          const aDate =
+            getPickupDateSortValue(
+              a.pickup_date
+            );
+
+          const bDate =
+            getPickupDateSortValue(
+              b.pickup_date
+            );
+
+          if (aDate !== bDate) {
+            return aDate - bDate;
+          }
+
+          return String(
+            a.product_name || ""
+          ).localeCompare(
+            String(
+              b.product_name || ""
+            ),
+            "ko-KR"
+          );
+        }
+      );
+    }
+
+    function getCombinedNotices(orderRows) {
+      const uniqueNotices =
+        new Set();
+
+      orderRows.forEach(
+        function (order) {
+          const notice =
+            String(
+              order.notice || ""
+            ).trim();
+
+          if (notice) {
+            uniqueNotices.add(notice);
+          }
+        }
+      );
+
+      return Array.from(
+        uniqueNotices
       );
     }
 
     function renderOrders(orderRows) {
-      const sortedOrders =
-        [...orderRows].sort(
-          function (a, b) {
-            const aDate =
-              getEarliestPickupDateValue(a);
+      const mergedItems =
+        mergeOrderItems(orderRows);
 
-            const bDate =
-              getEarliestPickupDateValue(b);
+      if (!mergedItems.length) {
+        showMessage(
+          "등록된 주문 상품이 없습니다.",
+          "error"
+        );
 
-            if (aDate !== bDate) {
-              return aDate - bDate;
-            }
+        return;
+      }
 
+      const nicknameOrder =
+        orderRows.find(
+          function (order) {
             return String(
-              a.order_number || ""
-            ).localeCompare(
-              String(b.order_number || "")
-            );
+              order.nickname || ""
+            ).trim();
           }
         );
 
-      results.innerHTML =
-        sortedOrders
-          .map(renderOrder)
-          .join("");
-
-      window.setTimeout(
-        function () {
-          results.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        },
-        100
-      );
-    }
-
-    function renderOrder(order) {
-      const items =
-        Array.isArray(order.items)
-          ? [...order.items].sort(
-              function (a, b) {
-                const aDate =
-                  getPickupDateSortValue(
-                    a.pickup_date
-                  );
-
-                const bDate =
-                  getPickupDateSortValue(
-                    b.pickup_date
-                  );
-
-                if (aDate !== bDate) {
-                  return aDate - bDate;
-                }
-
-                return String(
-                  a.product_name || ""
-                ).localeCompare(
-                  String(
-                    b.product_name || ""
-                  ),
-                  "ko-KR"
-                );
-              }
-            )
-          : [];
+      const nickname =
+        nicknameOrder?.nickname ||
+        nicknameInput.value.trim() ||
+        "고객";
 
       const itemHtml =
-        items.map(
+        mergedItems.map(
           function (item) {
             return `
               <div class="product-row">
@@ -1522,31 +1606,31 @@
           }
         ).join("");
 
-      return `
-        <article class="order-card">
+      const notices =
+        getCombinedNotices(orderRows);
+
+      const noticeHtml =
+        notices.length
+          ? `
+              <h3 class="section-title">
+                담픽 안내
+              </h3>
+
+              <div class="notice-box">
+                ${notices
+                  .map(escapeHtml)
+                  .join("\n\n")}
+              </div>
+            `
+          : "";
+
+      results.innerHTML = `
+        <article class="order-card merged-order-card">
           <div class="order-head">
             <p class="customer-name">
-              ${escapeHtml(
-                order.nickname ||
-                "고객"
-              )}
+              ${escapeHtml(nickname)}
               고객님의 주문
             </p>
-
-            <p class="order-number">
-              주문번호:
-              ${escapeHtml(order.order_number)}
-            </p>
-
-            <div class="badges">
-              <span class="badge order">
-                ${escapeHtml(order.order_status)}
-              </span>
-
-              <span class="badge payment">
-                ${escapeHtml(order.payment_status)}
-              </span>
-            </div>
           </div>
 
           <h3 class="section-title">
@@ -1557,21 +1641,19 @@
             ${itemHtml}
           </div>
 
-          ${
-            order.notice
-              ? `
-                <h3 class="section-title">
-                  담픽 안내
-                </h3>
-
-                <div class="notice-box">
-                  ${escapeHtml(order.notice)}
-                </div>
-              `
-              : ""
-          }
+          ${noticeHtml}
         </article>
       `;
+
+      window.setTimeout(
+        function () {
+          results.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        },
+        100
+      );
     }
 
     function showMessage(text, type) {
