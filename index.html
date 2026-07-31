@@ -5,13 +5,15 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
 
   <meta
     name="description"
     content="담픽 공동구매 주문조회"
   >
+
+  <meta name="theme-color" content="#ee2f78">
 
   <title>담픽 공동구매 주문조회</title>
 
@@ -21,31 +23,101 @@
     }
 
     :root {
-      --main: #ef3f7f;
-      --main-dark: #d92d69;
-      --main-light: #fff0f5;
-      --text: #252525;
-      --subtext: #777;
-      --border: #e8e8e8;
-      --success: #17864b;
-      --warning: #d47b00;
+      --main: #f2387d;
+      --main-dark: #d91d68;
+      --main-deep: #bd1457;
+      --main-soft: #fff0f6;
+      --main-pale: #fff7fa;
+      --navy: #141b3d;
+      --text: #252533;
+      --subtext: #71717d;
+      --border: #f0dce5;
+      --success: #26744b;
+      --success-bg: #eef9f2;
+      --warning: #a76b00;
+      --shadow: 0 20px 55px rgba(186, 39, 96, 0.14);
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: #fff8fb;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
+      overflow-x: hidden;
       font-family:
-        Arial,
+        "Pretendard",
         "Noto Sans KR",
+        "Apple SD Gothic Neo",
+        Arial,
         sans-serif;
       color: var(--text);
       background:
+        radial-gradient(
+          circle at 10% 10%,
+          rgba(255, 144, 187, 0.20) 0,
+          rgba(255, 144, 187, 0) 25%
+        ),
+        radial-gradient(
+          circle at 92% 16%,
+          rgba(244, 47, 123, 0.17) 0,
+          rgba(244, 47, 123, 0) 23%
+        ),
         linear-gradient(
           180deg,
-          #fff0f5 0%,
-          #fff9fb 50%,
-          #fff 100%
+          #fff4f8 0%,
+          #fffafc 48%,
+          #ffffff 100%
         );
+    }
+
+    body::before,
+    body::after {
+      position: fixed;
+      z-index: -1;
+      content: "";
+      pointer-events: none;
+      filter: blur(0.2px);
+    }
+
+    body::before {
+      top: 118px;
+      right: -62px;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background:
+        radial-gradient(
+          circle at 30% 25%,
+          #ffb7d1 0%,
+          #f83f85 48%,
+          #d81360 100%
+        );
+      box-shadow:
+        inset 16px 18px 28px rgba(255, 255, 255, 0.30),
+        0 24px 48px rgba(218, 28, 99, 0.15);
+      opacity: 0.72;
+    }
+
+    body::after {
+      top: 190px;
+      left: 7%;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background:
+        radial-gradient(
+          circle at 30% 25%,
+          #ffd1e0 0%,
+          #f94586 55%,
+          #cc0f57 100%
+        );
+      box-shadow:
+        inset 4px 4px 8px rgba(255, 255, 255, 0.45),
+        0 9px 18px rgba(209, 23, 89, 0.20);
+      opacity: 0.8;
     }
 
     button,
@@ -53,322 +125,891 @@
       font: inherit;
     }
 
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .top-accent {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: 50;
+      height: max(7px, env(safe-area-inset-top));
+      background:
+        linear-gradient(
+          90deg,
+          #ff4b8f,
+          #e92170,
+          #d81360
+        );
+      box-shadow: 0 2px 10px rgba(217, 29, 104, 0.12);
+    }
+
     .page {
+      position: relative;
       width: 100%;
-      max-width: 520px;
+      max-width: 560px;
       min-height: 100vh;
       margin: 0 auto;
-      padding: 34px 18px 50px;
+      padding:
+        calc(42px + env(safe-area-inset-top))
+        18px
+        calc(64px + env(safe-area-inset-bottom));
+    }
+
+    .page::before {
+      position: absolute;
+      top: 260px;
+      left: -180px;
+      z-index: -1;
+      width: 720px;
+      height: 250px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.55);
+      transform: rotate(-8deg);
+      content: "";
+      pointer-events: none;
     }
 
     .brand {
-      margin-bottom: 27px;
+      position: relative;
+      margin-bottom: 30px;
       text-align: center;
     }
 
+    .brand-bag {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 6px;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      color: #fff;
+      background:
+        linear-gradient(
+          145deg,
+          #ff6da4,
+          #ed2d79 55%,
+          #c9165e
+        );
+      box-shadow:
+        inset 0 5px 10px rgba(255, 255, 255, 0.30),
+        0 12px 25px rgba(226, 31, 107, 0.22);
+      transform: rotate(-3deg);
+    }
+
+    .brand-bag svg {
+      width: 26px;
+      height: 26px;
+    }
+
     .brand-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 10px;
       margin: 0;
-      color: var(--main);
-      font-size: 38px;
-      font-weight: 900;
-      letter-spacing: -1px;
+      color: var(--main-dark);
+      font-size: clamp(42px, 11vw, 57px);
+      font-weight: 950;
+      letter-spacing: -2.5px;
+      line-height: 1;
+      text-shadow: 0 8px 24px rgba(232, 36, 113, 0.10);
     }
 
     .brand-title span {
-      margin-left: 5px;
-      color: var(--main-dark);
-      font-size: 19px;
+      color: var(--main-deep);
+      font-size: clamp(19px, 5vw, 25px);
+      font-weight: 950;
+      letter-spacing: -1px;
     }
 
     .brand-slogan {
-      margin: 9px 0 0;
-      color: var(--subtext);
-      font-size: 14px;
-      font-weight: 700;
+      margin: 20px 0 0;
+      color: #686875;
+      font-size: 16px;
+      font-weight: 750;
       line-height: 1.55;
+      letter-spacing: -0.35px;
     }
 
-    .card {
-      padding: 28px 22px;
-      border: 1px solid rgba(239, 63, 127, 0.12);
-      border-radius: 23px;
-      background: #fff;
+    .brand-slogan strong {
+      color: var(--main);
+      font-weight: 950;
+    }
+
+    .lookup-card {
+      position: relative;
+      padding: 76px 28px 28px;
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      border-radius: 34px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .lookup-card::before {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.78),
+          rgba(255, 255, 255, 0) 45%
+        );
+      content: "";
+      pointer-events: none;
+    }
+
+    .lookup-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-icon {
+      position: absolute;
+      top: -39px;
+      left: 50%;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 82px;
+      height: 82px;
+      border: 8px solid rgba(255, 255, 255, 0.95);
+      border-radius: 50%;
+      color: var(--main);
+      background:
+        linear-gradient(
+          145deg,
+          #fff5f9,
+          #ffe2ed
+        );
       box-shadow:
-        0 14px 38px rgba(129, 61, 85, 0.12);
+        0 16px 30px rgba(215, 36, 104, 0.15),
+        inset 0 3px 7px rgba(255, 255, 255, 0.85);
+      transform: translateX(-50%);
+    }
+
+    .card-icon svg {
+      width: 38px;
+      height: 38px;
     }
 
     .card-title {
       margin: 0;
+      color: var(--navy);
       text-align: center;
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: -0.7px;
+      font-size: clamp(31px, 8vw, 39px);
+      font-weight: 950;
+      letter-spacing: -1.7px;
+      line-height: 1.2;
+    }
+
+    .title-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 13px;
+      margin: 16px auto 18px;
+      color: var(--main);
+    }
+
+    .title-divider::before,
+    .title-divider::after {
+      width: 55px;
+      height: 2px;
+      border-radius: 999px;
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          #ff6a9f
+        );
+      content: "";
+    }
+
+    .title-divider::after {
+      background:
+        linear-gradient(
+          90deg,
+          #ff6a9f,
+          transparent
+        );
+    }
+
+    .title-divider svg {
+      width: 17px;
+      height: 17px;
+      fill: currentColor;
     }
 
     .description {
-      margin: 12px 0 27px;
-      color: var(--subtext);
+      max-width: 430px;
+      margin: 0 auto 30px;
+      color: #595966;
       text-align: center;
-      font-size: 14px;
-      line-height: 1.7;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.75;
+      letter-spacing: -0.3px;
+      word-break: keep-all;
     }
 
     .field {
-      margin-bottom: 18px;
+      margin-bottom: 17px;
     }
 
     .field label {
       display: block;
-      margin-bottom: 9px;
-      font-size: 14px;
-      font-weight: 900;
+      margin: 0 0 10px 2px;
+      color: var(--navy);
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: -0.3px;
+    }
+
+    .input-shell {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 64px;
+      overflow: hidden;
+      border: 1.5px solid #f4bfd3;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        0 8px 20px rgba(199, 30, 94, 0.04);
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .input-shell:focus-within {
+      border-color: var(--main);
+      box-shadow:
+        0 0 0 5px rgba(242, 56, 125, 0.10),
+        0 13px 28px rgba(199, 30, 94, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .input-icon {
+      display: flex;
+      flex: 0 0 58px;
+      align-items: center;
+      justify-content: center;
+      color: #f56a9c;
+    }
+
+    .input-icon svg {
+      width: 25px;
+      height: 25px;
     }
 
     .field input {
       width: 100%;
-      height: 56px;
-      padding: 0 15px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: #fff;
+      height: 64px;
+      padding: 0 17px 0 0;
+      border: 0;
+      background: transparent;
       color: var(--text);
-      font-size: 17px;
+      font-size: 18px;
+      font-weight: 700;
       outline: none;
-      transition: 0.2s;
     }
 
-    .field input:focus {
-      border-color: var(--main);
-      box-shadow:
-        0 0 0 4px rgba(239, 63, 127, 0.12);
+    .field input::placeholder {
+      color: #a6a4ab;
+      font-weight: 500;
     }
 
     .lookup-button {
+      position: relative;
       width: 100%;
-      height: 58px;
+      min-height: 66px;
+      overflow: hidden;
       border: 0;
-      border-radius: 14px;
+      border-radius: 18px;
       color: #fff;
       background:
         linear-gradient(
-          135deg,
-          var(--main),
-          var(--main-dark)
+          105deg,
+          #fa397e 0%,
+          #eb2472 52%,
+          #d91767 100%
         );
       box-shadow:
-        0 9px 20px rgba(239, 63, 127, 0.26);
-      font-size: 18px;
-      font-weight: 900;
+        0 16px 27px rgba(226, 29, 105, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: -0.5px;
       cursor: pointer;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        opacity 0.18s ease;
+    }
+
+    .lookup-button::before {
+      position: absolute;
+      top: -130%;
+      left: -20%;
+      width: 32%;
+      height: 350%;
+      background: rgba(255, 255, 255, 0.16);
+      transform: rotate(28deg);
+      content: "";
+      transition: left 0.5s ease;
+    }
+
+    .lookup-button::after {
+      position: absolute;
+      top: 50%;
+      right: 22px;
+      width: 28px;
+      height: 28px;
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      border-radius: 50%;
+      background:
+        linear-gradient(
+          135deg,
+          transparent 44%,
+          #fff 45% 55%,
+          transparent 56%
+        );
+      background-size: 8px 8px;
+      background-position: 8px center;
+      background-repeat: no-repeat;
+      content: "";
+      transform: translateY(-50%);
+    }
+
+    .lookup-button:hover::before {
+      left: 108%;
+    }
+
+    .lookup-button:active {
+      transform: translateY(2px) scale(0.995);
+      box-shadow:
+        0 9px 18px rgba(226, 29, 105, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
     }
 
     .lookup-button:disabled {
-      opacity: 0.65;
+      opacity: 0.68;
       cursor: wait;
+      transform: none;
     }
 
     .message {
       display: none;
-      margin-top: 18px;
-      padding: 14px;
-      border-radius: 12px;
+      margin-top: 20px;
+      padding: 15px 16px;
+      border: 1px solid transparent;
+      border-radius: 15px;
       text-align: center;
       font-size: 14px;
+      font-weight: 750;
       line-height: 1.55;
+      word-break: keep-all;
     }
 
     .message.error {
       display: block;
-      color: #bd294d;
-      background: #fff0f2;
+      color: #b32954;
+      border-color: #ffd0df;
+      background: #fff0f5;
     }
 
     .message.success {
       display: block;
-      color: #176a3e;
-      background: #eaf8ef;
+      color: var(--success);
+      border-color: #d8f0df;
+      background: var(--success-bg);
+    }
+
+    .privacy-note {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0 0;
+      padding: 15px 16px;
+      border: 1px solid #f5dce6;
+      border-radius: 16px;
+      color: #74727b;
+      background:
+        linear-gradient(
+          135deg,
+          #fffafa,
+          #fff4f8
+        );
+      font-size: 12.5px;
+      font-weight: 600;
+      line-height: 1.65;
+      word-break: keep-all;
+    }
+
+    .privacy-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      color: var(--main);
+      background: #ffe4ee;
+    }
+
+    .privacy-icon svg {
+      width: 22px;
+      height: 22px;
     }
 
     .results {
-      margin-top: 24px;
+      margin-top: 26px;
+      scroll-margin-top: 16px;
     }
 
     .order-card {
       margin-top: 18px;
-      padding: 18px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: #fff;
+      padding: 17px;
+      border: 1px solid #f0dce5;
+      border-radius: 22px;
+      background:
+        linear-gradient(
+          180deg,
+          #ffffff 0%,
+          #fffafd 100%
+        );
+      box-shadow: 0 13px 30px rgba(133, 35, 75, 0.08);
     }
 
     .order-head {
-      padding: 17px;
-      border-radius: 15px;
-      background: var(--main-light);
+      position: relative;
+      overflow: hidden;
+      padding: 18px;
+      border: 1px solid rgba(246, 188, 212, 0.55);
+      border-radius: 17px;
+      background:
+        linear-gradient(
+          135deg,
+          #fff2f7,
+          #fff8fb 60%,
+          #ffeaf2
+        );
+    }
+
+    .order-head::after {
+      position: absolute;
+      top: -35px;
+      right: -24px;
+      width: 95px;
+      height: 95px;
+      border-radius: 50%;
+      background: rgba(244, 65, 132, 0.08);
+      content: "";
     }
 
     .customer-name {
-      margin: 0 0 6px;
-      font-size: 18px;
-      font-weight: 900;
+      position: relative;
+      z-index: 1;
+      margin: 0 0 7px;
+      color: var(--navy);
+      font-size: 19px;
+      font-weight: 950;
+      letter-spacing: -0.5px;
     }
 
     .order-number {
+      position: relative;
+      z-index: 1;
       margin: 0;
-      color: var(--subtext);
-      font-size: 13px;
+      color: #85838b;
+      font-size: 12.5px;
+      font-weight: 650;
+      word-break: break-all;
     }
 
     .badges {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 7px;
       margin-top: 13px;
     }
 
     .badge {
       padding: 6px 10px;
       border-radius: 999px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 900;
     }
 
     .badge.order {
       color: var(--warning);
-      background: #fff2d7;
+      background: #fff1ce;
     }
 
     .badge.payment {
       color: var(--success);
-      background: #e7f7ed;
+      background: #e6f7ec;
     }
 
     .section-title {
-      margin: 24px 0 11px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 23px 2px 11px;
+      color: var(--navy);
       font-size: 16px;
-      font-weight: 900;
+      font-weight: 950;
+      letter-spacing: -0.3px;
     }
 
-    .product-list,
-    .information {
+    .section-title::before {
+      width: 5px;
+      height: 17px;
+      border-radius: 999px;
+      background:
+        linear-gradient(
+          180deg,
+          #ff699e,
+          #d91767
+        );
+      content: "";
+    }
+
+    .product-list {
       overflow: hidden;
-      border: 1px solid var(--border);
-      border-radius: 15px;
+      border: 1px solid #f0e2e8;
+      border-radius: 16px;
       background: #fff;
     }
 
     .product-row {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 14px;
       padding: 16px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #f1e8ec;
     }
 
-    .product-row:last-child,
-    .information-row:last-child {
+    .product-row:last-child {
       border-bottom: 0;
     }
 
     .product-name {
-      margin: 0 0 5px;
+      margin: 0 0 6px;
+      color: #272733;
       font-size: 15px;
-      font-weight: 900;
+      font-weight: 950;
+      line-height: 1.45;
+      word-break: keep-all;
     }
 
     .product-option {
       margin: 0;
-      color: var(--subtext);
-      font-size: 13px;
-      line-height: 1.6;
+      color: #797780;
+      font-size: 12.5px;
+      font-weight: 600;
+      line-height: 1.65;
     }
 
     .pickup-date {
       display: inline-block;
-      margin-top: 7px;
-      padding: 5px 8px;
-      border-radius: 8px;
+      margin-top: 8px;
+      padding: 6px 9px;
+      border: 1px solid #ffd4e3;
+      border-radius: 9px;
       color: var(--main-dark);
-      background: var(--main-light);
-      font-size: 12px;
+      background: var(--main-soft);
+      font-size: 11.5px;
       font-weight: 900;
+      line-height: 1.4;
     }
 
     .product-price {
-      flex-shrink: 0;
+      align-self: start;
+      min-width: 72px;
+      padding-top: 1px;
+      color: var(--main-deep);
       text-align: right;
       font-size: 14px;
-      font-weight: 900;
-    }
-
-
-    .information-row {
-      display: flex;
-      padding: 14px 15px;
-      border-bottom: 1px solid #eee;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .information-label {
-      width: 95px;
-      flex-shrink: 0;
-      color: var(--subtext);
-    }
-
-    .information-value {
-      flex: 1;
-      font-weight: 800;
+      font-weight: 950;
+      white-space: nowrap;
     }
 
     .notice-box {
-      padding: 16px;
-      border-radius: 14px;
-      color: #634d00;
-      background: #fff8dd;
-      font-size: 14px;
+      padding: 15px 16px;
+      border: 1px solid #f5e3b2;
+      border-radius: 15px;
+      color: #63500f;
+      background:
+        linear-gradient(
+          135deg,
+          #fff9df,
+          #fffdf1
+        );
+      font-size: 13px;
+      font-weight: 600;
       line-height: 1.75;
       white-space: pre-wrap;
     }
 
-    .privacy-note {
-      margin: 21px 0 0;
-      color: #9a9a9a;
-      text-align: center;
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
     .admin-link {
-      display: block;
-      margin-top: 26px;
-      color: #aaa;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin-top: 28px;
+      padding: 9px 13px;
+      color: #87858e;
       text-align: center;
       text-decoration: none;
-      font-size: 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      transition:
+        color 0.2s ease,
+        transform 0.2s ease;
     }
 
-    @media (max-width: 380px) {
+    .admin-link:hover {
+      color: var(--main-dark);
+      transform: translateY(-1px);
+    }
+
+    .admin-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .admin-link-wrap {
+      text-align: center;
+    }
+
+    .bottom-wave {
+      position: absolute;
+      right: -190px;
+      bottom: -85px;
+      left: -190px;
+      z-index: -1;
+      height: 190px;
+      border-radius: 50% 50% 0 0;
+      background:
+        linear-gradient(
+          120deg,
+          rgba(255, 195, 218, 0.42),
+          rgba(239, 56, 125, 0.18),
+          rgba(255, 232, 241, 0.65)
+        );
+      transform: rotate(-3deg);
+      pointer-events: none;
+    }
+
+    @media (min-width: 720px) {
       .page {
-        padding-right: 14px;
-        padding-left: 14px;
+        max-width: 660px;
+        padding-right: 32px;
+        padding-left: 32px;
       }
 
-      .card {
-        padding-right: 18px;
-        padding-left: 18px;
+      .lookup-card {
+        padding-right: 38px;
+        padding-left: 38px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      body::before {
+        right: -85px;
+        width: 155px;
+        height: 155px;
+      }
+
+      .page {
+        padding-right: 16px;
+        padding-left: 16px;
+      }
+
+      .brand {
+        margin-bottom: 27px;
+      }
+
+      .brand-bag {
+        width: 43px;
+        height: 43px;
+        border-radius: 14px;
       }
 
       .brand-title {
-        font-size: 33px;
+        gap: 7px;
+        font-size: 42px;
+      }
+
+      .brand-title span {
+        font-size: 20px;
+      }
+
+      .brand-slogan {
+        margin-top: 16px;
+        font-size: 14px;
+      }
+
+      .lookup-card {
+        padding: 69px 20px 23px;
+        border-radius: 29px;
+      }
+
+      .card-icon {
+        top: -35px;
+        width: 72px;
+        height: 72px;
+        border-width: 7px;
+      }
+
+      .card-icon svg {
+        width: 33px;
+        height: 33px;
+      }
+
+      .card-title {
+        font-size: 32px;
+      }
+
+      .description {
+        margin-bottom: 25px;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .input-shell,
+      .field input {
+        min-height: 60px;
+        height: 60px;
+      }
+
+      .lookup-button {
+        min-height: 62px;
+        padding-right: 50px;
+        padding-left: 50px;
+        font-size: 18px;
+      }
+
+      .lookup-button::after {
+        right: 18px;
+        width: 26px;
+        height: 26px;
+      }
+
+      .privacy-note {
+        grid-template-columns: 38px minmax(0, 1fr);
+        gap: 10px;
+        padding: 14px;
+        font-size: 11.5px;
+      }
+
+      .privacy-icon {
+        width: 38px;
+        height: 38px;
+      }
+
+      .order-card {
+        padding: 14px;
+        border-radius: 19px;
+      }
+
+      .product-row {
+        padding: 14px;
+      }
+    }
+
+    @media (max-width: 350px) {
+      .brand-title {
+        font-size: 37px;
+      }
+
+      .brand-title span {
+        font-size: 18px;
+      }
+
+      .lookup-card {
+        padding-right: 17px;
+        padding-left: 17px;
+      }
+
+      .lookup-button {
+        padding-right: 42px;
+        padding-left: 22px;
+        font-size: 17px;
+      }
+
+      .product-row {
+        grid-template-columns: 1fr;
+      }
+
+      .product-price {
+        text-align: left;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
       }
     }
   </style>
 </head>
 
 <body>
+  <div class="top-accent"></div>
+
   <main class="page">
     <header class="brand">
+      <div class="brand-bag" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M6.5 8.5H17.5L18.4 20H5.6L6.5 8.5Z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M9 9V6.7C9 5.2 10.3 4 12 4C13.7 4 15 5.2 15 6.7V9"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M12 17.1L9.9 15.2C8.6 14 10.4 11.9 12 13.4C13.6 11.9 15.4 14 14.1 15.2L12 17.1Z"
+            fill="currentColor"
+          />
+        </svg>
+      </div>
+
       <h1 class="brand-title">
         DAMPICK
         <span>담픽</span>
@@ -376,18 +1017,77 @@
 
       <p class="brand-slogan">
         모일수록 더 좋아진다,<br>
-        담픽 공동구매
+        <strong>담픽 공동구매</strong>
       </p>
     </header>
 
-    <section class="card">
+    <section class="lookup-card">
+      <div class="card-icon" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M6.5 3.8H13.7L17.5 7.6V13.2"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M15 3.8V8H19.1"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M12.4 20.2H5.4C4.6 20.2 4 19.6 4 18.8V5.2C4 4.4 4.6 3.8 5.4 3.8H6.5"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M8 10.5H13"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M8 14H11"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <circle
+            cx="16.8"
+            cy="16.8"
+            r="3.2"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+          <path
+            d="M19.2 19.2L21 21"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+
       <h2 class="card-title">
         내 주문 조회
       </h2>
 
+      <div class="title-divider" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 21S3 15.4 3 8.6C3 5.5 5.3 3.4 8.1 3.4C9.8 3.4 11.2 4.3 12 5.5C12.8 4.3 14.2 3.4 15.9 3.4C18.7 3.4 21 5.5 21 8.6C21 15.4 12 21 12 21Z" />
+        </svg>
+      </div>
+
       <p class="description">
-        닉네임을 입력하면 주문 상품과 상품별 픽업 날짜를
-        바로 확인할 수 있습니다.
+        닉네임을 입력하면 주문 상품과<br>
+        상품별 픽업 날짜를 바로 확인할 수 있습니다.
       </p>
 
       <div class="field">
@@ -395,16 +1095,40 @@
           닉네임
         </label>
 
-        <input
-          id="nickname"
-          type="text"
-          lang="ko"
-          inputmode="text"
-          placeholder="예: 담픽1234"
-          autocomplete="off"
-          autocapitalize="off"
-          spellcheck="false"
-        >
+        <div class="input-shell">
+          <span class="input-icon" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="12"
+                cy="8"
+                r="3.5"
+                stroke="currentColor"
+                stroke-width="1.8"
+              />
+              <path
+                d="M5 20C5.4 15.9 8 13.8 12 13.8C16 13.8 18.6 15.9 19 20"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+
+          <input
+            id="nickname"
+            type="text"
+            lang="ko"
+            inputmode="text"
+            placeholder="예: 담픽1234"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+          >
+        </div>
       </div>
 
       <button
@@ -425,18 +1149,76 @@
         class="results"
       ></section>
 
-      <p class="privacy-note">
-        닉네임만으로 조회하며 전화번호와 주소 같은
-        민감한 개인정보는 표시하지 않습니다.
-      </p>
+      <div class="privacy-note">
+        <span class="privacy-icon" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 3L19 6V11.2C19 15.8 16.2 19.1 12 21C7.8 19.1 5 15.8 5 11.2V6L12 3Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M9.7 11.4V10.2C9.7 8.9 10.7 7.9 12 7.9C13.3 7.9 14.3 8.9 14.3 10.2V11.4"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+            <rect
+              x="8.7"
+              y="11.2"
+              width="6.6"
+              height="5.1"
+              rx="1.2"
+              stroke="currentColor"
+              stroke-width="1.6"
+            />
+          </svg>
+        </span>
+
+        <span>
+          닉네임만으로 조회하며 전화번호와 주소 같은
+          민감한 개인정보는 표시하지 않습니다.
+        </span>
+      </div>
     </section>
 
-    <a
-      class="admin-link"
-      href="./admin.html"
-    >
-      관리자 페이지
-    </a>
+    <div class="admin-link-wrap">
+      <a
+        class="admin-link"
+        href="./admin.html"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <rect
+            x="6"
+            y="10"
+            width="12"
+            height="10"
+            rx="2"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+          <path
+            d="M8.5 10V7.5C8.5 5.6 10.1 4 12 4C13.9 4 15.5 5.6 15.5 7.5V10"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </svg>
+        관리자 페이지
+      </a>
+    </div>
+
+    <div class="bottom-wave" aria-hidden="true"></div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -722,7 +1504,6 @@
             )
           : [];
 
-
       const itemHtml =
         items.map(
           function (item) {
@@ -859,6 +1640,7 @@
         .replaceAll("'", "&#039;");
     }
   </script>
+
   <script>
     document.addEventListener(
       "DOMContentLoaded",
@@ -894,6 +1676,5 @@
       }
     );
   </script>
-  
 </body>
 </html>
