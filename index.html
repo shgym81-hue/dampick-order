@@ -527,11 +527,14 @@
           return;
         }
 
+        const totalProductQuantity =
+          getTotalProductQuantity(orderRows);
+
         showMessage(
           nickname +
-          " 고객님의 주문 " +
-          orderRows.length +
-          "건을 찾았습니다.",
+          " 고객님의 주문 상품은 총 " +
+          totalProductQuantity.toLocaleString("ko-KR") +
+          "개입니다.",
           "success"
         );
 
@@ -550,6 +553,42 @@
         lookupButton.textContent =
           "주문 조회하기";
       }
+    }
+
+    function getTotalProductQuantity(orderRows) {
+      return orderRows.reduce(
+        function (orderTotal, order) {
+          const items =
+            Array.isArray(order.items)
+              ? order.items
+              : [];
+
+          const itemQuantityTotal =
+            items.reduce(
+              function (itemTotal, item) {
+                const quantity =
+                  Number(item.quantity || 0);
+
+                return (
+                  itemTotal +
+                  (
+                    Number.isFinite(quantity) &&
+                    quantity > 0
+                      ? quantity
+                      : 0
+                  )
+                );
+              },
+              0
+            );
+
+          return (
+            orderTotal +
+            itemQuantityTotal
+          );
+        },
+        0
+      );
     }
 
     function normalizeOrders(data) {
