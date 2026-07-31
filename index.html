@@ -301,22 +301,6 @@
       font-weight: 900;
     }
 
-    .total-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 12px;
-      padding: 17px;
-      border-radius: 14px;
-      color: #fff;
-      background: #292929;
-    }
-
-    .total-price {
-      color: #ff8eb5;
-      font-size: 21px;
-      font-weight: 900;
-    }
 
     .information-row {
       display: flex;
@@ -414,8 +398,12 @@
         <input
           id="nickname"
           type="text"
+          lang="ko"
+          inputmode="text"
           placeholder="예: 담픽1234"
           autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
         >
       </div>
 
@@ -590,8 +578,11 @@
         return Number.POSITIVE_INFINITY;
       }
 
+      const normalizedValue =
+        String(value).slice(0, 10);
+
       const date =
-        new Date(value + "T00:00:00");
+        new Date(normalizedValue + "T00:00:00");
 
       if (Number.isNaN(date.getTime())) {
         return Number.POSITIVE_INFINITY;
@@ -692,16 +683,6 @@
             )
           : [];
 
-      const totalAmount =
-        items.reduce(
-          function (sum, item) {
-            return (
-              sum +
-              Number(item.line_total || 0)
-            );
-          },
-          0
-        );
 
       const itemHtml =
         items.map(
@@ -768,14 +749,6 @@
 
           <div class="product-list">
             ${itemHtml}
-          </div>
-
-          <div class="total-box">
-            <span>총 주문금액</span>
-
-            <strong class="total-price">
-              ${formatPrice(totalAmount)}
-            </strong>
           </div>
 
           ${
@@ -848,22 +821,40 @@
     }
   </script>
   <script>
-document.addEventListener('DOMContentLoaded', function () {
-  document.documentElement.lang = 'ko';
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
+        document.documentElement.lang = "ko";
 
-  const koreanFields = document.querySelectorAll(
-    'input[type="text"], input[type="search"], textarea'
-  );
+        const koreanFields =
+          document.querySelectorAll(
+            'input[type="text"], input[type="search"], textarea'
+          );
 
-  koreanFields.forEach(function (field) {
-    field.setAttribute('lang', 'ko');
-    field.setAttribute('inputmode', 'text');
-    field.setAttribute('autocomplete', 'off');
-    field.setAttribute('autocapitalize', 'off');
-    field.setAttribute('spellcheck', 'false');
-  });
-});
-</script>
+        koreanFields.forEach(
+          function (field) {
+            field.setAttribute("lang", "ko");
+            field.setAttribute(
+              "inputmode",
+              "text"
+            );
+            field.setAttribute(
+              "autocomplete",
+              "off"
+            );
+            field.setAttribute(
+              "autocapitalize",
+              "off"
+            );
+            field.setAttribute(
+              "spellcheck",
+              "false"
+            );
+          }
+        );
+      }
+    );
+  </script>
   
 </body>
 </html>
