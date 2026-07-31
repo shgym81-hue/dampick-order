@@ -9,6 +9,26 @@
 
   <title>담픽 관리자</title>
 
+  <!-- 페이지를 열 때 항상 관리자 화면 맨 위에서 시작 -->
+  <script>
+    (function () {
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+
+      if (window.location.hash) {
+        history.replaceState(
+          null,
+          document.title,
+          window.location.pathname +
+          window.location.search
+        );
+      }
+
+      window.scrollTo(0, 0);
+    })();
+  </script>
+
   <!-- 담픽 관리자 앱 아이콘 및 PWA 설정 -->
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/png" href="./favicon.png">
@@ -1500,6 +1520,30 @@
     let orderListOpen = false;
     let selectedSalesDate = "";
 
+    function resetPagePosition() {
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
+
+      if (window.location.hash) {
+        history.replaceState(
+          null,
+          document.title,
+          window.location.pathname +
+          window.location.search
+        );
+      }
+
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "auto"
+      });
+
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+
     document
       .getElementById("loginButton")
       .addEventListener("click", login);
@@ -1664,6 +1708,54 @@
         downloadAllOrdersExcel
       );
 
+    document
+      .querySelectorAll(
+        '.category-nav a[href^="#"]'
+      )
+      .forEach(
+        function (link) {
+          link.addEventListener(
+            "click",
+            function (event) {
+              event.preventDefault();
+
+              const target =
+                document.querySelector(
+                  link.getAttribute("href")
+                );
+
+              if (target) {
+                target.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start"
+                });
+              }
+
+              if (window.location.hash) {
+                history.replaceState(
+                  null,
+                  document.title,
+                  window.location.pathname +
+                  window.location.search
+                );
+              }
+            }
+          );
+        }
+      );
+
+    window.addEventListener(
+      "pageshow",
+      function () {
+        resetPagePosition();
+
+        window.setTimeout(
+          resetPagePosition,
+          80
+        );
+      }
+    );
+
     start();
 
     async function start() {
@@ -1734,6 +1826,18 @@
     function showAdmin() {
       loginSection.classList.add("hidden");
       adminApp.classList.remove("hidden");
+
+      resetPagePosition();
+
+      window.setTimeout(
+        resetPagePosition,
+        0
+      );
+
+      window.setTimeout(
+        resetPagePosition,
+        500
+      );
     }
 
     async function loadAll() {
@@ -3731,6 +3835,13 @@
   <script>
     window.addEventListener("load", function () {
       const splash = document.getElementById("appSplash");
+
+      resetPagePosition();
+
+      window.setTimeout(
+        resetPagePosition,
+        700
+      );
 
       window.setTimeout(function () {
         if (splash) {
