@@ -843,6 +843,52 @@
             </div>
 
             ${
+              request.payment_method === "card_online"
+                ? `
+                  <div class="detail-box">
+                    <strong>온라인 카드 승인</strong>
+                    ${
+                      isPaymentCompleted(
+                        request.payment_status
+                      )
+                        ? `
+                          카드 자동 결제 완료<br>
+                          승인시각:
+                          ${escapeHtml(
+                            formatDateTime(
+                              request.toss_approved_at
+                            )
+                          )}
+                          ${
+                            request.toss_receipt_url
+                              ? `
+                                <br>
+                                <a
+                                  href="${escapeHtml(
+                                    request.toss_receipt_url
+                                  )}"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  카드 영수증 보기
+                                </a>
+                              `
+                              : ""
+                          }
+                        `
+                        : `
+                          ${escapeHtml(
+                            request.payment_status ||
+                            "카드 인증 대기"
+                          )}
+                        `
+                    }
+                  </div>
+                `
+                : ""
+            }
+
+            ${
               isHome
                 ? `
                   <div class="detail-box sensitive">
@@ -1097,6 +1143,34 @@
           year: "numeric",
           month: "long",
           day: "numeric"
+        }
+      ).format(date);
+    }
+
+    function formatDateTime(value) {
+      if (!value) {
+        return "확인 전";
+      }
+
+      const date =
+        new Date(value);
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return String(value);
+      }
+
+      return new Intl.DateTimeFormat(
+        "ko-KR",
+        {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
         }
       ).format(date);
     }
