@@ -262,6 +262,18 @@
       line-height: 1.55;
     }
 
+    .readonly-guide {
+      min-height: 46px;
+      padding: 11px 12px;
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      color: #1e4d8f;
+      background: #eff6ff;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.55;
+    }
+
     .search-info {
       min-height: 18px;
       margin-top: 6px;
@@ -1169,8 +1181,9 @@
           <div class="category-title-area">
             <h2>회원 주문 등록</h2>
             <p class="section-description">
-              고객과 상품을 선택하면 각 상품에 입력된 픽업 날짜가
-              주문과 고객 화면에 자동으로 저장됩니다.
+              관리자는 고객·주문상품·수량·주문상태를 등록합니다.
+              상품별 픽업 날짜는 자동 저장되고,
+              결제방법과 수령방법은 고객이 주문조회 화면에서 선택합니다.
             </p>
           </div>
         </div>
@@ -1223,18 +1236,16 @@
             </div>
 
             <div>
-              <label for="paymentStatus">
-                최초 결제상태
+              <label>
+                고객 결제방법
               </label>
 
-              <select id="paymentStatus">
-                <option>입금 대기</option>
-                <option>입금 확인 대기</option>
-                <option>현장 결제 예정</option>
-                <option>카드 결제 대기</option>
-                <option>입금 완료</option>
-                <option>결제 완료</option>
-              </select>
+              <div class="readonly-guide">
+                관리자는 주문상품만 등록합니다.
+                고객이 내 주문 조회에서
+                픽업 시 결제·계좌이체·카드결제 중
+                하나를 직접 선택합니다.
+              </div>
             </div>
 
             <div>
@@ -1279,7 +1290,7 @@
           ></div>
 
           <div class="total-preview">
-            <span>최종 결제금액</span>
+            <span>주문 상품 합계</span>
             <strong id="totalPreview">0원</strong>
           </div>
 
@@ -1306,7 +1317,8 @@
           <div class="category-title-area">
             <h2>등록된 회원 주문</h2>
             <p class="section-description">
-              주문상품·상품별 픽업 날짜·결제상태를 확인하고,
+              고객이 선택한 결제방법이 결제상태에 표시됩니다.
+              관리자가 최종 결제 확인과 주문상태 변경,
               부분취소·픽업완료·전체삭제를 처리합니다.
             </p>
           </div>
@@ -2039,11 +2051,7 @@
             )
             .value,
         payment_status:
-          document
-            .getElementById(
-              "paymentStatus"
-            )
-            .value,
+          "고객 선택 대기",
         order_status:
           document
             .getElementById(
@@ -2404,10 +2412,76 @@
       await loadOrders();
     }
 
+    async function updateOrderStatus(
+      orderId
+    ) {
+      const select =
+        document.getElementById(
+          "order-status-edit-" + orderId
+        );
+
+      if (!select) return;
+
+      const { error } =
+        await sb
+          .from("orders")
+          .update({
+            order_status:
+              select.value
+          })
+          .eq("id", orderId);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(
+        appMessage,
+        "주문상태를 " +
+        select.value +
+        "로 변경했습니다.",
+        "success"
+      );
+
+      await loadOrders();
+    }
+
+    function isPaymentCompleted(
+      status
+    ) {
+      const value =
+        String(status || "");
+
+      return (
+        value.includes("결제 완료") ||
+        value.includes("입금 완료")
+      );
+    }
+
     async function togglePickupComplete(
       orderId,
       completed
     ) {
+      const currentOrder =
+        orders.find(
+          function (order) {
+            return order.id === orderId;
+          }
+        );
+
+      if (
+        !completed &&
+        !isPaymentCompleted(
+          currentOrder?.payment_status
+        )
+      ) {
+        alert(
+          "먼저 결제상태를 결제 완료 또는 입금 완료로 변경해주세요."
+        );
+        return;
+      }
+
       const accepted =
         confirm(
           completed
@@ -2427,8 +2501,6 @@
           : {
               order_status:
                 "픽업 완료",
-              payment_status:
-                "결제 완료",
               completed_at:
                 new Date().toISOString()
             };
@@ -3141,7 +3213,7 @@
                     </span>
 
                     <span class="order-status-badge">
-                      ${escapeHtml(order.payment_status || "입금 대기")}
+                      ${escapeHtml(order.payment_status || "고객 선택 대기")}
                     </span>
                   </div>
 
@@ -3184,6 +3256,23 @@
                     data-payment-save="${escapeHtml(order.id)}"
                   >
                     결제상태 저장
+                  </button>
+                </div>
+
+                <div class="payment-edit">
+                  <select
+                    id="order-status-edit-${escapeHtml(order.id)}"
+                    aria-label="주문상태 변경"
+                  >
+                    ${renderOrderStatusOptions(order.order_status)}
+                  </select>
+
+                  <button
+                    class="button secondary"
+                    type="button"
+                    data-order-status-save="${escapeHtml(order.id)}"
+                  >
+                    주문상태 저장
                   </button>
                 </div>
 
@@ -3266,6 +3355,23 @@
 
       document
         .querySelectorAll(
+          "[data-order-status-save]"
+        )
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                updateOrderStatus(
+                  button.dataset.orderStatusSave
+                );
+              }
+            );
+          }
+        );
+
+      document
+        .querySelectorAll(
           "[data-payment-complete]"
         )
         .forEach(
@@ -3335,12 +3441,51 @@
       currentStatus
     ) {
       const statuses = [
+        "고객 선택 대기",
         "입금 대기",
         "입금 확인 대기",
         "현장 결제 예정",
         "카드 결제 대기",
         "입금 완료",
         "결제 완료"
+      ];
+
+      if (
+        currentStatus &&
+        !statuses.includes(
+          currentStatus
+        )
+      ) {
+        statuses.unshift(
+          currentStatus
+        );
+      }
+
+      return statuses.map(
+        function (status) {
+          return `
+            <option
+              ${status === currentStatus ? "selected" : ""}
+            >
+              ${escapeHtml(status)}
+            </option>
+          `;
+        }
+      ).join("");
+    }
+
+    function renderOrderStatusOptions(
+      currentStatus
+    ) {
+      const statuses = [
+        "주문 접수",
+        "상품 준비 중",
+        "픽업 가능",
+        "픽업 완료",
+        "선결제 확인 대기",
+        "배송 준비 가능",
+        "배송 준비 중",
+        "배송 완료"
       ];
 
       if (
