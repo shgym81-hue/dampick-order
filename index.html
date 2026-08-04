@@ -516,8 +516,8 @@
       </h1>
 
       <p>
-        주문상품을 필요한 만큼 나누어 선택하고<br>
-        결제방법과 수령방법을 정하세요.
+        별도 변경이 없으면 매장 픽업·픽업할 때 결제입니다.<br>
+        원하는 상품만 골라 미리 결제하거나 배송으로 변경하세요.
       </p>
     </header>
 
@@ -525,8 +525,9 @@
       <h2>내 주문 조회</h2>
 
       <p class="description">
-        같은 상품을 여러 번 주문한 경우
-        상품명·가격·픽업 날짜가 같으면 수량을 합쳐 표시합니다.
+        같은 상품은 수량을 합쳐 표시합니다.
+        별도 신청을 하지 않은 상품은 자동으로
+        매장 픽업·픽업할 때 결제로 처리됩니다.
       </p>
 
       <label
@@ -728,8 +729,8 @@
           <span>
             <strong>카드로 미리 결제</strong>
             <small>
-              현재는 카드결제 선택이 저장됩니다.
-              실제 카드 승인은 PG 연결 후 가능합니다.
+              토스페이먼츠 카드·간편결제 창에서 바로 결제합니다.
+              승인되면 관리자 화면에 자동으로 결제 완료가 표시됩니다.
             </small>
           </span>
         </label>
@@ -769,9 +770,9 @@
         <strong>카드결제 안내</strong>
 
         <p style="margin-bottom:0;line-height:1.65;">
-          카드결제 선택은 저장되지만,
-          실제 온라인 카드 승인 기능은 PG 계약과
-          결제 서버 연결이 완료된 뒤 사용할 수 있습니다.
+          카드·간편결제 승인이 끝나면
+          관리자 결제·배송 화면에 자동으로
+          ‘카드 자동 결제 완료’가 표시됩니다.
         </p>
       </div>
 
@@ -801,7 +802,9 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://js.tosspayments.com/v2/standard"></script>
   <script src="./config.js"></script>
+  <script src="./payment-config.js"></script>
 
   <script>
     "use strict";
@@ -811,6 +814,14 @@
 
     const sb =
       window.dampickSupabase;
+
+    const paymentConfig =
+      window.DAMPICK_PAYMENT_CONFIG || {};
+
+    const TOSS_CLIENT_KEY =
+      String(
+        paymentConfig.tossClientKey || ""
+      ).trim();
 
     const nicknameInput =
       document.getElementById(
@@ -844,6 +855,8 @@
 
     let currentOrders = [];
     let productGroups = [];
+
+    restoreNickname();
 
     lookupButton.addEventListener(
       "click",
@@ -1285,7 +1298,11 @@
                             ${escapeHtml(statusText)}
                           </span>
                         `
-                        : ""
+                        : `
+                          <span class="status-badge">
+                            기본: 매장 픽업 · 픽업할 때 결제
+                          </span>
+                        `
                     }
                   </div>
                 </div>
@@ -1295,7 +1312,7 @@
                     ${
                       assigned
                         ? "이미 결제·수령 방법을 신청한 상품입니다."
-                        : "이번 신청에 포함할 상품을 체크하세요."
+                        : "변경하지 않으면 매장 픽업·픽업할 때 결제입니다."
                     }
                   </span>
 
@@ -1592,7 +1609,7 @@
           "이번에 결제할 상품을 한 개 이상 체크해주세요.";
       } else if (!isHome) {
         guide.textContent =
-          "체크된 상품만 이번 결제·픽업 신청에 포함됩니다. 남은 상품은 다시 조회해 다른 방법으로 신청할 수 있습니다.";
+          "체크한 상품만 결제방법이 변경됩니다. 체크하지 않은 상품은 자동으로 매장 픽업·픽업할 때 결제입니다.";
       } else if (
         productAmount >=
           FREE_DELIVERY_THRESHOLD
@@ -1675,6 +1692,22 @@
         return;
       }
 
+      if (
+        paymentMethod === "card_online" &&
+        !isTossConfigured()
+      ) {
+        showMessage(
+          "카드결제 설정이 아직 완료되지 않았습니다. payment-config.js의 토스 클라이언트 키를 확인해주세요.",
+          "error"
+        );
+        return;
+      }
+
+      localStorage.setItem(
+        "dampickLastNickname",
+        nickname
+      );
+
       submitCheckoutButton.disabled =
         true;
 
@@ -1712,6 +1745,16 @@
             ? JSON.parse(data)
             : data;
 
+        if (
+          paymentMethod === "card_online"
+        ) {
+          await startTossCardPayment(
+            result,
+            nickname
+          );
+          return;
+        }
+
         const completeBox =
           document.getElementById(
             "checkoutComplete"
@@ -1737,7 +1780,7 @@
             "을 입금해주세요.";
         } else {
           nextGuide =
-            "카드결제 선택이 저장되었습니다. 실제 온라인 카드 승인은 PG 연결 후 가능합니다.";
+            "카드 결제창으로 이동합니다.";
         }
 
         completeBox.innerHTML = `
@@ -1799,6 +1842,159 @@
 
         submitCheckoutButton.textContent =
           "선택 상품 결제·수령 신청하기";
+      }
+    }
+
+    function restoreNickname() {
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+      const saved =
+        params.get("nickname") ||
+        localStorage.getItem(
+          "dampickLastNickname"
+        ) ||
+        "";
+
+      if (saved) {
+        nicknameInput.value =
+          saved;
+      }
+    }
+
+    function isTossConfigured() {
+      return (
+        TOSS_CLIENT_KEY.startsWith(
+          "test_ck_"
+        ) ||
+        TOSS_CLIENT_KEY.startsWith(
+          "live_ck_"
+        )
+      );
+    }
+
+    function makeTossOrderName() {
+      const groups =
+        getSelectedGroups();
+
+      if (!groups.length) {
+        return "담픽 주문상품";
+      }
+
+      const firstName =
+        String(
+          groups[0].productName ||
+          "담픽 상품"
+        );
+
+      return groups.length > 1
+        ? (
+            firstName +
+            " 외 " +
+            (groups.length - 1) +
+            "건"
+          ).slice(0, 100)
+        : firstName.slice(0, 100);
+    }
+
+    async function startTossCardPayment(
+      result,
+      nickname
+    ) {
+      if (
+        typeof window.TossPayments !==
+        "function"
+      ) {
+        throw new Error(
+          "토스페이먼츠 결제 모듈을 불러오지 못했습니다."
+        );
+      }
+
+      const amount =
+        Number(
+          result.final_amount || 0
+        );
+
+      if (
+        !Number.isInteger(amount) ||
+        amount < 100
+      ) {
+        throw new Error(
+          "카드결제 금액은 100원 이상이어야 합니다."
+        );
+      }
+
+      const tossPayments =
+        window.TossPayments(
+          TOSS_CLIENT_KEY
+        );
+
+      const payment =
+        tossPayments.payment({
+          customerKey:
+            window.TossPayments.ANONYMOUS
+        });
+
+      const successUrl =
+        new URL(
+          "./payment-success.html",
+          window.location.href
+        ).href;
+
+      const failUrl =
+        new URL(
+          "./payment-fail.html",
+          window.location.href
+        ).href;
+
+      try {
+        await payment.requestPayment({
+          method: "CARD",
+          amount: {
+            currency: "KRW",
+            value: amount
+          },
+          orderId:
+            String(
+              result.request_code
+            ),
+          orderName:
+            makeTossOrderName(),
+          successUrl,
+          failUrl,
+          customerName:
+            nickname.slice(0, 100),
+          card: {
+            flowMode: "DEFAULT"
+          }
+        });
+      } catch (error) {
+        try {
+          await sb.rpc(
+            "mark_card_payment_failed",
+            {
+              p_request_code:
+                String(
+                  result.request_code
+                ),
+              p_error_code:
+                String(
+                  error?.code || ""
+                ),
+              p_error_message:
+                String(
+                  error?.message ||
+                  "카드결제 창을 열지 못했습니다."
+                )
+            }
+          );
+        } catch (ignore) {
+          console.warn(ignore);
+        }
+
+        throw error;
       }
     }
 
