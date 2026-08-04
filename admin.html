@@ -4,10 +4,18 @@
   <meta charset="UTF-8">
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
-
   <title>담픽 관리자</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+
+  <meta name="theme-color" content="#ef3f7f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="담픽 관리자">
 
   <style>
     * {
@@ -23,16 +31,23 @@
       --background: #fff7fa;
       --danger: #c83b54;
       --success: #197348;
+      --warning: #b7791f;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--background);
     }
 
     body {
       margin: 0;
+      color: var(--dark);
+      background: var(--background);
       font-family:
         Arial,
         "Noto Sans KR",
+        "Apple SD Gothic Neo",
         sans-serif;
-      color: var(--dark);
-      background: var(--background);
     }
 
     button,
@@ -42,10 +57,17 @@
       font: inherit;
     }
 
+    button {
+      cursor: pointer;
+    }
+
     .wrap {
       width: min(1120px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 28px 0 60px;
+      padding:
+        calc(28px + env(safe-area-inset-top))
+        0
+        calc(60px + env(safe-area-inset-bottom));
     }
 
     .hidden {
@@ -56,13 +78,14 @@
       margin: 0;
       color: var(--main);
       font-size: 30px;
-      font-weight: 900;
+      font-weight: 950;
     }
 
     .brand p {
       margin: 5px 0 0;
       color: var(--sub);
       font-size: 13px;
+      line-height: 1.5;
     }
 
     .login-card {
@@ -83,9 +106,9 @@
     .topbar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       gap: 15px;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
 
     h2,
@@ -97,7 +120,8 @@
       margin-top: -5px;
       color: var(--sub);
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.65;
+      word-break: keep-all;
     }
 
     .grid {
@@ -151,17 +175,23 @@
 
     .button {
       display: inline-flex;
+      min-height: 44px;
       align-items: center;
       justify-content: center;
-      min-height: 44px;
       padding: 10px 16px;
       border: 0;
       border-radius: 10px;
       color: #fff;
       background: var(--main);
       font-weight: 900;
+      text-align: center;
       text-decoration: none;
       cursor: pointer;
+    }
+
+    .button:disabled {
+      opacity: .55;
+      cursor: wait;
     }
 
     .button.secondary {
@@ -170,6 +200,19 @@
 
     .button.danger {
       background: var(--danger);
+    }
+
+    .button.success {
+      background: var(--success);
+    }
+
+    .button.warning {
+      background: var(--warning);
+    }
+
+    .button.light {
+      color: #333;
+      background: #ececec;
     }
 
     .button.small {
@@ -208,10 +251,55 @@
       background: #eaf8ef;
     }
 
+    .message.info {
+      color: #305ea8;
+      background: #edf4ff;
+    }
+
+    .muted {
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .search-info {
+      min-height: 18px;
+      margin-top: 6px;
+    }
+
     .list {
       display: grid;
       gap: 9px;
       margin-top: 15px;
+    }
+
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: #fff;
+    }
+
+    .list-row-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .list-row-title {
+      margin: 0;
+      font-weight: 950;
+      word-break: break-word;
+    }
+
+    .list-row-meta {
+      margin: 5px 0 0;
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.6;
     }
 
     .member-tools,
@@ -229,7 +317,7 @@
     #customerList,
     #orderList {
       display: none;
-      max-height: 620px;
+      max-height: 680px;
       overflow-y: auto;
       padding-right: 2px;
     }
@@ -239,27 +327,200 @@
       display: grid;
     }
 
-    .search-info {
-      min-height: 18px;
-      margin-top: 6px;
+    /* 카테고리 */
+    .category-nav {
+      position: sticky;
+      top: 7px;
+      z-index: 100;
+      display: grid;
+      grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+      gap: 9px;
+      margin: 0 0 22px;
+      padding: 11px;
+      border: 1px solid rgba(231, 231, 231, .95);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .96);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, .09);
+      backdrop-filter: blur(10px);
     }
 
-    .list-row {
+    .category-nav a {
       display: flex;
-      justify-content: space-between;
+      min-height: 62px;
+      flex-direction: column;
       align-items: center;
-      gap: 12px;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
+      justify-content: center;
+      padding: 8px 6px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      color: #333;
+      background: #f7f7f7;
+      text-align: center;
+      text-decoration: none;
     }
 
-    .muted {
-      color: var(--sub);
+    .category-nav-number {
+      display: flex;
+      width: 25px;
+      height: 25px;
+      margin-bottom: 4px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .category-nav-label {
       font-size: 12px;
-      line-height: 1.5;
+      font-weight: 950;
+      line-height: 1.25;
+      word-break: keep-all;
     }
 
+    .category-nav .nav-1 {
+      border-color: #bfdbfe;
+      background: #eff6ff;
+    }
+
+    .category-nav .nav-1 .category-nav-number {
+      background: #2563eb;
+    }
+
+    .category-nav .nav-2 {
+      border-color: #ddd6fe;
+      background: #f5f3ff;
+    }
+
+    .category-nav .nav-2 .category-nav-number {
+      background: #7c3aed;
+    }
+
+    .category-nav .nav-3 {
+      border-color: #a7f3d0;
+      background: #ecfdf5;
+    }
+
+    .category-nav .nav-3 .category-nav-number {
+      background: #059669;
+    }
+
+    .category-nav .nav-4 {
+      border-color: #fed7aa;
+      background: #fff7ed;
+    }
+
+    .category-nav .nav-4 .category-nav-number {
+      background: #ea580c;
+    }
+
+    .category-nav .nav-5 {
+      border-color: #fecdd3;
+      background: #fff1f2;
+    }
+
+    .category-nav .nav-5 .category-nav-number {
+      background: #e11d48;
+    }
+
+    .category-card {
+      --category: #ef3f7f;
+      --category-dark: #d92d69;
+      --category-border: #f8bbd0;
+      position: relative;
+      overflow: hidden;
+      padding-top: 0;
+      border-width: 2px;
+      border-color: var(--category-border);
+      scroll-margin-top: 105px;
+    }
+
+    .category-card.category-1 {
+      --category: #3b82f6;
+      --category-dark: #1d4ed8;
+      --category-border: #bfdbfe;
+    }
+
+    .category-card.category-2 {
+      --category: #8b5cf6;
+      --category-dark: #6d28d9;
+      --category-border: #ddd6fe;
+    }
+
+    .category-card.category-3 {
+      --category: #10b981;
+      --category-dark: #047857;
+      --category-border: #a7f3d0;
+    }
+
+    .category-card.category-4 {
+      --category: #f97316;
+      --category-dark: #c2410c;
+      --category-border: #fed7aa;
+    }
+
+    .category-card.category-5 {
+      --category: #f43f5e;
+      --category-dark: #be123c;
+      --category-border: #fecdd3;
+    }
+
+    .category-heading {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin: 0 -22px 22px;
+      padding: 18px 20px;
+      color: #fff;
+      background:
+        linear-gradient(
+          135deg,
+          var(--category),
+          var(--category-dark)
+        );
+    }
+
+    .category-number {
+      display: flex;
+      width: 43px;
+      height: 43px;
+      flex: 0 0 43px;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255, 255, 255, .55);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .2);
+      font-size: 20px;
+      font-weight: 950;
+    }
+
+    .category-icon {
+      flex: 0 0 auto;
+      font-size: 27px;
+      line-height: 1;
+    }
+
+    .category-title-area {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .category-title-area h2 {
+      margin: 0;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 950;
+    }
+
+    .category-title-area .section-description {
+      margin: 4px 0 0;
+      color: rgba(255, 255, 255, .92);
+      font-weight: 700;
+    }
+
+    /* 상품/주문 */
     .product-checks {
       display: grid;
       grid-template-columns:
@@ -276,6 +537,7 @@
       padding: 12px;
       border: 1px solid var(--border);
       border-radius: 12px;
+      background: #fff;
       cursor: pointer;
     }
 
@@ -291,6 +553,17 @@
 
     .product-choice input[type="number"] {
       padding: 9px;
+    }
+
+    .pickup-date-badge {
+      display: inline-flex;
+      margin-top: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      color: #663c00;
+      background: #fff2c7;
+      font-size: 11px;
+      font-weight: 900;
     }
 
     .total-preview {
@@ -313,6 +586,12 @@
       padding: 15px;
       border: 1px solid var(--border);
       border-radius: 13px;
+      background: #fff;
+    }
+
+    .order-card.completed {
+      border-color: #9bd6b7;
+      background: #f6fff9;
     }
 
     .order-head {
@@ -323,28 +602,9 @@
       margin-bottom: 9px;
     }
 
-    .order-items {
-      margin: 8px 0 10px;
-      padding-left: 20px;
-      color: #555;
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    .order-total {
-      margin-top: 8px;
-      font-weight: 900;
-    }
-
-    .order-card.completed {
-      border-color: #9bd6b7;
-      background: #f6fff9;
-    }
-
     .order-status-badge {
       display: inline-flex;
-      align-items: center;
-      margin-top: 5px;
+      margin: 5px 5px 0 0;
       padding: 4px 8px;
       border-radius: 999px;
       color: #555;
@@ -382,25 +642,32 @@
       margin-top: 1px;
     }
 
+    .order-total {
+      margin-top: 8px;
+      font-weight: 950;
+    }
+
+    .payment-edit {
+      display: grid;
+      grid-template-columns:
+        minmax(0, 1fr) auto;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
     .order-action-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-top: 13px;
     }
 
-    .button.success {
-      background: var(--success);
-    }
-
-    .button.light {
-      color: #333;
-      background: #ececec;
-    }
-
+    /* 매출 */
     .sales-tools {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns:
+        minmax(0, 1fr) auto;
       align-items: end;
       gap: 10px;
       margin-top: 15px;
@@ -408,7 +675,8 @@
 
     .sales-summary {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
       gap: 9px;
       margin-top: 14px;
     }
@@ -429,7 +697,8 @@
     .calendar-weekdays,
     .sales-calendar {
       display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-template-columns:
+        repeat(7, minmax(0, 1fr));
       gap: 5px;
     }
 
@@ -512,19 +781,55 @@
     @media (max-width: 720px) {
       .grid,
       .grid-3,
-      .product-checks {
+      .product-checks,
+      .order-action-grid,
+      .sales-summary,
+      .sales-tools,
+      .payment-edit {
         grid-template-columns: 1fr;
       }
 
       .topbar {
-        align-items: flex-start;
         flex-direction: column;
       }
 
-      .order-action-grid,
-      .sales-summary,
-      .sales-tools {
-        grid-template-columns: 1fr;
+      .category-nav {
+        display: flex;
+        overflow-x: auto;
+        gap: 8px;
+        margin-right: -14px;
+        margin-left: -14px;
+        padding: 9px 14px;
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+      }
+
+      .category-nav a {
+        flex: 0 0 108px;
+        min-height: 57px;
+      }
+
+      .category-heading {
+        gap: 9px;
+        margin-right: -22px;
+        margin-left: -22px;
+        padding: 15px 16px;
+      }
+
+      .category-number {
+        width: 37px;
+        height: 37px;
+        flex-basis: 37px;
+        font-size: 17px;
+      }
+
+      .category-title-area h2 {
+        font-size: 18px;
+      }
+
+      .product-choice {
+        grid-template-columns: auto 1fr 72px;
       }
 
       .calendar-empty,
@@ -542,7 +847,7 @@
 <body>
   <main class="wrap">
 
-    <!-- 관리자 로그인 -->
+    <!-- 로그인 -->
     <section
       id="loginSection"
       class="card login-card"
@@ -567,7 +872,7 @@
         autocomplete="username"
       >
 
-      <div style="height: 12px;"></div>
+      <div style="height:12px;"></div>
 
       <label for="adminPassword">
         관리자 비밀번호
@@ -597,7 +902,7 @@
       </div>
     </section>
 
-    <!-- 로그인 후 관리자 앱 -->
+    <!-- 관리자 앱 -->
     <section
       id="adminApp"
       class="hidden"
@@ -606,11 +911,18 @@
         <div class="brand">
           <h1>DAMPICK 담픽 관리자</h1>
           <p>
-            고객 닉네임·상품·주문을 등록하고 관리합니다.
+            회원·상품·주문·결제상태·픽업완료 매출을 관리합니다.
           </p>
         </div>
 
         <div class="actions">
+          <a
+            class="button"
+            href="./payments.html"
+          >
+            결제·배송 관리
+          </a>
+
           <a
             class="button secondary"
             href="./index.html"
@@ -633,13 +945,52 @@
         class="message"
       ></div>
 
-      <!-- 고객 관리 -->
-      <section class="card">
-        <h2>1. 회원 닉네임 관리</h2>
+      <nav
+        class="category-nav"
+        aria-label="관리자 카테고리 바로가기"
+      >
+        <a class="nav-1" href="#categoryMembers">
+          <span class="category-nav-number">1</span>
+          <span class="category-nav-label">회원 닉네임 관리</span>
+        </a>
 
-        <p class="section-description">
-          고객이 주문조회에 사용할 고유한 닉네임을 등록합니다.
-        </p>
+        <a class="nav-2" href="#categoryProducts">
+          <span class="category-nav-number">2</span>
+          <span class="category-nav-label">공동구매 상품 관리</span>
+        </a>
+
+        <a class="nav-3" href="#categoryOrderForm">
+          <span class="category-nav-number">3</span>
+          <span class="category-nav-label">회원 주문 등록</span>
+        </a>
+
+        <a class="nav-4" href="#categoryOrders">
+          <span class="category-nav-number">4</span>
+          <span class="category-nav-label">등록된 회원 주문</span>
+        </a>
+
+        <a class="nav-5" href="#categorySales">
+          <span class="category-nav-number">5</span>
+          <span class="category-nav-label">월별 픽업 완료 매출</span>
+        </a>
+      </nav>
+
+      <!-- 1. 회원 관리 -->
+      <section
+        id="categoryMembers"
+        class="card category-card category-1"
+      >
+        <div class="category-heading">
+          <div class="category-number">1</div>
+          <div class="category-icon" aria-hidden="true">👤</div>
+
+          <div class="category-title-area">
+            <h2>회원 닉네임 관리</h2>
+            <p class="section-description">
+              고객이 주문조회에 사용할 닉네임과 관리자 메모를 등록합니다.
+            </p>
+          </div>
+        </div>
 
         <form
           id="customerForm"
@@ -699,15 +1050,13 @@
             class="button secondary"
             type="button"
           >
-            회원 목록 펼치기 ▼ (0명)
+            회원 목록 펼치기 ▼
           </button>
 
           <div
             id="customerListInfo"
             class="muted"
-          >
-            회원 목록은 처음에는 접혀 있습니다.
-          </div>
+          ></div>
         </div>
 
         <div
@@ -716,14 +1065,23 @@
         ></div>
       </section>
 
-      <!-- 상품 관리 -->
-      <section class="card">
-        <h2>2. 공동구매 상품 관리</h2>
+      <!-- 2. 상품 관리 -->
+      <section
+        id="categoryProducts"
+        class="card category-card category-2"
+      >
+        <div class="category-heading">
+          <div class="category-number">2</div>
+          <div class="category-icon" aria-hidden="true">📦</div>
 
-        <p class="section-description">
-          공동구매 상품이 바뀔 때마다 새 상품을 등록하고,
-          판매가 끝난 상품은 비활성화합니다.
-        </p>
+          <div class="category-title-area">
+            <h2>공동구매 상품 관리</h2>
+            <p class="section-description">
+              상품을 올릴 때 상품명·가격·단위와 함께
+              상품별 픽업 날짜를 등록합니다.
+            </p>
+          </div>
+        </div>
 
         <form
           id="productForm"
@@ -771,6 +1129,18 @@
             >
           </div>
 
+          <div>
+            <label for="newProductPickupDate">
+              상품 픽업 날짜
+            </label>
+
+            <input
+              id="newProductPickupDate"
+              type="date"
+              required
+            >
+          </div>
+
           <div class="full">
             <button
               class="button"
@@ -787,21 +1157,29 @@
         ></div>
       </section>
 
-      <!-- 주문 등록 -->
-      <section class="card">
-        <h2>3. 회원 주문 등록</h2>
+      <!-- 3. 주문 등록 -->
+      <section
+        id="categoryOrderForm"
+        class="card category-card category-3"
+      >
+        <div class="category-heading">
+          <div class="category-number">3</div>
+          <div class="category-icon" aria-hidden="true">📝</div>
 
-        <p class="section-description">
-          고객 닉네임을 선택한 뒤 주문한 상품을 클릭하고
-          수량을 입력하면 최종 결제금액이 자동 계산됩니다.
-        </p>
+          <div class="category-title-area">
+            <h2>회원 주문 등록</h2>
+            <p class="section-description">
+              고객과 상품을 선택하면 각 상품에 입력된 픽업 날짜가
+              주문과 고객 화면에 자동으로 저장됩니다.
+            </p>
+          </div>
+        </div>
 
         <form id="orderForm">
           <div class="grid-3">
-
             <div>
-              <label for="orderCustomer">
-                고객 닉네임
+              <label for="orderCustomerSearch">
+                고객 닉네임 검색
               </label>
 
               <input
@@ -814,9 +1192,13 @@
               <div
                 id="orderCustomerSearchInfo"
                 class="muted search-info"
-              >
-                닉네임 일부를 입력하면 아래 목록이 줄어듭니다.
-              </div>
+              ></div>
+            </div>
+
+            <div>
+              <label for="orderCustomer">
+                고객 닉네임
+              </label>
 
               <select
                 id="orderCustomer"
@@ -841,38 +1223,17 @@
             </div>
 
             <div>
-              <label for="pickupDate">
-                픽업 예정일
-              </label>
-
-              <input
-                id="pickupDate"
-                type="date"
-              >
-            </div>
-
-            <div>
-              <label for="pickupPlace">
-                픽업 장소
-              </label>
-
-              <input
-                id="pickupPlace"
-                type="text"
-                value="담픽 매장"
-                readonly
-                aria-readonly="true"
-              >
-            </div>
-
-            <div>
               <label for="paymentStatus">
-                결제상태
+                최초 결제상태
               </label>
 
               <select id="paymentStatus">
                 <option>입금 대기</option>
+                <option>입금 확인 대기</option>
+                <option>현장 결제 예정</option>
+                <option>카드 결제 대기</option>
                 <option>입금 완료</option>
+                <option>결제 완료</option>
               </select>
             </div>
 
@@ -886,6 +1247,8 @@
                 <option>상품 준비 중</option>
                 <option>픽업 가능</option>
                 <option>픽업 완료</option>
+                <option>배송 준비 중</option>
+                <option>배송 완료</option>
               </select>
             </div>
 
@@ -896,14 +1259,19 @@
 
               <textarea
                 id="orderNotice"
-                placeholder="예: 오후 5시부터 픽업 가능합니다."
+                placeholder="예: 오후 5시부터 수령 가능합니다."
               ></textarea>
             </div>
           </div>
 
-          <h3 style="margin-top: 22px;">
+          <h3 style="margin-top:22px;">
             주문한 상품 선택
           </h3>
+
+          <p class="section-description">
+            픽업 장소와 주문별 픽업 예정일은 사용하지 않습니다.
+            선택한 상품의 픽업 날짜가 자동으로 적용됩니다.
+          </p>
 
           <div
             id="productChecks"
@@ -912,9 +1280,7 @@
 
           <div class="total-preview">
             <span>최종 결제금액</span>
-            <strong id="totalPreview">
-              0원
-            </strong>
+            <strong id="totalPreview">0원</strong>
           </div>
 
           <div class="actions">
@@ -928,25 +1294,34 @@
         </form>
       </section>
 
-      <!-- 주문 목록 -->
-      <section class="card">
-        <h2>4. 등록된 회원 주문</h2>
+      <!-- 4. 주문 관리 -->
+      <section
+        id="categoryOrders"
+        class="card category-card category-4"
+      >
+        <div class="category-heading">
+          <div class="category-number">4</div>
+          <div class="category-icon" aria-hidden="true">📋</div>
 
-        <p class="section-description">
-          주문한 회원을 검색하고, 선택한 상품만 취소하거나
-          픽업 완료·전체 삭제를 처리할 수 있습니다.
-        </p>
+          <div class="category-title-area">
+            <h2>등록된 회원 주문</h2>
+            <p class="section-description">
+              주문상품·상품별 픽업 날짜·결제상태를 확인하고,
+              부분취소·픽업완료·전체삭제를 처리합니다.
+            </p>
+          </div>
+        </div>
 
         <div class="order-tools">
           <div>
             <label for="orderListSearch">
-              주문 회원 검색
+              회원 주문 검색
             </label>
 
             <input
               id="orderListSearch"
               type="search"
-              placeholder="주문한 회원 닉네임을 입력하세요"
+              placeholder="닉네임을 입력하세요"
               autocomplete="off"
             >
           </div>
@@ -956,15 +1331,13 @@
             class="button secondary"
             type="button"
           >
-            주문 목록 펼치기 ▼ (0명 / 0건)
+            주문 목록 펼치기 ▼
           </button>
 
           <div
             id="orderListInfo"
             class="muted"
-          >
-            주문 목록은 처음에는 접혀 있습니다.
-          </div>
+          ></div>
         </div>
 
         <div
@@ -973,14 +1346,23 @@
         ></div>
       </section>
 
-      <!-- 월별 매출 -->
-      <section class="card">
-        <h2>5. 월별 픽업 완료 매출</h2>
+      <!-- 5. 완료 매출 -->
+      <section
+        id="categorySales"
+        class="card category-card category-5"
+      >
+        <div class="category-heading">
+          <div class="category-number">5</div>
+          <div class="category-icon" aria-hidden="true">📊</div>
 
-        <p class="section-description">
-          픽업 완료 처리된 주문만 매출에 포함됩니다.
-          날짜를 누르면 그날 고객별 주문금액을 확인할 수 있습니다.
-        </p>
+          <div class="category-title-area">
+            <h2>월별 픽업 완료 매출</h2>
+            <p class="section-description">
+              픽업 완료 또는 배송 완료된 주문만 완료 날짜 기준으로
+              매출 달력과 월 합계에 반영합니다.
+            </p>
+          </div>
+        </div>
 
         <div class="sales-tools">
           <div>
@@ -995,39 +1377,39 @@
           </div>
 
           <button
-            id="goCurrentMonthButton"
-            class="button secondary"
+            id="refreshSalesButton"
+            class="button"
             type="button"
           >
-            이번 달 보기
+            매출 새로고침
           </button>
         </div>
 
         <div class="sales-summary">
           <div class="summary-box">
-            <span class="muted">월 매출</span>
-            <strong id="monthlySalesTotal">0원</strong>
-          </div>
-
-          <div class="summary-box">
-            <span class="muted">완료 고객</span>
-            <strong id="monthlyCustomerCount">0명</strong>
-          </div>
-
-          <div class="summary-box">
-            <span class="muted">완료 주문</span>
+            <span class="muted">월 완료 주문</span>
             <strong id="monthlyOrderCount">0건</strong>
+          </div>
+
+          <div class="summary-box">
+            <span class="muted">월 판매 상품</span>
+            <strong id="monthlyItemCount">0개</strong>
+          </div>
+
+          <div class="summary-box">
+            <span class="muted">월 완료 매출</span>
+            <strong id="monthlySalesTotal">0원</strong>
           </div>
         </div>
 
         <div class="calendar-weekdays">
-          <div>일</div>
-          <div>월</div>
-          <div>화</div>
-          <div>수</div>
-          <div>목</div>
-          <div>금</div>
-          <div>토</div>
+          <span>일</span>
+          <span>월</span>
+          <span>화</span>
+          <span>수</span>
+          <span>목</span>
+          <span>금</span>
+          <span>토</span>
         </div>
 
         <div
@@ -1039,22 +1421,20 @@
           id="dailySalesDetail"
           class="daily-sales-detail"
         >
-          <div class="muted">
-            달력에서 날짜를 누르면 해당 날짜의 매출이 표시됩니다.
-          </div>
+          날짜를 누르면 해당 날짜의 완료 주문이 표시됩니다.
         </div>
 
         <div class="excel-actions">
           <button
-            id="downloadMonthlyExcelButton"
-            class="button"
+            id="downloadMonthlyExcel"
+            class="button success"
             type="button"
           >
             선택 월 매출 엑셀
           </button>
 
           <button
-            id="downloadAllExcelButton"
+            id="downloadAllExcel"
             class="button secondary"
             type="button"
           >
@@ -1066,199 +1446,193 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="./config.js"></script>
 
   <script>
+    "use strict";
+
     const sb =
       window.dampickSupabase;
 
     const loginSection =
-      document.getElementById("loginSection");
+      document.getElementById(
+        "loginSection"
+      );
 
     const adminApp =
-      document.getElementById("adminApp");
+      document.getElementById(
+        "adminApp"
+      );
 
     const loginMessage =
-      document.getElementById("loginMessage");
+      document.getElementById(
+        "loginMessage"
+      );
 
     const appMessage =
-      document.getElementById("appMessage");
+      document.getElementById(
+        "appMessage"
+      );
 
     let customers = [];
     let products = [];
     let orders = [];
+
     let memberListOpen = false;
     let orderListOpen = false;
     let selectedSalesDate = "";
 
-    document
-      .getElementById("loginButton")
-      .addEventListener("click", login);
-
-    document
-      .getElementById("logoutButton")
-      .addEventListener("click", logout);
-
-    document
-      .getElementById("customerForm")
-      .addEventListener(
-        "submit",
-        addCustomer
-      );
-
-    document
-      .getElementById("productForm")
-      .addEventListener(
-        "submit",
-        addProduct
-      );
-
-    document
-      .getElementById("orderForm")
-      .addEventListener(
-        "submit",
-        addOrder
-      );
-
-    document
-      .getElementById("customerSearch")
-      .addEventListener(
-        "input",
-        function () {
-          if (
-            document
-              .getElementById("customerSearch")
-              .value
-              .trim()
-          ) {
-            memberListOpen = true;
-          }
-
-          renderCustomers();
-        }
-      );
-
-    document
-      .getElementById("customerListToggle")
-      .addEventListener(
-        "click",
-        function () {
-          memberListOpen =
-            !memberListOpen;
-
-          renderCustomers();
-        }
-      );
-
-    document
-      .getElementById("orderCustomerSearch")
-      .addEventListener(
-        "input",
-        renderCustomerSelect
-      );
-
-    document
-      .getElementById("orderCustomer")
-      .addEventListener(
-        "change",
-        function () {
-          const select =
-            document.getElementById(
-              "orderCustomer"
-            );
-
-          const selectedOption =
-            select.options[
-              select.selectedIndex
-            ];
-
-          if (
-            selectedOption &&
-            selectedOption.value
-          ) {
-            document
-              .getElementById(
-                "orderCustomerSearch"
-              )
-              .value =
-                selectedOption.textContent
-                  .trim();
-          }
-        }
-      );
-
-    document
-      .getElementById("orderListSearch")
-      .addEventListener(
-        "input",
-        function () {
-          if (
-            document
-              .getElementById("orderListSearch")
-              .value
-              .trim()
-          ) {
-            orderListOpen = true;
-          }
-
-          renderOrders();
-        }
-      );
-
-    document
-      .getElementById("orderListToggle")
-      .addEventListener(
-        "click",
-        function () {
-          orderListOpen =
-            !orderListOpen;
-
-          renderOrders();
-        }
-      );
-
-    document
-      .getElementById("salesMonth")
-      .addEventListener(
-        "change",
-        function () {
-          selectedSalesDate = "";
-          renderSalesCalendar();
-        }
-      );
-
-    document
-      .getElementById("goCurrentMonthButton")
-      .addEventListener(
-        "click",
-        function () {
-          document
-            .getElementById("salesMonth")
-            .value = getCurrentMonthKey();
-
-          selectedSalesDate = "";
-          renderSalesCalendar();
-        }
-      );
-
-    document
-      .getElementById("downloadMonthlyExcelButton")
-      .addEventListener(
-        "click",
-        downloadMonthlySalesExcel
-      );
-
-    document
-      .getElementById("downloadAllExcelButton")
-      .addEventListener(
-        "click",
-        downloadAllOrdersExcel
-      );
-
+    bindEvents();
     start();
 
+    function bindEvents() {
+      document
+        .getElementById("loginButton")
+        .addEventListener("click", login);
+
+      document
+        .getElementById("logoutButton")
+        .addEventListener("click", logout);
+
+      document
+        .getElementById("customerForm")
+        .addEventListener(
+          "submit",
+          addCustomer
+        );
+
+      document
+        .getElementById("productForm")
+        .addEventListener(
+          "submit",
+          addProduct
+        );
+
+      document
+        .getElementById("orderForm")
+        .addEventListener(
+          "submit",
+          addOrder
+        );
+
+      document
+        .getElementById("customerSearch")
+        .addEventListener(
+          "input",
+          renderCustomers
+        );
+
+      document
+        .getElementById(
+          "customerListToggle"
+        )
+        .addEventListener(
+          "click",
+          function () {
+            memberListOpen =
+              !memberListOpen;
+
+            renderCustomers();
+          }
+        );
+
+      document
+        .getElementById(
+          "orderCustomerSearch"
+        )
+        .addEventListener(
+          "input",
+          renderCustomerSelect
+        );
+
+      document
+        .getElementById(
+          "orderListSearch"
+        )
+        .addEventListener(
+          "input",
+          renderOrders
+        );
+
+      document
+        .getElementById(
+          "orderListToggle"
+        )
+        .addEventListener(
+          "click",
+          function () {
+            orderListOpen =
+              !orderListOpen;
+
+            renderOrders();
+          }
+        );
+
+      document
+        .getElementById(
+          "salesMonth"
+        )
+        .addEventListener(
+          "change",
+          renderSalesCalendar
+        );
+
+      document
+        .getElementById(
+          "refreshSalesButton"
+        )
+        .addEventListener(
+          "click",
+          loadOrders
+        );
+
+      document
+        .getElementById(
+          "downloadMonthlyExcel"
+        )
+        .addEventListener(
+          "click",
+          downloadMonthlyExcel
+        );
+
+      document
+        .getElementById(
+          "downloadAllExcel"
+        )
+        .addEventListener(
+          "click",
+          downloadAllExcel
+        );
+
+      document
+        .getElementById(
+          "adminPassword"
+        )
+        .addEventListener(
+          "keydown",
+          function (event) {
+            if (event.key === "Enter") {
+              login();
+            }
+          }
+        );
+    }
+
     async function start() {
+      setToday();
+      setCurrentMonth();
+
+      if (!sb) {
+        setMessage(
+          loginMessage,
+          "config.js의 Supabase 연결정보를 불러오지 못했습니다.",
+          "error"
+        );
+
+        return;
+      }
+
       const { data } =
         await sb.auth.getSession();
 
@@ -1271,20 +1645,20 @@
     async function login() {
       const email =
         document
-          .getElementById("adminEmail")
+          .getElementById(
+            "adminEmail"
+          )
           .value
           .trim();
 
       const password =
         document
-          .getElementById("adminPassword")
+          .getElementById(
+            "adminPassword"
+          )
           .value;
 
-      setMessage(
-        loginMessage,
-        "",
-        ""
-      );
+      clearMessage(loginMessage);
 
       if (!email || !password) {
         setMessage(
@@ -1320,12 +1694,21 @@
       await sb.auth.signOut();
 
       adminApp.classList.add("hidden");
-      loginSection.classList.remove("hidden");
+      loginSection.classList.remove(
+        "hidden"
+      );
     }
 
     function showAdmin() {
-      loginSection.classList.add("hidden");
-      adminApp.classList.remove("hidden");
+      loginSection.classList.add(
+        "hidden"
+      );
+
+      adminApp.classList.remove(
+        "hidden"
+      );
+
+      window.scrollTo(0, 0);
     }
 
     async function loadAll() {
@@ -1361,6 +1744,10 @@
           .from("products")
           .select("*")
           .eq("is_active", true)
+          .order("pickup_date", {
+            ascending: true,
+            nullsFirst: false
+          })
           .order("created_at", {
             ascending: false
           });
@@ -1382,23 +1769,29 @@
           .from("orders")
           .select(`
             id,
+            customer_id,
             order_number,
             order_date,
-            pickup_date,
-            pickup_place,
             payment_status,
             order_status,
             notice,
             completed_at,
             created_at,
-            customers(nickname),
+            is_visible,
+            customers(
+              id,
+              nickname
+            ),
             order_items(
               id,
+              product_id,
               product_name,
               quantity,
               unit_name,
               unit_price,
-              line_total
+              line_total,
+              pickup_date,
+              created_at
             )
           `)
           .order(
@@ -1411,7 +1804,13 @@
         return;
       }
 
-      orders = data || [];
+      orders =
+        (data || []).filter(
+          function (order) {
+            return order.is_visible !== false;
+          }
+        );
+
       renderOrders();
       renderSalesCalendar();
     }
@@ -1421,19 +1820,21 @@
 
       const nickname =
         document
-          .getElementById("newNickname")
+          .getElementById(
+            "newNickname"
+          )
           .value
           .trim();
 
       const memo =
         document
-          .getElementById("customerMemo")
+          .getElementById(
+            "customerMemo"
+          )
           .value
           .trim();
 
-      if (!nickname) {
-        return;
-      }
+      if (!nickname) return;
 
       const { error } =
         await sb
@@ -1454,6 +1855,13 @@
       }
 
       event.target.reset();
+      memberListOpen = true;
+
+      document
+        .getElementById(
+          "customerSearch"
+        )
+        .value = nickname;
 
       setMessage(
         appMessage,
@@ -1461,12 +1869,6 @@
         " 회원을 등록했습니다.",
         "success"
       );
-
-      memberListOpen = true;
-
-      document
-        .getElementById("customerSearch")
-        .value = nickname;
 
       await loadCustomers();
     }
@@ -1476,28 +1878,49 @@
 
       const name =
         document
-          .getElementById("newProductName")
+          .getElementById(
+            "newProductName"
+          )
           .value
           .trim();
 
       const unitPrice =
         Number(
           document
-            .getElementById("newProductPrice")
+            .getElementById(
+              "newProductPrice"
+            )
             .value
         );
 
       const unitName =
         document
-          .getElementById("newProductUnit")
+          .getElementById(
+            "newProductUnit"
+          )
           .value
           .trim();
 
+      const pickupDate =
+        document
+          .getElementById(
+            "newProductPickupDate"
+          )
+          .value;
+
       if (
         !name ||
+        !Number.isFinite(unitPrice) ||
         unitPrice < 0 ||
-        !unitName
+        !unitName ||
+        !pickupDate
       ) {
+        setMessage(
+          appMessage,
+          "상품명·가격·단위·픽업 날짜를 모두 입력해주세요.",
+          "error"
+        );
+
         return;
       }
 
@@ -1507,13 +1930,14 @@
           .insert({
             name,
             unit_price: unitPrice,
-            unit_name: unitName
+            unit_name: unitName,
+            pickup_date: pickupDate
           });
 
       if (error) {
         setMessage(
           appMessage,
-          "상품 등록에 실패했습니다.",
+          "상품 등록에 실패했습니다. Supabase에 pickup_date 칸이 있는지 확인해주세요.",
           "error"
         );
 
@@ -1523,8 +1947,12 @@
       event.target.reset();
 
       document
-        .getElementById("newProductUnit")
+        .getElementById(
+          "newProductUnit"
+        )
         .value = "개";
+
+      setDefaultProductPickupDate();
 
       setMessage(
         appMessage,
@@ -1541,7 +1969,9 @@
 
       const customerId =
         document
-          .getElementById("orderCustomer")
+          .getElementById(
+            "orderCustomer"
+          )
           .value;
 
       const selected =
@@ -1571,7 +2001,7 @@
                 quantity: Math.max(
                   1,
                   Number(
-                    quantityInput.value || 1
+                    quantityInput?.value || 1
                   )
                 )
               };
@@ -1584,56 +2014,58 @@
           "고객 닉네임을 선택해주세요.",
           "error"
         );
-
         return;
       }
 
-      if (selected.length === 0) {
+      if (!selected.length) {
         setMessage(
           appMessage,
           "주문 상품을 한 개 이상 선택해주세요.",
           "error"
         );
-
         return;
       }
 
       const orderNumber =
         makeOrderNumber();
 
-      const { data: order, error: orderError } =
+      const orderValues = {
+        customer_id: customerId,
+        order_number: orderNumber,
+        order_date:
+          document
+            .getElementById(
+              "orderDate"
+            )
+            .value,
+        payment_status:
+          document
+            .getElementById(
+              "paymentStatus"
+            )
+            .value,
+        order_status:
+          document
+            .getElementById(
+              "orderStatus"
+            )
+            .value,
+        notice:
+          document
+            .getElementById(
+              "orderNotice"
+            )
+            .value
+            .trim()
+      };
+
+      const {
+        data: order,
+        error: orderError
+      } =
         await sb
           .from("orders")
-          .insert({
-            customer_id: customerId,
-            order_number: orderNumber,
-            order_date:
-              document
-                .getElementById("orderDate")
-                .value,
-            pickup_date:
-              document
-                .getElementById("pickupDate")
-                .value || null,
-            pickup_place:
-              document
-                .getElementById("pickupPlace")
-                .value
-                .trim(),
-            payment_status:
-              document
-                .getElementById("paymentStatus")
-                .value,
-            order_status:
-              document
-                .getElementById("orderStatus")
-                .value,
-            notice:
-              document
-                .getElementById("orderNotice")
-                .value
-                .trim()
-          })
+          .insert(orderValues)
           .select()
           .single();
 
@@ -1643,7 +2075,6 @@
           "주문 저장에 실패했습니다.",
           "error"
         );
-
         return;
       }
 
@@ -1661,7 +2092,11 @@
               unit_name:
                 selection.product.unit_name,
               unit_price:
-                selection.product.unit_price
+                Number(
+                  selection.product.unit_price
+                ),
+              pickup_date:
+                selection.product.pickup_date
             };
           }
         );
@@ -1679,18 +2114,14 @@
 
         setMessage(
           appMessage,
-          "주문상품 저장에 실패했습니다.",
+          "주문상품 저장에 실패했습니다. 상품별 픽업 날짜 SQL이 실행됐는지 확인해주세요.",
           "error"
         );
-
         return;
       }
 
       event.target.reset();
-
-      document
-        .getElementById("pickupPlace")
-        .value = "담픽 매장";
+      setToday();
 
       document
         .getElementById(
@@ -1698,7 +2129,6 @@
         )
         .value = "";
 
-      setToday();
       renderCustomerSelect();
       renderProductChecks();
       updateTotalPreview();
@@ -1711,7 +2141,60 @@
         "success"
       );
 
+      orderListOpen = true;
       await loadOrders();
+    }
+
+    async function editCustomer(
+      id,
+      currentNickname,
+      currentMemo
+    ) {
+      const nickname =
+        prompt(
+          "변경할 닉네임을 입력하세요.",
+          currentNickname
+        );
+
+      if (nickname === null) return;
+
+      const trimmedNickname =
+        nickname.trim();
+
+      if (!trimmedNickname) {
+        alert("닉네임을 입력해주세요.");
+        return;
+      }
+
+      const memo =
+        prompt(
+          "관리자 메모를 입력하세요.",
+          currentMemo || ""
+        );
+
+      if (memo === null) return;
+
+      const { error } =
+        await sb
+          .from("customers")
+          .update({
+            nickname: trimmedNickname,
+            memo: memo.trim()
+          })
+          .eq("id", id);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(
+        appMessage,
+        "회원 정보를 수정했습니다.",
+        "success"
+      );
+
+      await loadCustomers();
     }
 
     async function deleteCustomer(
@@ -1724,9 +2207,7 @@
           " 회원과 연결된 주문을 모두 삭제할까요?"
         );
 
-      if (!accepted) {
-        return;
-      }
+      if (!accepted) return;
 
       const { error } =
         await sb
@@ -1738,6 +2219,12 @@
         showAppError(error);
         return;
       }
+
+      setMessage(
+        appMessage,
+        "회원을 삭제했습니다.",
+        "success"
+      );
 
       await loadAll();
     }
@@ -1752,9 +2239,7 @@
           " 상품을 현재 상품목록에서 내릴까요?"
         );
 
-      if (!accepted) {
-        return;
-      }
+      if (!accepted) return;
 
       const { error } =
         await sb
@@ -1769,515 +2254,22 @@
         return;
       }
 
+      setMessage(
+        appMessage,
+        "상품을 현재 판매목록에서 내렸습니다.",
+        "success"
+      );
+
       await loadProducts();
     }
 
-    async function deleteOrder(
-      id,
-      number
+    async function deleteSelectedItems(
+      orderId
     ) {
-      const accepted =
-        confirm(
-          number +
-          " 주문을 삭제할까요?"
-        );
-
-      if (!accepted) {
-        return;
-      }
-
-      const { error } =
-        await sb
-          .from("orders")
-          .delete()
-          .eq("id", id);
-
-      if (error) {
-        showAppError(error);
-        return;
-      }
-
-      await loadOrders();
-    }
-
-    function renderCustomers() {
-      const target =
-        document.getElementById(
-          "customerList"
-        );
-
-      const searchInput =
-        document.getElementById(
-          "customerSearch"
-        );
-
-      const toggleButton =
-        document.getElementById(
-          "customerListToggle"
-        );
-
-      const info =
-        document.getElementById(
-          "customerListInfo"
-        );
-
-      const keyword =
-        searchInput.value
-          .trim()
-          .toLocaleLowerCase("ko-KR");
-
-      const filteredCustomers =
-        customers.filter(
-          function (customer) {
-            const nickname =
-              String(
-                customer.nickname || ""
-              )
-                .toLocaleLowerCase(
-                  "ko-KR"
-                );
-
-            const memo =
-              String(
-                customer.memo || ""
-              )
-                .toLocaleLowerCase(
-                  "ko-KR"
-                );
-
-            return (
-              !keyword ||
-              nickname.includes(keyword) ||
-              memo.includes(keyword)
-            );
-          }
-        );
-
-      target.classList.toggle(
-        "open",
-        memberListOpen
-      );
-
-      toggleButton.textContent =
-        memberListOpen
-          ? (
-              "회원 목록 접기 ▲ (" +
-              customers.length +
-              "명)"
-            )
-          : (
-              "회원 목록 펼치기 ▼ (" +
-              customers.length +
-              "명)"
-            );
-
-      if (keyword) {
-        info.textContent =
-          "검색 결과 " +
-          filteredCustomers.length +
-          "명 / 전체 " +
-          customers.length +
-          "명";
-      } else {
-        info.textContent =
-          "전체 등록 회원 " +
-          customers.length +
-          "명";
-      }
-
-      if (!customers.length) {
-        target.innerHTML =
-          '<div class="muted">' +
-          '등록된 회원이 없습니다.' +
-          '</div>';
-
-        return;
-      }
-
-      if (!filteredCustomers.length) {
-        target.innerHTML =
-          '<div class="muted">' +
-          '일치하는 회원이 없습니다.' +
-          '</div>';
-
-        return;
-      }
-
-      target.innerHTML =
-        filteredCustomers.map(
-          function (customer) {
-            return `
-              <div class="list-row">
-
-                <div>
-                  <strong>
-                    ${escapeHtml(customer.nickname)}
-                  </strong>
-
-                  <div class="muted">
-                    ${escapeHtml(
-                      customer.memo ||
-                      "메모 없음"
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  class="button danger small"
-                  type="button"
-                  onclick='deleteCustomer(
-                    ${JSON.stringify(customer.id)},
-                    ${JSON.stringify(customer.nickname)}
-                  )'
-                >
-                  삭제
-                </button>
-
-              </div>
-            `;
-          }
-        ).join("");
-    }
-
-    function renderCustomerSelect() {
-      const target =
-        document.getElementById(
-          "orderCustomer"
-        );
-
-      const searchInput =
-        document.getElementById(
-          "orderCustomerSearch"
-        );
-
-      const info =
-        document.getElementById(
-          "orderCustomerSearchInfo"
-        );
-
-      const previousValue =
-        target.value;
-
-      const keyword =
-        searchInput.value
-          .trim()
-          .toLocaleLowerCase("ko-KR");
-
-      const matchedCustomers =
-        customers.filter(
-          function (customer) {
-            return String(
-              customer.nickname || ""
-            )
-              .toLocaleLowerCase(
-                "ko-KR"
-              )
-              .includes(keyword);
-          }
-        );
-
-      target.innerHTML =
-        '<option value="">' +
-        '닉네임을 선택하세요' +
-        '</option>' +
-        matchedCustomers.map(
-          function (customer) {
-            return `
-              <option value="${customer.id}">
-                ${escapeHtml(customer.nickname)}
-              </option>
-            `;
-          }
-        ).join("");
-
-      const previousStillExists =
-        matchedCustomers.some(
-          function (customer) {
-            return (
-              String(customer.id) ===
-              String(previousValue)
-            );
-          }
-        );
-
-      if (previousStillExists) {
-        target.value =
-          previousValue;
-      } else if (
-        keyword &&
-        matchedCustomers.length === 1
-      ) {
-        target.value =
-          matchedCustomers[0].id;
-      }
-
-      if (!keyword) {
-        info.textContent =
-          "전체 회원 " +
-          customers.length +
-          "명";
-      } else if (
-        matchedCustomers.length
-      ) {
-        info.textContent =
-          "검색 결과 " +
-          matchedCustomers.length +
-          "명";
-      } else {
-        info.textContent =
-          "일치하는 회원이 없습니다.";
-      }
-    }
-
-    function renderProducts() {
-      const target =
-        document.getElementById(
-          "productList"
-        );
-
-      if (!products.length) {
-        target.innerHTML =
-          '<div class="muted">' +
-          '현재 등록된 상품이 없습니다.' +
-          '</div>';
-
-        return;
-      }
-
-      target.innerHTML =
-        products.map(
-          function (product) {
-            return `
-              <div class="list-row">
-
-                <div>
-                  <strong>
-                    ${escapeHtml(product.name)}
-                  </strong>
-
-                  <div class="muted">
-                    ${formatPrice(product.unit_price)}
-                    /
-                    ${escapeHtml(product.unit_name)}
-                  </div>
-                </div>
-
-                <button
-                  class="button danger small"
-                  type="button"
-                  onclick='deactivateProduct(
-                    ${JSON.stringify(product.id)},
-                    ${JSON.stringify(product.name)}
-                  )'
-                >
-                  상품 내리기
-                </button>
-
-              </div>
-            `;
-          }
-        ).join("");
-    }
-
-    function renderProductChecks() {
-      const target =
-        document.getElementById(
-          "productChecks"
-        );
-
-      if (!products.length) {
-        target.innerHTML =
-          '<div class="muted">' +
-          '먼저 공동구매 상품을 등록해주세요.' +
-          '</div>';
-
-        return;
-      }
-
-      target.innerHTML =
-        products.map(
-          function (product) {
-            return `
-              <label
-                class="product-choice"
-                id="choice-${product.id}"
-              >
-                <input
-                  id="check-${product.id}"
-                  type="checkbox"
-                  data-product-id="${product.id}"
-                >
-
-                <span>
-                  <strong>
-                    ${escapeHtml(product.name)}
-                  </strong>
-                  <br>
-                  <span class="muted">
-                    ${formatPrice(product.unit_price)}
-                    /
-                    ${escapeHtml(product.unit_name)}
-                  </span>
-                </span>
-
-                <input
-                  id="qty-${product.id}"
-                  type="number"
-                  min="1"
-                  value="1"
-                  data-product-id="${product.id}"
-                  aria-label="${escapeHtml(product.name)} 수량"
-                >
-              </label>
-            `;
-          }
-        ).join("");
-
-      target
-        .querySelectorAll(
-          'input[type="checkbox"]'
-        )
-        .forEach(
-          function (checkbox) {
-            checkbox.addEventListener(
-              "change",
-              function () {
-                const productId =
-                  checkbox.dataset.productId;
-
-                document
-                  .getElementById(
-                    "choice-" + productId
-                  )
-                  .classList
-                  .toggle(
-                    "selected",
-                    checkbox.checked
-                  );
-
-                updateTotalPreview();
-              }
-            );
-          }
-        );
-
-      target
-        .querySelectorAll(
-          'input[type="number"]'
-        )
-        .forEach(
-          function (quantityInput) {
-            quantityInput.addEventListener(
-              "input",
-              updateTotalPreview
-            );
-          }
-        );
-    }
-
-    function updateTotalPreview() {
-      let total = 0;
-
-      products.forEach(
-        function (product) {
-          const checkbox =
-            document.getElementById(
-              "check-" + product.id
-            );
-
-          const quantityInput =
-            document.getElementById(
-              "qty-" + product.id
-            );
-
-          if (
-            checkbox &&
-            checkbox.checked
-          ) {
-            const quantity =
-              Math.max(
-                1,
-                Number(
-                  quantityInput.value || 1
-                )
-              );
-
-            total +=
-              quantity *
-              Number(product.unit_price);
-          }
-        }
-      );
-
-      document
-        .getElementById("totalPreview")
-        .textContent =
-          formatPrice(total);
-    }
-
-    function getUniqueOrderCustomerCount(orderRows) {
-      const nicknameSet =
-        new Set(
-          orderRows
-            .map(
-              function (order) {
-                return String(
-                  order.customers?.nickname || ""
-                ).trim();
-              }
-            )
-            .filter(Boolean)
-        );
-
-      return nicknameSet.size;
-    }
-
-    function calculateOrderTotal(order) {
-      return (order.order_items || [])
-        .reduce(
-          function (sum, item) {
-            return (
-              sum +
-              Number(item.line_total || 0)
-            );
-          },
-          0
-        );
-    }
-
-    function isPickupCompleted(order) {
-      return (
-        order.order_status === "픽업 완료" &&
-        Boolean(order.completed_at)
-      );
-    }
-
-    async function cancelSelectedOrderItems(
-      orderId,
-      orderNumber
-    ) {
-      const order =
-        orders.find(
-          function (row) {
-            return row.id === orderId;
-          }
-        );
-
-      if (!order) {
-        return;
-      }
-
-      if (isPickupCompleted(order)) {
-        alert(
-          "픽업 완료된 주문은 먼저 완료 취소를 해주세요."
-        );
-        return;
-      }
-
       const checked =
         Array.from(
           document.querySelectorAll(
-            '[data-order-id="' +
+            '[data-order-item-check="' +
             orderId +
             '"]:checked'
           )
@@ -2286,47 +2278,25 @@
       const itemIds =
         checked.map(
           function (checkbox) {
-            return checkbox.dataset.itemId;
+            return checkbox.value;
           }
         );
 
       if (!itemIds.length) {
         alert(
-          "취소할 상품의 체크박스를 먼저 선택해주세요."
-        );
-        return;
-      }
-
-      const allItems =
-        order.order_items || [];
-
-      if (itemIds.length >= allItems.length) {
-        const deleteAll =
-          confirm(
-            "모든 상품을 선택했습니다. 주문 전체를 삭제할까요?"
-          );
-
-        if (!deleteAll) {
-          return;
-        }
-
-        await deleteOrder(
-          orderId,
-          orderNumber
+          "부분 취소할 상품을 먼저 체크해주세요."
         );
         return;
       }
 
       const accepted =
         confirm(
-          "선택한 " +
+          "선택한 상품 " +
           itemIds.length +
-          "개 상품을 이 주문에서 취소할까요?"
+          "개를 주문에서 취소할까요?"
         );
 
-      if (!accepted) {
-        return;
-      }
+      if (!accepted) return;
 
       const { error } =
         await sb
@@ -2339,9 +2309,95 @@
         return;
       }
 
+      const currentOrder =
+        orders.find(
+          function (order) {
+            return order.id === orderId;
+          }
+        );
+
+      const remainingCount =
+        (currentOrder?.order_items || [])
+          .filter(
+            function (item) {
+              return !itemIds.includes(
+                item.id
+              );
+            }
+          )
+          .length;
+
+      if (remainingCount === 0) {
+        await sb
+          .from("orders")
+          .delete()
+          .eq("id", orderId);
+      }
+
       setMessage(
         appMessage,
-        "선택한 상품을 취소했습니다. 최종 결제금액이 다시 계산되었습니다.",
+        "선택한 상품을 취소했습니다.",
+        "success"
+      );
+
+      await loadOrders();
+    }
+
+    async function updatePaymentStatus(
+      orderId
+    ) {
+      const select =
+        document.getElementById(
+          "payment-edit-" + orderId
+        );
+
+      if (!select) return;
+
+      const { error } =
+        await sb
+          .from("orders")
+          .update({
+            payment_status:
+              select.value
+          })
+          .eq("id", orderId);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(
+        appMessage,
+        "결제상태를 " +
+        select.value +
+        "로 변경했습니다.",
+        "success"
+      );
+
+      await loadOrders();
+    }
+
+    async function markPaymentComplete(
+      orderId
+    ) {
+      const { error } =
+        await sb
+          .from("orders")
+          .update({
+            payment_status:
+              "결제 완료"
+          })
+          .eq("id", orderId);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(
+        appMessage,
+        "결제 완료로 처리했습니다.",
         "success"
       );
 
@@ -2355,23 +2411,24 @@
       const accepted =
         confirm(
           completed
-            ? "픽업 완료 처리를 취소할까요? 이 주문은 매출에서 제외됩니다."
+            ? "픽업 완료 처리를 취소할까요? 이 주문은 완료 매출에서 제외됩니다."
             : "이 주문을 픽업 완료로 처리할까요? 완료 날짜의 매출에 포함됩니다."
         );
 
-      if (!accepted) {
-        return;
-      }
+      if (!accepted) return;
 
       const updateValues =
         completed
           ? {
-              order_status: "픽업 가능",
+              order_status:
+                "픽업 가능",
               completed_at: null
             }
           : {
-              order_status: "픽업 완료",
-              payment_status: "입금 완료",
+              order_status:
+                "픽업 완료",
+              payment_status:
+                "결제 완료",
               completed_at:
                 new Date().toISOString()
             };
@@ -2391,11 +2448,534 @@
         appMessage,
         completed
           ? "픽업 완료를 취소했습니다."
-          : "픽업 완료 처리했습니다. 매출 달력에 반영되었습니다.",
+          : "픽업 완료 처리했습니다. 매출 달력에 반영됩니다.",
         "success"
       );
 
       await loadOrders();
+    }
+
+    async function deleteOrder(
+      id,
+      number
+    ) {
+      const accepted =
+        confirm(
+          "주문번호 " +
+          number +
+          " 전체를 삭제할까요?"
+        );
+
+      if (!accepted) return;
+
+      const { error } =
+        await sb
+          .from("orders")
+          .delete()
+          .eq("id", id);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(
+        appMessage,
+        "주문을 삭제했습니다.",
+        "success"
+      );
+
+      await loadOrders();
+    }
+
+    function renderCustomers() {
+      const target =
+        document.getElementById(
+          "customerList"
+        );
+
+      const keyword =
+        document
+          .getElementById(
+            "customerSearch"
+          )
+          .value
+          .trim()
+          .toLocaleLowerCase(
+            "ko-KR"
+          );
+
+      const filtered =
+        customers.filter(
+          function (customer) {
+            return (
+              !keyword ||
+              String(
+                customer.nickname || ""
+              )
+                .toLocaleLowerCase(
+                  "ko-KR"
+                )
+                .includes(keyword)
+            );
+          }
+        );
+
+      target.classList.toggle(
+        "open",
+        memberListOpen
+      );
+
+      document
+        .getElementById(
+          "customerListToggle"
+        )
+        .textContent =
+          memberListOpen
+            ? (
+                "회원 목록 접기 ▲ (" +
+                customers.length +
+                "명)"
+              )
+            : (
+                "회원 목록 펼치기 ▼ (" +
+                customers.length +
+                "명)"
+              );
+
+      document
+        .getElementById(
+          "customerListInfo"
+        )
+        .textContent =
+          keyword
+            ? (
+                "검색 결과 " +
+                filtered.length +
+                "명"
+              )
+            : (
+                "등록 회원 " +
+                customers.length +
+                "명"
+              );
+
+      if (!filtered.length) {
+        target.innerHTML = `
+          <div class="muted">
+            표시할 회원이 없습니다.
+          </div>
+        `;
+        return;
+      }
+
+      target.innerHTML =
+        filtered.map(
+          function (customer) {
+            return `
+              <div class="list-row">
+                <div class="list-row-main">
+                  <p class="list-row-title">
+                    ${escapeHtml(customer.nickname)}
+                  </p>
+
+                  <p class="list-row-meta">
+                    ${escapeHtml(customer.memo || "메모 없음")}
+                  </p>
+                </div>
+
+                <div class="actions" style="margin-top:0;">
+                  <button
+                    class="button light small"
+                    type="button"
+                    data-customer-edit="${escapeHtml(customer.id)}"
+                  >
+                    수정
+                  </button>
+
+                  <button
+                    class="button danger small"
+                    type="button"
+                    data-customer-delete="${escapeHtml(customer.id)}"
+                  >
+                    삭제
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+        ).join("");
+
+      target
+        .querySelectorAll(
+          "[data-customer-edit]"
+        )
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                const customer =
+                  customers.find(
+                    function (item) {
+                      return (
+                        item.id ===
+                        button.dataset.customerEdit
+                      );
+                    }
+                  );
+
+                if (customer) {
+                  editCustomer(
+                    customer.id,
+                    customer.nickname,
+                    customer.memo
+                  );
+                }
+              }
+            );
+          }
+        );
+
+      target
+        .querySelectorAll(
+          "[data-customer-delete]"
+        )
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                const customer =
+                  customers.find(
+                    function (item) {
+                      return (
+                        item.id ===
+                        button.dataset.customerDelete
+                      );
+                    }
+                  );
+
+                if (customer) {
+                  deleteCustomer(
+                    customer.id,
+                    customer.nickname
+                  );
+                }
+              }
+            );
+          }
+        );
+    }
+
+    function renderCustomerSelect() {
+      const target =
+        document.getElementById(
+          "orderCustomer"
+        );
+
+      const keyword =
+        document
+          .getElementById(
+            "orderCustomerSearch"
+          )
+          .value
+          .trim()
+          .toLocaleLowerCase(
+            "ko-KR"
+          );
+
+      const previousValue =
+        target.value;
+
+      const filtered =
+        customers.filter(
+          function (customer) {
+            return (
+              !keyword ||
+              String(
+                customer.nickname || ""
+              )
+                .toLocaleLowerCase(
+                  "ko-KR"
+                )
+                .includes(keyword)
+            );
+          }
+        );
+
+      target.innerHTML = `
+        <option value="">
+          닉네임을 선택하세요
+        </option>
+      ` +
+      filtered.map(
+        function (customer) {
+          return `
+            <option value="${escapeHtml(customer.id)}">
+              ${escapeHtml(customer.nickname)}
+            </option>
+          `;
+        }
+      ).join("");
+
+      if (
+        filtered.some(
+          function (customer) {
+            return customer.id === previousValue;
+          }
+        )
+      ) {
+        target.value = previousValue;
+      }
+
+      document
+        .getElementById(
+          "orderCustomerSearchInfo"
+        )
+        .textContent =
+          keyword
+            ? (
+                "검색 결과 " +
+                filtered.length +
+                "명"
+              )
+            : (
+                "등록 회원 " +
+                customers.length +
+                "명"
+              );
+    }
+
+    function renderProducts() {
+      const target =
+        document.getElementById(
+          "productList"
+        );
+
+      if (!products.length) {
+        target.innerHTML = `
+          <div class="muted">
+            등록된 판매 상품이 없습니다.
+          </div>
+        `;
+        return;
+      }
+
+      target.innerHTML =
+        products.map(
+          function (product) {
+            return `
+              <div class="list-row">
+                <div class="list-row-main">
+                  <p class="list-row-title">
+                    ${escapeHtml(product.name)}
+                  </p>
+
+                  <p class="list-row-meta">
+                    ${formatWon(product.unit_price)}
+                    /
+                    ${escapeHtml(product.unit_name || "개")}
+                  </p>
+
+                  <span class="pickup-date-badge">
+                    픽업 날짜:
+                    ${formatDate(product.pickup_date)}
+                  </span>
+                </div>
+
+                <button
+                  class="button danger small"
+                  type="button"
+                  data-product-deactivate="${escapeHtml(product.id)}"
+                >
+                  상품 내리기
+                </button>
+              </div>
+            `;
+          }
+        ).join("");
+
+      target
+        .querySelectorAll(
+          "[data-product-deactivate]"
+        )
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                const product =
+                  products.find(
+                    function (item) {
+                      return (
+                        item.id ===
+                        button.dataset.productDeactivate
+                      );
+                    }
+                  );
+
+                if (product) {
+                  deactivateProduct(
+                    product.id,
+                    product.name
+                  );
+                }
+              }
+            );
+          }
+        );
+    }
+
+    function renderProductChecks() {
+      const target =
+        document.getElementById(
+          "productChecks"
+        );
+
+      if (!products.length) {
+        target.innerHTML = `
+          <div class="muted">
+            먼저 2번 공동구매 상품 관리에서 상품과 픽업 날짜를 등록해주세요.
+          </div>
+        `;
+
+        updateTotalPreview();
+        return;
+      }
+
+      target.innerHTML =
+        products.map(
+          function (product) {
+            return `
+              <label
+                id="choice-${escapeHtml(product.id)}"
+                class="product-choice"
+              >
+                <input
+                  id="check-${escapeHtml(product.id)}"
+                  type="checkbox"
+                  data-product-check="${escapeHtml(product.id)}"
+                >
+
+                <span>
+                  <strong>
+                    ${escapeHtml(product.name)}
+                  </strong>
+
+                  <span class="muted">
+                    ${formatWon(product.unit_price)}
+                    /
+                    ${escapeHtml(product.unit_name || "개")}
+                  </span>
+
+                  <span class="pickup-date-badge">
+                    픽업:
+                    ${formatDate(product.pickup_date)}
+                  </span>
+                </span>
+
+                <input
+                  id="qty-${escapeHtml(product.id)}"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value="1"
+                  aria-label="${escapeHtml(product.name)} 수량"
+                  data-product-qty="${escapeHtml(product.id)}"
+                >
+              </label>
+            `;
+          }
+        ).join("");
+
+      target
+        .querySelectorAll(
+          "[data-product-check]"
+        )
+        .forEach(
+          function (checkbox) {
+            checkbox.addEventListener(
+              "change",
+              function () {
+                const choice =
+                  document.getElementById(
+                    "choice-" +
+                    checkbox.dataset.productCheck
+                  );
+
+                choice?.classList.toggle(
+                  "selected",
+                  checkbox.checked
+                );
+
+                updateTotalPreview();
+              }
+            );
+          }
+        );
+
+      target
+        .querySelectorAll(
+          "[data-product-qty]"
+        )
+        .forEach(
+          function (input) {
+            input.addEventListener(
+              "input",
+              updateTotalPreview
+            );
+          }
+        );
+
+      updateTotalPreview();
+    }
+
+    function updateTotalPreview() {
+      const total =
+        products.reduce(
+          function (sum, product) {
+            const checkbox =
+              document.getElementById(
+                "check-" + product.id
+              );
+
+            if (
+              !checkbox ||
+              !checkbox.checked
+            ) {
+              return sum;
+            }
+
+            const quantity =
+              Math.max(
+                1,
+                Number(
+                  document
+                    .getElementById(
+                      "qty-" + product.id
+                    )
+                    ?.value || 1
+                )
+              );
+
+            return (
+              sum +
+              Number(
+                product.unit_price || 0
+              ) *
+              quantity
+            );
+          },
+          0
+        );
+
+      document
+        .getElementById(
+          "totalPreview"
+        )
+        .textContent =
+          formatWon(total);
     }
 
     function renderOrders() {
@@ -2404,32 +2984,24 @@
           "orderList"
         );
 
-      const searchInput =
-        document.getElementById(
-          "orderListSearch"
-        );
-
-      const toggleButton =
-        document.getElementById(
-          "orderListToggle"
-        );
-
-      const info =
-        document.getElementById(
-          "orderListInfo"
-        );
-
       const keyword =
-        searchInput.value
+        document
+          .getElementById(
+            "orderListSearch"
+          )
+          .value
           .trim()
-          .toLocaleLowerCase("ko-KR");
+          .toLocaleLowerCase(
+            "ko-KR"
+          );
 
-      const filteredOrders =
+      const filtered =
         orders.filter(
           function (order) {
             const nickname =
               String(
-                order.customers?.nickname || ""
+                order.customers?.nickname ||
+                ""
               )
                 .toLocaleLowerCase(
                   "ko-KR"
@@ -2442,282 +3014,398 @@
           }
         );
 
-      const totalCustomerCount =
-        getUniqueOrderCustomerCount(orders);
-
-      const filteredCustomerCount =
-        getUniqueOrderCustomerCount(
-          filteredOrders
-        );
-
       target.classList.toggle(
         "open",
         orderListOpen
       );
 
-      toggleButton.textContent =
-        orderListOpen
-          ? (
-              "주문 목록 접기 ▲ (" +
-              totalCustomerCount +
-              "명 / " +
-              orders.length +
-              "건)"
-            )
-          : (
-              "주문 목록 펼치기 ▼ (" +
-              totalCustomerCount +
-              "명 / " +
-              orders.length +
-              "건)"
-            );
+      document
+        .getElementById(
+          "orderListToggle"
+        )
+        .textContent =
+          orderListOpen
+            ? (
+                "주문 목록 접기 ▲ (" +
+                orders.length +
+                "건)"
+              )
+            : (
+                "주문 목록 펼치기 ▼ (" +
+                orders.length +
+                "건)"
+              );
 
-      if (keyword) {
-        info.textContent =
-          "검색 결과 " +
-          filteredCustomerCount +
-          "명 · " +
-          filteredOrders.length +
-          "건 / 전체 " +
-          totalCustomerCount +
-          "명 · " +
-          orders.length +
-          "건";
-      } else {
-        info.textContent =
-          "주문 회원 " +
-          totalCustomerCount +
-          "명 · 전체 주문 " +
-          orders.length +
-          "건";
-      }
+      document
+        .getElementById(
+          "orderListInfo"
+        )
+        .textContent =
+          keyword
+            ? (
+                "검색 결과 " +
+                filtered.length +
+                "건"
+              )
+            : (
+                "등록 주문 " +
+                orders.length +
+                "건"
+              );
 
-      if (!orders.length) {
-        target.innerHTML =
-          '<div class="muted">' +
-          '등록된 주문이 없습니다.' +
-          '</div>';
-
-        return;
-      }
-
-      if (!filteredOrders.length) {
-        target.innerHTML =
-          '<div class="muted">' +
-          '일치하는 주문 회원이 없습니다.' +
-          '</div>';
-
+      if (!filtered.length) {
+        target.innerHTML = `
+          <div class="muted">
+            표시할 주문이 없습니다.
+          </div>
+        `;
         return;
       }
 
       target.innerHTML =
-        filteredOrders.map(
+        filtered.map(
           function (order) {
             const items =
-              order.order_items || [];
-
-            const total =
-              calculateOrderTotal(order);
+              Array.isArray(
+                order.order_items
+              )
+                ? order.order_items
+                : [];
 
             const completed =
-              isPickupCompleted(order);
+              Boolean(
+                order.completed_at
+              ) ||
+              String(
+                order.order_status || ""
+              ).includes("픽업 완료") ||
+              String(
+                order.order_status || ""
+              ).includes("배송 완료");
+
+            const total =
+              getOrderTotal(order);
+
+            const itemsHtml =
+              items.map(
+                function (item) {
+                  return `
+                    <label class="order-item-edit-row">
+                      <input
+                        type="checkbox"
+                        value="${escapeHtml(item.id)}"
+                        data-order-item-check="${escapeHtml(order.id)}"
+                      >
+
+                      <span>
+                        <strong>
+                          ${escapeHtml(item.product_name)}
+                        </strong><br>
+
+                        <span class="muted">
+                          ${Number(item.quantity || 0).toLocaleString("ko-KR")}
+                          ${escapeHtml(item.unit_name || "개")}
+                          ×
+                          ${formatWon(item.unit_price)}
+                          =
+                          ${formatWon(item.line_total)}
+                        </span><br>
+
+                        <span class="pickup-date-badge">
+                          픽업 날짜:
+                          ${formatDate(item.pickup_date)}
+                        </span>
+                      </span>
+                    </label>
+                  `;
+                }
+              ).join("");
 
             return `
-              <article class="order-card ${completed ? "completed" : ""}">
-
+              <article
+                class="order-card ${completed ? "completed" : ""}"
+              >
                 <div class="order-head">
-
                   <div>
                     <strong>
-                      ${escapeHtml(
-                        order.customers?.nickname ||
-                        "회원 없음"
-                      )}
+                      ${escapeHtml(order.customers?.nickname || "고객")}
                     </strong>
 
                     <div class="muted">
-                      ${escapeHtml(order.order_number)}
-                      ·
-                      ${escapeHtml(order.order_status)}
-                      ·
-                      ${escapeHtml(order.payment_status)}
+                      주문일:
+                      ${formatDate(order.order_date)}
                     </div>
 
                     <span class="order-status-badge ${completed ? "completed" : ""}">
-                      ${completed
-                        ? "픽업 완료 · 매출 반영"
-                        : "진행 중 주문"}
+                      ${escapeHtml(order.order_status || "주문 접수")}
+                    </span>
+
+                    <span class="order-status-badge">
+                      ${escapeHtml(order.payment_status || "입금 대기")}
                     </span>
                   </div>
 
-                </div>
-
-                <div class="muted">
-                  취소할 상품만 체크한 뒤
-                  ‘선택 상품 취소’를 누르세요.
+                  <span class="muted">
+                    ${escapeHtml(order.order_number || "")}
+                  </span>
                 </div>
 
                 <div class="order-item-edit-list">
-                  ${items.map(
-                    function (item) {
-                      return `
-                        <label class="order-item-edit-row">
-                          <input
-                            type="checkbox"
-                            data-order-id="${escapeHtml(order.id)}"
-                            data-item-id="${escapeHtml(item.id)}"
-                            ${completed ? "disabled" : ""}
-                          >
-
-                          <span>
-                            <strong>
-                              ${escapeHtml(item.product_name)}
-                            </strong>
-                            <br>
-                            <span class="muted">
-                              ${item.quantity}
-                              ${escapeHtml(item.unit_name)}
-                              · 단가 ${formatPrice(item.unit_price)}
-                              · 합계 ${formatPrice(item.line_total)}
-                            </span>
-                          </span>
-                        </label>
-                      `;
-                    }
-                  ).join("")}
+                  ${itemsHtml}
                 </div>
+
+                ${
+                  order.notice
+                    ? `
+                      <div class="muted">
+                        안내:
+                        ${escapeHtml(order.notice)}
+                      </div>
+                    `
+                    : ""
+                }
 
                 <div class="order-total">
-                  최종 결제금액:
-                  ${formatPrice(total)}
+                  주문 상품 합계:
+                  ${formatWon(total)}
                 </div>
 
-                <div class="muted">
-                  주문일
-                  ${escapeHtml(order.order_date || "-")}
-                  /
-                  픽업 예정일
-                  ${escapeHtml(order.pickup_date || "미정")}
-                  /
-                  ${escapeHtml(order.pickup_place || "장소 미정")}
-                  ${completed
-                    ? (
-                        " / 완료일 " +
-                        escapeHtml(
-                          formatDateTime(order.completed_at)
-                        )
-                      )
-                    : ""}
+                <div class="payment-edit">
+                  <select
+                    id="payment-edit-${escapeHtml(order.id)}"
+                    aria-label="결제상태 변경"
+                  >
+                    ${renderPaymentOptions(order.payment_status)}
+                  </select>
+
+                  <button
+                    class="button warning"
+                    type="button"
+                    data-payment-save="${escapeHtml(order.id)}"
+                  >
+                    결제상태 저장
+                  </button>
                 </div>
 
                 <div class="order-action-grid">
                   <button
-                    class="button light small"
+                    class="button light"
                     type="button"
-                    onclick='cancelSelectedOrderItems(
-                      ${JSON.stringify(order.id)},
-                      ${JSON.stringify(order.order_number)}
-                    )'
-                    ${completed ? "disabled" : ""}
+                    data-items-delete="${escapeHtml(order.id)}"
                   >
-                    선택 상품 취소
+                    체크 상품 부분취소
                   </button>
 
                   <button
-                    class="button ${completed ? "secondary" : "success"} small"
+                    class="button success"
                     type="button"
-                    onclick='togglePickupComplete(
-                      ${JSON.stringify(order.id)},
-                      ${completed}
-                    )'
+                    data-payment-complete="${escapeHtml(order.id)}"
                   >
-                    ${completed
-                      ? "완료 취소"
-                      : "픽업 완료"}
+                    결제 완료
                   </button>
 
                   <button
-                    class="button danger small"
+                    class="button ${completed ? "warning" : "success"}"
                     type="button"
-                    onclick='deleteOrder(
-                      ${JSON.stringify(order.id)},
-                      ${JSON.stringify(order.order_number)}
-                    )'
+                    data-pickup-toggle="${escapeHtml(order.id)}"
+                    data-completed="${completed ? "true" : "false"}"
                   >
-                    전체 주문 삭제
+                    ${completed ? "픽업 완료 취소" : "픽업 완료"}
+                  </button>
+
+                  <button
+                    class="button danger"
+                    type="button"
+                    data-order-delete="${escapeHtml(order.id)}"
+                  >
+                    주문 전체 삭제
                   </button>
                 </div>
-
               </article>
             `;
           }
         ).join("");
+
+      bindOrderActionButtons();
     }
 
-    function getCurrentMonthKey() {
-      const now = new Date();
+    function bindOrderActionButtons() {
+      document
+        .querySelectorAll(
+          "[data-items-delete]"
+        )
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                deleteSelectedItems(
+                  button.dataset.itemsDelete
+                );
+              }
+            );
+          }
+        );
 
-      return (
-        now.getFullYear() +
-        "-" +
-        String(now.getMonth() + 1)
-          .padStart(2, "0")
-      );
+      document
+        .querySelectorAll(
+          "[data-payment-save]"
+        )
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                updatePaymentStatus(
+                  button.dataset.paymentSave
+                );
+              }
+            );
+          }
+        );
+
+      document
+        .querySelectorAll(
+          "[data-payment-complete]"
+        )
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                markPaymentComplete(
+                  button.dataset.paymentComplete
+                );
+              }
+            );
+          }
+        );
+
+      document
+        .querySelectorAll(
+          "[data-pickup-toggle]"
+        )
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                togglePickupComplete(
+                  button.dataset.pickupToggle,
+                  button.dataset.completed ===
+                    "true"
+                );
+              }
+            );
+          }
+        );
+
+      document
+        .querySelectorAll(
+          "[data-order-delete]"
+        )
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                const order =
+                  orders.find(
+                    function (item) {
+                      return (
+                        item.id ===
+                        button.dataset.orderDelete
+                      );
+                    }
+                  );
+
+                if (order) {
+                  deleteOrder(
+                    order.id,
+                    order.order_number
+                  );
+                }
+              }
+            );
+          }
+        );
     }
 
-    function toLocalDateKey(value) {
-      if (!value) {
-        return "";
+    function renderPaymentOptions(
+      currentStatus
+    ) {
+      const statuses = [
+        "입금 대기",
+        "입금 확인 대기",
+        "현장 결제 예정",
+        "카드 결제 대기",
+        "입금 완료",
+        "결제 완료"
+      ];
+
+      if (
+        currentStatus &&
+        !statuses.includes(
+          currentStatus
+        )
+      ) {
+        statuses.unshift(
+          currentStatus
+        );
       }
 
-      const date = new Date(value);
-
-      if (Number.isNaN(date.getTime())) {
-        return "";
-      }
-
-      return (
-        date.getFullYear() +
-        "-" +
-        String(date.getMonth() + 1)
-          .padStart(2, "0") +
-        "-" +
-        String(date.getDate())
-          .padStart(2, "0")
-      );
-    }
-
-    function formatDateTime(value) {
-      if (!value) {
-        return "-";
-      }
-
-      const date = new Date(value);
-
-      if (Number.isNaN(date.getTime())) {
-        return "-";
-      }
-
-      return date.toLocaleString(
-        "ko-KR",
-        {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit"
+      return statuses.map(
+        function (status) {
+          return `
+            <option
+              ${status === currentStatus ? "selected" : ""}
+            >
+              ${escapeHtml(status)}
+            </option>
+          `;
         }
+      ).join("");
+    }
+
+    function getOrderTotal(order) {
+      return (
+        order.order_items || []
+      ).reduce(
+        function (sum, item) {
+          return (
+            sum +
+            Number(
+              item.line_total ??
+              (
+                Number(item.quantity || 0) *
+                Number(item.unit_price || 0)
+              )
+            )
+          );
+        },
+        0
       );
     }
 
-    function getCompletedOrdersForMonth(monthKey) {
+    function getCompletedOrdersForMonth() {
+      const monthValue =
+        document
+          .getElementById(
+            "salesMonth"
+          )
+          .value;
+
       return orders.filter(
         function (order) {
+          if (!order.completed_at) {
+            return false;
+          }
+
           return (
-            isPickupCompleted(order) &&
-            toLocalDateKey(
+            String(
               order.completed_at
-            ).startsWith(monthKey)
+            ).slice(0, 7) ===
+            monthValue
           );
         }
       );
@@ -2730,195 +3418,240 @@
         );
 
       if (!monthInput.value) {
-        monthInput.value =
-          getCurrentMonthKey();
+        setCurrentMonth();
       }
 
-      const monthKey =
-        monthInput.value;
+      const [year, month] =
+        monthInput.value
+          .split("-")
+          .map(Number);
 
-      const monthOrders =
-        getCompletedOrdersForMonth(
-          monthKey
-        );
+      const completedOrders =
+        getCompletedOrdersForMonth();
 
-      const totalSales =
-        monthOrders.reduce(
+      const total =
+        completedOrders.reduce(
           function (sum, order) {
             return (
               sum +
-              calculateOrderTotal(order)
+              getOrderTotal(order)
+            );
+          },
+          0
+        );
+
+      const itemCount =
+        completedOrders.reduce(
+          function (sum, order) {
+            return (
+              sum +
+              (order.order_items || [])
+                .reduce(
+                  function (
+                    itemSum,
+                    item
+                  ) {
+                    return (
+                      itemSum +
+                      Number(
+                        item.quantity || 0
+                      )
+                    );
+                  },
+                  0
+                )
             );
           },
           0
         );
 
       document
-        .getElementById("monthlySalesTotal")
+        .getElementById(
+          "monthlyOrderCount"
+        )
         .textContent =
-          formatPrice(totalSales);
+          completedOrders.length +
+          "건";
 
       document
-        .getElementById("monthlyCustomerCount")
+        .getElementById(
+          "monthlyItemCount"
+        )
         .textContent =
-          getUniqueOrderCustomerCount(
-            monthOrders
-          ) + "명";
+          itemCount.toLocaleString(
+            "ko-KR"
+          ) +
+          "개";
 
       document
-        .getElementById("monthlyOrderCount")
+        .getElementById(
+          "monthlySalesTotal"
+        )
         .textContent =
-          monthOrders.length + "건";
-
-      const dailyMap = {};
-
-      monthOrders.forEach(
-        function (order) {
-          const dateKey =
-            toLocalDateKey(
-              order.completed_at
-            );
-
-          if (!dailyMap[dateKey]) {
-            dailyMap[dateKey] = {
-              total: 0,
-              orders: []
-            };
-          }
-
-          dailyMap[dateKey].total +=
-            calculateOrderTotal(order);
-
-          dailyMap[dateKey].orders.push(
-            order
-          );
-        }
-      );
-
-      const parts =
-        monthKey.split("-");
-
-      const year = Number(parts[0]);
-      const monthIndex =
-        Number(parts[1]) - 1;
+          formatWon(total);
 
       const firstDay =
-        new Date(year, monthIndex, 1);
-
-      const daysInMonth =
         new Date(
           year,
-          monthIndex + 1,
+          month - 1,
+          1
+        );
+
+      const lastDate =
+        new Date(
+          year,
+          month,
           0
         ).getDate();
+
+      const dailyMap =
+        new Map();
+
+      completedOrders.forEach(
+        function (order) {
+          const date =
+            String(
+              order.completed_at
+            ).slice(0, 10);
+
+          if (!dailyMap.has(date)) {
+            dailyMap.set(
+              date,
+              []
+            );
+          }
+
+          dailyMap
+            .get(date)
+            .push(order);
+        }
+      );
 
       const calendar =
         document.getElementById(
           "salesCalendar"
         );
 
-      let html = "";
+      const cells = [];
 
       for (
-        let blank = 0;
-        blank < firstDay.getDay();
-        blank += 1
+        let i = 0;
+        i < firstDay.getDay();
+        i += 1
       ) {
-        html +=
-          '<div class="calendar-empty"></div>';
+        cells.push(
+          '<div class="calendar-empty"></div>'
+        );
       }
 
       for (
         let day = 1;
-        day <= daysInMonth;
+        day <= lastDate;
         day += 1
       ) {
-        const dateKey =
-          monthKey +
-          "-" +
-          String(day).padStart(2, "0");
+        const date =
+          [
+            year,
+            String(month).padStart(2, "0"),
+            String(day).padStart(2, "0")
+          ].join("-");
 
-        const dayData =
-          dailyMap[dateKey];
+        const dayOrders =
+          dailyMap.get(date) || [];
 
-        html += `
+        const dayTotal =
+          dayOrders.reduce(
+            function (sum, order) {
+              return (
+                sum +
+                getOrderTotal(order)
+              );
+            },
+            0
+          );
+
+        cells.push(`
           <button
-            class="calendar-day ${dayData ? "has-sales" : ""} ${selectedSalesDate === dateKey ? "selected" : ""}"
+            class="
+              calendar-day
+              ${dayOrders.length ? "has-sales" : ""}
+              ${selectedSalesDate === date ? "selected" : ""}
+            "
             type="button"
-            onclick='showDailySales(
-              ${JSON.stringify(dateKey)}
-            )'
+            data-sales-date="${date}"
           >
             <span class="calendar-date-number">
               ${day}
             </span>
-            ${dayData
-              ? (
-                  '<span class="calendar-sales-amount">' +
-                  formatPrice(dayData.total) +
-                  '<br>' +
-                  dayData.orders.length +
-                  '건</span>'
-                )
-              : ""}
+
+            ${
+              dayOrders.length
+                ? `
+                  <span class="calendar-sales-amount">
+                    ${formatWon(dayTotal)}
+                  </span>
+                `
+                : ""
+            }
           </button>
-        `;
+        `);
       }
 
-      calendar.innerHTML = html;
+      calendar.innerHTML =
+        cells.join("");
 
-      if (
-        selectedSalesDate &&
-        selectedSalesDate.startsWith(
-          monthKey
+      calendar
+        .querySelectorAll(
+          "[data-sales-date]"
         )
-      ) {
-        renderDailySalesDetail(
-          selectedSalesDate
-        );
-      } else {
-        document
-          .getElementById(
-            "dailySalesDetail"
-          )
-          .innerHTML =
-            '<div class="muted">' +
-            '달력에서 날짜를 누르면 해당 날짜의 매출이 표시됩니다.' +
-            '</div>';
-      }
-    }
+        .forEach(
+          function (button) {
+            button.addEventListener(
+              "click",
+              function () {
+                selectedSalesDate =
+                  button.dataset.salesDate;
 
-    function showDailySales(dateKey) {
-      selectedSalesDate = dateKey;
-      renderSalesCalendar();
-    }
-
-    function renderDailySalesDetail(dateKey) {
-      const dayOrders =
-        orders.filter(
-          function (order) {
-            return (
-              isPickupCompleted(order) &&
-              toLocalDateKey(
-                order.completed_at
-              ) === dateKey
+                renderSalesCalendar();
+                renderDailySalesDetail();
+              }
             );
           }
         );
 
+      renderDailySalesDetail();
+    }
+
+    function renderDailySalesDetail() {
       const target =
         document.getElementById(
           "dailySalesDetail"
         );
 
+      if (!selectedSalesDate) {
+        target.textContent =
+          "날짜를 누르면 해당 날짜의 완료 주문이 표시됩니다.";
+        return;
+      }
+
+      const dayOrders =
+        orders.filter(
+          function (order) {
+            return (
+              order.completed_at &&
+              String(
+                order.completed_at
+              ).slice(0, 10) ===
+              selectedSalesDate
+            );
+          }
+        );
+
       if (!dayOrders.length) {
-        target.innerHTML =
-          '<strong>' +
-          escapeHtml(dateKey) +
-          '</strong>' +
-          '<div class="muted" style="margin-top:8px;">' +
-          '이 날짜에 완료된 매출이 없습니다.' +
-          '</div>';
+        target.innerHTML = `
+          <strong>${formatDate(selectedSalesDate)}</strong><br>
+          완료 매출이 없습니다.
+        `;
         return;
       }
 
@@ -2927,90 +3660,150 @@
           function (sum, order) {
             return (
               sum +
-              calculateOrderTotal(order)
+              getOrderTotal(order)
             );
           },
           0
         );
 
-      target.innerHTML =
-        '<strong>' +
-        escapeHtml(dateKey) +
-        ' 매출 · ' +
-        formatPrice(total) +
-        '</strong>' +
-        dayOrders.map(
+      target.innerHTML = `
+        <strong>
+          ${formatDate(selectedSalesDate)}
+          · ${formatWon(total)}
+        </strong>
+
+        ${dayOrders.map(
           function (order) {
             return `
               <div class="daily-sales-row">
-                <div>
-                  <strong>
-                    ${escapeHtml(
-                      order.customers?.nickname ||
-                      "회원 없음"
-                    )}
-                  </strong>
-                  <div class="muted">
-                    ${escapeHtml(order.order_number)}
-                  </div>
-                </div>
+                <span>
+                  ${escapeHtml(order.customers?.nickname || "고객")}
+                </span>
+
                 <strong>
-                  ${formatPrice(
-                    calculateOrderTotal(order)
-                  )}
+                  ${formatWon(getOrderTotal(order))}
                 </strong>
               </div>
             `;
           }
-        ).join("");
+        ).join("")}
+      `;
     }
 
-    function makeOrderExportRows(orderRows) {
+    function downloadMonthlyExcel() {
+      if (
+        typeof XLSX === "undefined"
+      ) {
+        alert(
+          "엑셀 라이브러리를 불러오지 못했습니다."
+        );
+        return;
+      }
+
+      const month =
+        document
+          .getElementById(
+            "salesMonth"
+          )
+          .value;
+
+      const monthlyOrders =
+        getCompletedOrdersForMonth();
+
+      const rows =
+        makeExcelRows(
+          monthlyOrders
+        );
+
+      downloadExcel(
+        rows,
+        "담픽_" +
+        month +
+        "_완료매출.xlsx"
+      );
+    }
+
+    function downloadAllExcel() {
+      if (
+        typeof XLSX === "undefined"
+      ) {
+        alert(
+          "엑셀 라이브러리를 불러오지 못했습니다."
+        );
+        return;
+      }
+
+      const rows =
+        makeExcelRows(orders);
+
+      downloadExcel(
+        rows,
+        "담픽_전체주문.xlsx"
+      );
+    }
+
+    function makeExcelRows(
+      sourceOrders
+    ) {
       const rows = [];
 
-      orderRows.forEach(
+      sourceOrders.forEach(
         function (order) {
           const items =
             order.order_items || [];
 
-          const orderTotal =
-            calculateOrderTotal(order);
-
-          if (!items.length) {
-            rows.push({
-              "완료일": toLocalDateKey(order.completed_at),
-              "고객 닉네임": order.customers?.nickname || "",
-              "주문번호": order.order_number || "",
-              "상품명": "",
-              "수량": "",
-              "단위": "",
-              "단가": "",
-              "상품금액": "",
-              "최종 주문금액": orderTotal,
-              "주문일": order.order_date || "",
-              "픽업 예정일": order.pickup_date || "",
-              "결제상태": order.payment_status || "",
-              "주문상태": order.order_status || ""
-            });
-            return;
-          }
-
           items.forEach(
             function (item) {
               rows.push({
-                "완료일": toLocalDateKey(order.completed_at),
-                "고객 닉네임": order.customers?.nickname || "",
-                "주문번호": order.order_number || "",
-                "상품명": item.product_name || "",
-                "수량": Number(item.quantity || 0),
-                "단위": item.unit_name || "",
-                "단가": Number(item.unit_price || 0),
-                "상품금액": Number(item.line_total || 0),
-                "최종 주문금액": orderTotal,
-                "주문일": order.order_date || "",
-                "픽업 예정일": order.pickup_date || "",
-                "결제상태": order.payment_status || "",
-                "주문상태": order.order_status || ""
+                고객닉네임:
+                  order.customers?.nickname ||
+                  "",
+                주문번호:
+                  order.order_number ||
+                  "",
+                주문일:
+                  order.order_date ||
+                  "",
+                상품명:
+                  item.product_name ||
+                  "",
+                수량:
+                  Number(
+                    item.quantity || 0
+                  ),
+                단위:
+                  item.unit_name ||
+                  "개",
+                단가:
+                  Number(
+                    item.unit_price || 0
+                  ),
+                금액:
+                  Number(
+                    item.line_total ??
+                    (
+                      Number(item.quantity || 0) *
+                      Number(item.unit_price || 0)
+                    )
+                  ),
+                상품픽업날짜:
+                  item.pickup_date ||
+                  "",
+                결제상태:
+                  order.payment_status ||
+                  "",
+                주문상태:
+                  order.order_status ||
+                  "",
+                완료일:
+                  order.completed_at
+                    ? String(
+                        order.completed_at
+                      ).slice(0, 10)
+                    : "",
+                안내사항:
+                  order.notice ||
+                  ""
               });
             }
           );
@@ -3020,237 +3813,180 @@
       return rows;
     }
 
-    function makeDailySummaryRows(orderRows) {
-      const map = {};
-
-      orderRows.forEach(
-        function (order) {
-          const dateKey =
-            toLocalDateKey(
-              order.completed_at
-            ) || "미완료";
-
-          if (!map[dateKey]) {
-            map[dateKey] = {
-              date: dateKey,
-              total: 0,
-              orders: 0,
-              customers: new Set()
-            };
-          }
-
-          map[dateKey].total +=
-            calculateOrderTotal(order);
-          map[dateKey].orders += 1;
-          map[dateKey].customers.add(
-            order.customers?.nickname ||
-            "회원 없음"
-          );
-        }
-      );
-
-      return Object.values(map)
-        .sort(
-          function (a, b) {
-            return a.date.localeCompare(b.date);
-          }
-        )
-        .map(
-          function (row) {
-            return {
-              "날짜": row.date,
-              "고객 수": row.customers.size,
-              "주문 건수": row.orders,
-              "총 매출": row.total
-            };
-          }
-        );
-    }
-
-    function makeCustomerSummaryRows(orderRows) {
-      const map = {};
-
-      orderRows.forEach(
-        function (order) {
-          const nickname =
-            order.customers?.nickname ||
-            "회원 없음";
-
-          if (!map[nickname]) {
-            map[nickname] = {
-              nickname,
-              orders: 0,
-              total: 0
-            };
-          }
-
-          map[nickname].orders += 1;
-          map[nickname].total +=
-            calculateOrderTotal(order);
-        }
-      );
-
-      return Object.values(map)
-        .sort(
-          function (a, b) {
-            return b.total - a.total;
-          }
-        )
-        .map(
-          function (row) {
-            return {
-              "고객 닉네임": row.nickname,
-              "주문 건수": row.orders,
-              "최종 주문금액 합계": row.total
-            };
-          }
-        );
-    }
-
-    function downloadWorkbook(
-      orderRows,
-      fileName
+    function downloadExcel(
+      rows,
+      filename
     ) {
-      if (!window.XLSX) {
-        alert(
-          "엑셀 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요."
-        );
-        return;
-      }
-
-      if (!orderRows.length) {
-        alert(
-          "다운로드할 주문 내역이 없습니다."
-        );
-        return;
-      }
-
       const workbook =
         XLSX.utils.book_new();
 
-      const detailSheet =
+      const sheet =
         XLSX.utils.json_to_sheet(
-          makeOrderExportRows(orderRows)
-        );
-
-      const dailySheet =
-        XLSX.utils.json_to_sheet(
-          makeDailySummaryRows(orderRows)
-        );
-
-      const customerSheet =
-        XLSX.utils.json_to_sheet(
-          makeCustomerSummaryRows(orderRows)
+          rows.length
+            ? rows
+            : [
+                {
+                  안내:
+                    "표시할 주문이 없습니다."
+                }
+              ]
         );
 
       XLSX.utils.book_append_sheet(
         workbook,
-        detailSheet,
-        "주문 상세"
-      );
-
-      XLSX.utils.book_append_sheet(
-        workbook,
-        dailySheet,
-        "날짜별 합계"
-      );
-
-      XLSX.utils.book_append_sheet(
-        workbook,
-        customerSheet,
-        "고객별 합계"
+        sheet,
+        "주문내역"
       );
 
       XLSX.writeFile(
         workbook,
-        fileName
-      );
-    }
-
-    function downloadMonthlySalesExcel() {
-      const monthKey =
-        document
-          .getElementById("salesMonth")
-          .value ||
-        getCurrentMonthKey();
-
-      downloadWorkbook(
-        getCompletedOrdersForMonth(
-          monthKey
-        ),
-        "담픽_" +
-        monthKey +
-        "_픽업완료매출.xlsx"
-      );
-    }
-
-    function downloadAllOrdersExcel() {
-      downloadWorkbook(
-        orders,
-        "담픽_전체주문_" +
-        toLocalDateKey(new Date()) +
-        ".xlsx"
+        filename
       );
     }
 
     function setToday() {
+      const today =
+        new Date();
+
       document
-        .getElementById("orderDate")
+        .getElementById(
+          "orderDate"
+        )
         .value =
-          new Date()
-            .toISOString()
-            .slice(0, 10);
+          toDateInputValue(today);
 
-      document
-        .getElementById("pickupPlace")
-        .value = "담픽 매장";
+      setDefaultProductPickupDate();
+    }
 
-      const salesMonth =
+    function setDefaultProductPickupDate() {
+      const target =
         document.getElementById(
-          "salesMonth"
+          "newProductPickupDate"
         );
 
-      if (
-        salesMonth &&
-        !salesMonth.value
-      ) {
-        salesMonth.value =
-          getCurrentMonthKey();
+      if (!target || target.value) {
+        return;
       }
+
+      const date =
+        new Date();
+
+      date.setDate(
+        date.getDate() + 1
+      );
+
+      target.value =
+        toDateInputValue(date);
+    }
+
+    function setCurrentMonth() {
+      const now =
+        new Date();
+
+      document
+        .getElementById(
+          "salesMonth"
+        )
+        .value =
+          [
+            now.getFullYear(),
+            String(
+              now.getMonth() + 1
+            ).padStart(2, "0")
+          ].join("-");
+    }
+
+    function toDateInputValue(
+      date
+    ) {
+      return [
+        date.getFullYear(),
+        String(
+          date.getMonth() + 1
+        ).padStart(2, "0"),
+        String(
+          date.getDate()
+        ).padStart(2, "0")
+      ].join("-");
     }
 
     function makeOrderNumber() {
       const now =
         new Date();
 
-      const pad =
-        function (value) {
-          return String(value)
-            .padStart(2, "0");
-        };
-
-      const date =
-        now.getFullYear() +
-        pad(now.getMonth() + 1) +
-        pad(now.getDate());
-
-      const time =
-        pad(now.getHours()) +
-        pad(now.getMinutes()) +
-        pad(now.getSeconds());
-
-      const random =
-        Math.floor(
-          Math.random() * 900 + 100
-        );
-
       return (
         "DP-" +
-        date +
+        now
+          .toISOString()
+          .replace(/\D/g, "")
+          .slice(0, 14) +
         "-" +
-        time +
-        "-" +
-        random
+        Math.floor(
+          1000 +
+          Math.random() * 9000
+        )
+      );
+    }
+
+    function formatWon(value) {
+      return (
+        Number(value || 0)
+          .toLocaleString("ko-KR") +
+        "원"
+      );
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return "날짜 미정";
+      }
+
+      const date =
+        new Date(
+          String(value).slice(0, 10) +
+          "T00:00:00"
+        );
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return String(value);
+      }
+
+      return new Intl.DateTimeFormat(
+        "ko-KR",
+        {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        }
+      ).format(date);
+    }
+
+    function setMessage(
+      element,
+      text,
+      type
+    ) {
+      element.textContent = text;
+      element.className =
+        text
+          ? (
+              "message show " +
+              (type || "info")
+            )
+          : "message";
+    }
+
+    function clearMessage(
+      element
+    ) {
+      setMessage(
+        element,
+        "",
+        ""
       );
     }
 
@@ -3259,33 +3995,9 @@
 
       setMessage(
         appMessage,
-        "오류: " +
-        (
-          error.message ||
-          "작업을 완료하지 못했습니다."
-        ),
+        error?.message ||
+        "데이터를 처리하는 중 오류가 발생했습니다.",
         "error"
-      );
-    }
-
-    function setMessage(
-      target,
-      text,
-      type
-    ) {
-      target.textContent = text;
-
-      target.className =
-        text
-          ? "message show " + type
-          : "message";
-    }
-
-    function formatPrice(value) {
-      return (
-        Number(value || 0)
-          .toLocaleString("ko-KR") +
-        "원"
       );
     }
 
@@ -3297,8 +4009,6 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
-
-    setToday();
   </script>
 </body>
 </html>
