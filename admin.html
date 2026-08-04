@@ -420,13 +420,47 @@
       text-align: center;
     }
 
-    .admin-link {
-      display: block;
+    .admin-links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       margin-top: 24px;
-      color: #aaa;
-      font-size: 12px;
+    }
+
+    .admin-link {
+      display: flex;
+      min-height: 50px;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 950;
       text-align: center;
       text-decoration: none;
+    }
+
+    .admin-link.basic {
+      border: 1px solid #e6d9df;
+      color: #3d3840;
+      background: #ffffff;
+    }
+
+    .admin-link.payment {
+      border: 1px solid transparent;
+      color: #ffffff;
+      background:
+        linear-gradient(105deg, #fa397e, #d91767);
+      box-shadow:
+        0 12px 24px rgba(226, 29, 105, .20);
+    }
+
+    .admin-guide {
+      margin: 10px 0 0;
+      color: #999;
+      font-size: 11px;
+      line-height: 1.55;
+      text-align: center;
     }
 
     @media (max-width: 420px) {
@@ -434,6 +468,7 @@
       .brand h1 { font-size: 38px; }
       .item-row { flex-direction: column; }
       .item-price { text-align: right; }
+      .admin-links { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -683,9 +718,30 @@
       수집하며 관리자 결제·배송 화면에서만 확인합니다.
     </p>
 
-    <a class="admin-link" href="./admin.html">
-      관리자 페이지
-    </a>
+    <nav
+      class="admin-links"
+      aria-label="담픽 관리자 메뉴"
+    >
+      <a
+        class="admin-link basic"
+        href="./admin.html"
+      >
+        기존 관리자
+      </a>
+
+      <a
+        class="admin-link payment"
+        href="./payments.html"
+      >
+        결제·배송 관리
+      </a>
+    </nav>
+
+    <p class="admin-guide">
+      관리자 전용 메뉴입니다.
+      회원·상품·주문 관리는 기존 관리자,
+      결제·배송 확인은 결제·배송 관리를 이용하세요.
+    </p>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
