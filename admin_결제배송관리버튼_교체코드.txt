@@ -1,0 +1,64 @@
+기존 admin.html 상단에 "결제·배송 관리" 버튼 추가하기
+
+GitHub의 admin.html에서 아래 기존 부분을 찾으세요.
+
+==================================================
+찾을 기존 코드
+==================================================
+
+<div class="actions">
+  <a
+    class="button secondary"
+    href="./index.html"
+  >
+    고객 화면 보기
+  </a>
+
+  <button
+    id="logoutButton"
+    class="button danger"
+    type="button"
+  >
+    로그아웃
+  </button>
+</div>
+
+==================================================
+위 코드를 전부 지우고 아래 코드로 교체
+==================================================
+
+<div class="actions">
+  <a
+    class="button"
+    href="./payments.html"
+  >
+    결제·배송 관리
+  </a>
+
+  <a
+    class="button secondary"
+    href="./index.html"
+  >
+    고객 화면 보기
+  </a>
+
+  <button
+    id="logoutButton"
+    class="button danger"
+    type="button"
+  >
+    로그아웃
+  </button>
+</div>
+
+==================================================
+적용 후
+==================================================
+
+관리자 로그인 후 화면 위쪽에 다음 버튼이 보입니다.
+
+결제·배송 관리
+
+이 버튼을 누르면 payments.html로 이동하며,
+같은 브라우저에서 이미 관리자 로그인을 했다면
+로그인 상태가 유지되어 결제·배송 신청 목록이 표시됩니다.
