@@ -4,1485 +4,3289 @@
   <meta charset="UTF-8">
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    content="width=device-width, initial-scale=1.0"
   >
-  <meta name="theme-color" content="#ee2f78">
-  <meta
-    name="description"
-    content="담픽 공동구매 주문조회·결제·배송 신청"
-  >
-  <title>담픽 주문조회·결제</title>
+
+  <title>담픽 관리자</title>
 
   <style>
-    * { box-sizing: border-box; }
-
-    :root {
-      --main: #f2387d;
-      --main-dark: #d91d68;
-      --navy: #171a37;
-      --text: #292733;
-      --sub: #74717a;
-      --border: #f0dce5;
-      --soft: #fff2f7;
-      --success: #176a3e;
-      --danger: #a62840;
-      --shadow: 0 18px 48px rgba(186, 39, 96, 0.13);
+    * {
+      box-sizing: border-box;
     }
 
-    html {
-      background: #fff7fa;
-      scroll-behavior: smooth;
+    :root {
+      --main: #ef3f7f;
+      --main-dark: #d92d69;
+      --dark: #252525;
+      --sub: #777;
+      --border: #e7e7e7;
+      --background: #fff7fa;
+      --danger: #c83b54;
+      --success: #197348;
     }
 
     body {
-      min-height: 100svh;
       margin: 0;
-      color: var(--text);
-      background:
-        radial-gradient(
-          circle at 90% 8%,
-          rgba(246, 74, 139, .17),
-          transparent 24%
-        ),
-        linear-gradient(
-          180deg,
-          #fff4f8,
-          #ffffff 60%
-        );
       font-family:
-        "Pretendard",
-        "Noto Sans KR",
-        "Apple SD Gothic Neo",
         Arial,
+        "Noto Sans KR",
         sans-serif;
+      color: var(--dark);
+      background: var(--background);
     }
 
     button,
     input,
+    select,
     textarea {
       font: inherit;
     }
 
-    button {
-      cursor: pointer;
-    }
-
-    .page {
-      width: min(640px, 100%);
+    .wrap {
+      width: min(1120px, calc(100% - 28px));
       margin: 0 auto;
-      padding:
-        calc(34px + env(safe-area-inset-top))
-        16px
-        calc(60px + env(safe-area-inset-bottom));
+      padding: 28px 0 60px;
     }
 
-    .brand {
-      margin-bottom: 34px;
-      text-align: center;
-    }
-
-    .brand-mark {
-      display: grid;
-      width: 56px;
-      height: 56px;
-      margin: 0 auto 10px;
-      place-items: center;
-      border-radius: 18px;
-      color: #fff;
-      background:
-        linear-gradient(145deg, #ff6da4, #d91d68);
-      box-shadow: 0 13px 28px rgba(217, 29, 104, .23);
-      font-size: 28px;
+    .hidden {
+      display: none !important;
     }
 
     .brand h1 {
       margin: 0;
-      color: var(--main-dark);
-      font-size: 44px;
-      font-weight: 950;
-      letter-spacing: -2px;
-    }
-
-    .brand h1 span {
-      margin-left: 7px;
-      font-size: 21px;
+      color: var(--main);
+      font-size: 30px;
+      font-weight: 900;
     }
 
     .brand p {
-      margin: 11px 0 0;
+      margin: 5px 0 0;
       color: var(--sub);
-      font-weight: 700;
-      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .login-card {
+      max-width: 460px;
+      margin: 60px auto;
     }
 
     .card {
-      margin-top: 16px;
+      margin-bottom: 18px;
       padding: 22px;
-      border: 1px solid rgba(255,255,255,.9);
-      border-radius: 25px;
-      background: rgba(255,255,255,.97);
-      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 22px;
     }
 
     h2,
     h3 {
       margin-top: 0;
-      color: var(--navy);
-      letter-spacing: -.7px;
     }
 
-    .description {
+    .section-description {
+      margin-top: -5px;
       color: var(--sub);
-      line-height: 1.7;
-      word-break: keep-all;
+      font-size: 13px;
+      line-height: 1.6;
     }
 
-    label.field-label {
+    .grid {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
       display: block;
-      margin: 16px 0 8px;
-      color: var(--navy);
-      font-size: 14px;
+      margin-bottom: 7px;
+      font-size: 13px;
       font-weight: 900;
     }
 
-    input[type="text"],
+    input,
+    select,
     textarea {
       width: 100%;
-      padding: 14px;
-      border: 1px solid #e5d7dd;
-      border-radius: 13px;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
       background: #fff;
       outline: none;
     }
 
-    input[type="text"]:focus,
-    textarea:focus {
-      border-color: var(--main);
-      box-shadow: 0 0 0 4px rgba(242, 56, 125, .10);
-    }
-
     textarea {
-      min-height: 85px;
+      min-height: 90px;
       resize: vertical;
     }
 
-    .primary-button {
-      width: 100%;
-      min-height: 56px;
-      margin-top: 14px;
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--main);
+      box-shadow:
+        0 0 0 3px rgba(239, 63, 127, 0.12);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 16px;
       border: 0;
-      border-radius: 15px;
+      border-radius: 10px;
       color: #fff;
-      background:
-        linear-gradient(105deg, #fa397e, #d91767);
-      box-shadow: 0 14px 25px rgba(226, 29, 105, .25);
-      font-size: 17px;
-      font-weight: 950;
-    }
-
-    .primary-button:disabled {
-      opacity: .6;
-      cursor: wait;
-    }
-
-    .secondary-button {
-      min-height: 45px;
-      padding: 10px 14px;
-      border: 1px solid #e5d7dd;
-      border-radius: 12px;
-      color: #333;
-      background: #fff;
+      background: var(--main);
       font-weight: 900;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .button.secondary {
+      background: #333;
+    }
+
+    .button.danger {
+      background: var(--danger);
+    }
+
+    .button.small {
+      min-height: 34px;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 15px;
     }
 
     .message {
       display: none;
-      margin-top: 15px;
-      padding: 13px;
-      border-radius: 12px;
-      line-height: 1.55;
-      text-align: center;
-      word-break: keep-all;
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
-    .message.show { display: block; }
+    .message.show {
+      display: block;
+    }
 
     .message.error {
-      color: var(--danger);
-      background: #fff0f4;
+      color: #a62840;
+      background: #fff0f3;
     }
 
     .message.success {
-      color: var(--success);
+      color: #176a3e;
       background: #eaf8ef;
     }
 
-    .results {
-      margin-top: 18px;
-    }
-
-    .order-select-card {
-      margin-top: 11px;
-      padding: 15px;
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      background: #fffafd;
-    }
-
-    .order-select-card:first-child {
-      margin-top: 0;
-    }
-
-    .order-select-head {
+    .list {
       display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 10px;
-      align-items: start;
+      gap: 9px;
+      margin-top: 15px;
     }
 
-    .order-select-head input {
-      width: 22px;
-      height: 22px;
-      accent-color: var(--main);
+    .member-tools,
+    .order-tools {
+      display: grid;
+      gap: 9px;
+      margin-top: 15px;
     }
 
-    .order-number {
-      color: var(--navy);
-      font-weight: 950;
+    .member-tools .button,
+    .order-tools .button {
+      width: 100%;
     }
 
-    .status-line {
-      margin-top: 5px;
+    #customerList,
+    #orderList {
+      display: none;
+      max-height: 620px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    #customerList.open,
+    #orderList.open {
+      display: grid;
+    }
+
+    .search-info {
+      min-height: 18px;
+      margin-top: 6px;
+    }
+
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+    }
+
+    .muted {
       color: var(--sub);
       font-size: 12px;
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
-    .item-list {
+    .product-checks {
       display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .product-choice {
+      display: grid;
+      grid-template-columns:
+        auto 1fr 88px;
+      align-items: center;
+      gap: 9px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .product-choice.selected {
+      border-color: var(--main);
+      background: #fff3f7;
+    }
+
+    .product-choice input[type="checkbox"] {
+      width: 21px;
+      height: 21px;
+    }
+
+    .product-choice input[type="number"] {
+      padding: 9px;
+    }
+
+    .total-preview {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding: 17px;
+      border-radius: 13px;
+      color: #fff;
+      background: #292929;
+    }
+
+    .total-preview strong {
+      color: #ff8eb5;
+      font-size: 22px;
+    }
+
+    .order-card {
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+    }
+
+    .order-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 9px;
+    }
+
+    .order-items {
+      margin: 8px 0 10px;
+      padding-left: 20px;
+      color: #555;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .order-total {
+      margin-top: 8px;
+      font-weight: 900;
+    }
+
+    .order-card.completed {
+      border-color: #9bd6b7;
+      background: #f6fff9;
+    }
+
+    .order-status-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 5px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      color: #555;
+      background: #f1f1f1;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .order-status-badge.completed {
+      color: #176a3e;
+      background: #e4f7eb;
+    }
+
+    .order-item-edit-list {
+      display: grid;
+      gap: 7px;
+      margin: 12px 0;
+    }
+
+    .order-item-edit-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: start;
+      gap: 9px;
+      padding: 10px;
+      border: 1px solid #ededed;
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .order-item-edit-row input {
+      width: 19px;
+      height: 19px;
+      margin-top: 1px;
+    }
+
+    .order-action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-top: 13px;
     }
 
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 13px;
-      padding: 10px 0;
-      border-top: 1px dashed #eadce2;
+    .button.success {
+      background: var(--success);
     }
 
-    .item-name {
-      font-weight: 850;
+    .button.light {
+      color: #333;
+      background: #ececec;
     }
 
-    .item-meta {
-      margin-top: 4px;
-      color: var(--sub);
-      font-size: 12px;
-      line-height: 1.55;
+    .sales-tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 10px;
+      margin-top: 15px;
     }
 
-    .item-price {
-      flex: 0 0 auto;
-      font-weight: 950;
-    }
-
-    .checkout-card {
-      display: none;
-    }
-
-    .checkout-card.show {
-      display: block;
+    .sales-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 14px;
     }
 
     .summary-box {
-      margin-top: 15px;
-      padding: 15px;
-      border-radius: 15px;
-      color: #fff;
-      background: #25232c;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 7px 0;
-    }
-
-    .summary-row.final {
-      margin-top: 5px;
-      padding-top: 13px;
-      border-top: 1px solid rgba(255,255,255,.18);
-      font-size: 18px;
-    }
-
-    .summary-row.final strong {
-      color: #ff91b8;
-      font-size: 22px;
-    }
-
-    .choice-grid {
-      display: grid;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .choice {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 10px;
-      align-items: start;
-      padding: 14px;
-      border: 1px solid #eadde3;
-      border-radius: 14px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
       background: #fff;
     }
 
-    .choice:has(input:checked) {
-      border-color: #f27fa9;
-      background: #fff4f8;
-    }
-
-    .choice input {
-      width: 20px;
-      height: 20px;
-      accent-color: var(--main);
-    }
-
-    .choice strong {
-      display: block;
-      color: var(--navy);
-    }
-
-    .choice small {
+    .summary-box strong {
       display: block;
       margin-top: 4px;
-      color: var(--sub);
-      line-height: 1.5;
-    }
-
-    .delivery-fields,
-    .bank-box,
-    .card-box {
-      margin-top: 14px;
-      padding: 15px;
-      border: 1px solid #f1c9d8;
-      border-radius: 14px;
-      background: #fff7fa;
-    }
-
-    .delivery-fields[hidden],
-    .bank-box[hidden],
-    .card-box[hidden] {
-      display: none;
-    }
-
-    .bank-account {
-      margin: 6px 0;
-      color: var(--main-dark);
       font-size: 18px;
-      font-weight: 950;
     }
 
-    .notice {
-      margin-top: 13px;
-      padding: 12px;
-      border-radius: 12px;
-      color: #6a5400;
-      background: #fff8da;
-      font-size: 13px;
-      line-height: 1.6;
+    .calendar-weekdays,
+    .sales-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .calendar-weekdays {
+      margin-top: 17px;
+      color: #777;
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .sales-calendar {
+      margin-top: 6px;
+    }
+
+    .calendar-empty,
+    .calendar-day {
+      min-height: 74px;
+      border-radius: 10px;
+    }
+
+    .calendar-day {
+      padding: 7px 5px;
+      border: 1px solid var(--border);
+      background: #fff;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .calendar-day.has-sales {
+      border-color: #ef9fba;
+      background: #fff5f8;
+    }
+
+    .calendar-day.selected {
+      border: 2px solid var(--main);
+    }
+
+    .calendar-date-number {
+      display: block;
+      font-weight: 900;
+    }
+
+    .calendar-sales-amount {
+      display: block;
+      margin-top: 7px;
+      color: var(--main-dark);
+      font-size: 11px;
+      font-weight: 900;
       word-break: keep-all;
     }
 
-    .complete-box {
-      display: none;
-      margin-top: 16px;
-      padding: 18px;
-      border: 1px solid #afe0c5;
-      border-radius: 17px;
-      color: #155e39;
-      background: #effbf4;
-      line-height: 1.75;
+    .daily-sales-detail {
+      margin-top: 15px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fafafa;
     }
 
-    .complete-box.show {
-      display: block;
-    }
-
-    .privacy-note {
-      margin-top: 19px;
-      color: #888;
-      font-size: 12px;
-      line-height: 1.65;
-      text-align: center;
-    }
-
-    .admin-links {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 24px;
-    }
-
-    .admin-link {
+    .daily-sales-row {
       display: flex;
-      min-height: 50px;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 14px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 950;
-      text-align: center;
-      text-decoration: none;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid #e8e8e8;
     }
 
-    .admin-link.basic {
-      border: 1px solid #e6d9df;
-      color: #3d3840;
-      background: #ffffff;
+    .daily-sales-row:last-child {
+      border-bottom: 0;
     }
 
-    .admin-link.payment {
-      border: 1px solid transparent;
-      color: #ffffff;
-      background:
-        linear-gradient(105deg, #fa397e, #d91767);
-      box-shadow:
-        0 12px 24px rgba(226, 29, 105, .20);
+    .excel-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
     }
 
-    .admin-guide {
-      margin: 10px 0 0;
-      color: #999;
-      font-size: 11px;
-      line-height: 1.55;
-      text-align: center;
-    }
+    @media (max-width: 720px) {
+      .grid,
+      .grid-3,
+      .product-checks {
+        grid-template-columns: 1fr;
+      }
 
-    @media (max-width: 420px) {
-      .card { padding: 18px; }
-      .brand h1 { font-size: 38px; }
-      .item-row { flex-direction: column; }
-      .item-price { text-align: right; }
-      .admin-links { grid-template-columns: 1fr; }
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .order-action-grid,
+      .sales-summary,
+      .sales-tools {
+        grid-template-columns: 1fr;
+      }
+
+      .calendar-empty,
+      .calendar-day {
+        min-height: 65px;
+      }
+
+      .calendar-sales-amount {
+        font-size: 10px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <main class="page">
-    <header class="brand">
-      <div class="brand-mark" aria-hidden="true">🛍️</div>
-      <h1>DAMPICK <span>담픽</span></h1>
-      <p>
-        닉네임으로 주문을 확인하고<br>
-        결제와 수령 방법을 선택하세요.
-      </p>
-    </header>
+  <main class="wrap">
 
-    <section class="card">
-      <h2>내 주문 조회</h2>
+    <!-- 관리자 로그인 -->
+    <section
+      id="loginSection"
+      class="card login-card"
+    >
+      <div class="brand">
+        <h1>DAMPICK 담픽</h1>
+        <p>공동구매 대표자 관리자 로그인</p>
+      </div>
 
-      <p class="description">
-        기존처럼 닉네임을 입력하면 주문 상품과
-        상품별 픽업 날짜를 확인할 수 있습니다.
-      </p>
+      <div
+        id="loginMessage"
+        class="message"
+      ></div>
 
-      <label class="field-label" for="nickname">
-        닉네임
+      <label for="adminEmail">
+        관리자 이메일
       </label>
 
       <input
-        id="nickname"
-        type="text"
-        lang="ko"
-        inputmode="text"
-        placeholder="예: 담픽1234"
-        autocomplete="off"
-        autocapitalize="off"
-        spellcheck="false"
+        id="adminEmail"
+        type="email"
+        autocomplete="username"
       >
 
-      <button
-        id="lookupButton"
-        class="primary-button"
-        type="button"
+      <div style="height: 12px;"></div>
+
+      <label for="adminPassword">
+        관리자 비밀번호
+      </label>
+
+      <input
+        id="adminPassword"
+        type="password"
+        autocomplete="current-password"
       >
-        주문 조회하기
-      </button>
 
-      <div id="message" class="message"></div>
+      <div class="actions">
+        <button
+          id="loginButton"
+          class="button"
+          type="button"
+        >
+          관리자 로그인
+        </button>
 
-      <section id="results" class="results"></section>
+        <a
+          class="button secondary"
+          href="./index.html"
+        >
+          고객 화면
+        </a>
+      </div>
     </section>
 
+    <!-- 로그인 후 관리자 앱 -->
     <section
-      id="checkoutCard"
-      class="card checkout-card"
+      id="adminApp"
+      class="hidden"
     >
-      <h2>결제·수령 방법 선택</h2>
-
-      <p class="description">
-        결제할 주문을 위에서 선택한 뒤
-        픽업 또는 집 앞 배송을 선택하세요.
-      </p>
-
-      <div class="summary-box">
-        <div class="summary-row">
-          <span>선택 상품 합계</span>
-          <strong id="productAmountText">0원</strong>
+      <header class="topbar">
+        <div class="brand">
+          <h1>DAMPICK 담픽 관리자</h1>
+          <p>
+            고객 닉네임·상품·주문을 등록하고 관리합니다.
+          </p>
         </div>
 
-        <div class="summary-row">
-          <span>배송비</span>
-          <strong id="deliveryFeeText">0원</strong>
+        <div class="actions">
+          <a
+            class="button secondary"
+            href="./index.html"
+          >
+            고객 화면 보기
+          </a>
+
+          <button
+            id="logoutButton"
+            class="button danger"
+            type="button"
+          >
+            로그아웃
+          </button>
         </div>
-
-        <div class="summary-row final">
-          <span>최종 결제금액</span>
-          <strong id="finalAmountText">0원</strong>
-        </div>
-      </div>
-
-      <h3 style="margin-top:22px;">수령 방법</h3>
-
-      <div class="choice-grid">
-        <label class="choice">
-          <input
-            type="radio"
-            name="receiptMethod"
-            value="pickup"
-            checked
-          >
-          <span>
-            <strong>담픽 매장 픽업</strong>
-            <small>
-              상품금액과 관계없이 배송비 0원
-            </small>
-          </span>
-        </label>
-
-        <label class="choice">
-          <input
-            type="radio"
-            name="receiptMethod"
-            value="home"
-          >
-          <span>
-            <strong>집 앞 배송</strong>
-            <small>
-              최소 주문금액 없음 · 4만원 미만 500원 ·
-              4만원 이상 무료
-            </small>
-          </span>
-        </label>
-      </div>
+      </header>
 
       <div
-        id="deliveryFields"
-        class="delivery-fields"
-        hidden
-      >
-        <label class="field-label" for="deliveryAddress">
-          주소
-        </label>
-
-        <input
-          id="deliveryAddress"
-          type="text"
-          placeholder="예: ○○아파트 101동 1203호"
-          autocomplete="street-address"
-        >
-
-        <label class="field-label" for="entranceInfo">
-          공동현관 비밀번호 또는 출입방법
-        </label>
-
-        <input
-          id="entranceInfo"
-          type="text"
-          placeholder="예: 종 모양 버튼 후 1234"
-          autocomplete="off"
-        >
-
-        <label class="field-label" for="deliveryRequest">
-          배송 요청사항
-        </label>
-
-        <textarea
-          id="deliveryRequest"
-          placeholder="예: 문 앞에 두고 문자 주세요."
-        ></textarea>
-      </div>
-
-      <h3 style="margin-top:22px;">결제 방법</h3>
-
-      <div class="choice-grid">
-        <label
-          id="pickupPayChoice"
-          class="choice"
-        >
-          <input
-            type="radio"
-            name="paymentMethod"
-            value="pickup_pay"
-            checked
-          >
-          <span>
-            <strong>픽업할 때 현장결제</strong>
-            <small>
-              매장에서 상품을 받을 때 결제합니다.
-            </small>
-          </span>
-        </label>
-
-        <label class="choice">
-          <input
-            type="radio"
-            name="paymentMethod"
-            value="bank_transfer"
-          >
-          <span>
-            <strong>계좌이체로 미리 결제</strong>
-            <small>
-              입금 확인 후 픽업 또는 배송이 준비됩니다.
-            </small>
-          </span>
-        </label>
-
-        <label class="choice">
-          <input
-            type="radio"
-            name="paymentMethod"
-            value="card_online"
-          >
-          <span>
-            <strong>카드로 미리 결제</strong>
-            <small>
-              카드 PG 연결 후 온라인 결제가 진행됩니다.
-            </small>
-          </span>
-        </label>
-      </div>
-
-      <div
-        id="bankBox"
-        class="bank-box"
-        hidden
-      >
-        <strong>현금입금 계좌</strong>
-        <p class="bank-account">
-          하나은행 412-910821-25107
-        </p>
-        <p style="margin:0;">예금주: 담픽</p>
-        <p style="margin-bottom:0;color:#777;font-size:12px;">
-          입금자명은 주문 닉네임과 같게 입력해 주세요.
-        </p>
-      </div>
-
-      <div
-        id="cardBox"
-        class="card-box"
-        hidden
-      >
-        <strong>카드결제 안내</strong>
-        <p style="margin-bottom:0;line-height:1.65;">
-          현재는 카드결제 신청까지 저장됩니다.
-          토스페이먼츠 등 PG 계약과 API 키가 연결되면
-          이 자리에서 실제 카드 결제를 진행할 수 있습니다.
-        </p>
-      </div>
-
-      <p id="deliveryGuide" class="notice"></p>
-
-      <button
-        id="submitCheckoutButton"
-        class="primary-button"
-        type="button"
-      >
-        결제·수령 방법 신청하기
-      </button>
-
-      <div
-        id="checkoutComplete"
-        class="complete-box"
+        id="appMessage"
+        class="message"
       ></div>
+
+      <!-- 고객 관리 -->
+      <section class="card">
+        <h2>1. 회원 닉네임 관리</h2>
+
+        <p class="section-description">
+          고객이 주문조회에 사용할 고유한 닉네임을 등록합니다.
+        </p>
+
+        <form
+          id="customerForm"
+          class="grid"
+        >
+          <div>
+            <label for="newNickname">
+              고객 닉네임
+            </label>
+
+            <input
+              id="newNickname"
+              type="text"
+              placeholder="예: 담픽1234"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="customerMemo">
+              관리자 메모
+            </label>
+
+            <input
+              id="customerMemo"
+              type="text"
+              placeholder="예: 101동 고객"
+            >
+          </div>
+
+          <div class="full">
+            <button
+              class="button"
+              type="submit"
+            >
+              회원 닉네임 등록
+            </button>
+          </div>
+        </form>
+
+        <div class="member-tools">
+          <div>
+            <label for="customerSearch">
+              등록 회원 검색
+            </label>
+
+            <input
+              id="customerSearch"
+              type="search"
+              placeholder="회원 닉네임을 입력하세요"
+              autocomplete="off"
+            >
+          </div>
+
+          <button
+            id="customerListToggle"
+            class="button secondary"
+            type="button"
+          >
+            회원 목록 펼치기 ▼ (0명)
+          </button>
+
+          <div
+            id="customerListInfo"
+            class="muted"
+          >
+            회원 목록은 처음에는 접혀 있습니다.
+          </div>
+        </div>
+
+        <div
+          id="customerList"
+          class="list"
+        ></div>
+      </section>
+
+      <!-- 상품 관리 -->
+      <section class="card">
+        <h2>2. 공동구매 상품 관리</h2>
+
+        <p class="section-description">
+          공동구매 상품이 바뀔 때마다 새 상품을 등록하고,
+          판매가 끝난 상품은 비활성화합니다.
+        </p>
+
+        <form
+          id="productForm"
+          class="grid-3"
+        >
+          <div>
+            <label for="newProductName">
+              상품명
+            </label>
+
+            <input
+              id="newProductName"
+              type="text"
+              placeholder="예: 프리미엄 수박"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="newProductPrice">
+              개당 가격
+            </label>
+
+            <input
+              id="newProductPrice"
+              type="number"
+              min="0"
+              step="100"
+              placeholder="18000"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="newProductUnit">
+              수량 단위
+            </label>
+
+            <input
+              id="newProductUnit"
+              type="text"
+              value="개"
+              placeholder="개, 판, 팩"
+              required
+            >
+          </div>
+
+          <div class="full">
+            <button
+              class="button"
+              type="submit"
+            >
+              공동구매 상품 등록
+            </button>
+          </div>
+        </form>
+
+        <div
+          id="productList"
+          class="list"
+        ></div>
+      </section>
+
+      <!-- 주문 등록 -->
+      <section class="card">
+        <h2>3. 회원 주문 등록</h2>
+
+        <p class="section-description">
+          고객 닉네임을 선택한 뒤 주문한 상품을 클릭하고
+          수량을 입력하면 최종 결제금액이 자동 계산됩니다.
+        </p>
+
+        <form id="orderForm">
+          <div class="grid-3">
+
+            <div>
+              <label for="orderCustomer">
+                고객 닉네임
+              </label>
+
+              <input
+                id="orderCustomerSearch"
+                type="search"
+                placeholder="닉네임을 검색하세요"
+                autocomplete="off"
+              >
+
+              <div
+                id="orderCustomerSearchInfo"
+                class="muted search-info"
+              >
+                닉네임 일부를 입력하면 아래 목록이 줄어듭니다.
+              </div>
+
+              <select
+                id="orderCustomer"
+                required
+              >
+                <option value="">
+                  닉네임을 선택하세요
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label for="orderDate">
+                주문일
+              </label>
+
+              <input
+                id="orderDate"
+                type="date"
+                required
+              >
+            </div>
+
+            <div>
+              <label for="pickupDate">
+                픽업 예정일
+              </label>
+
+              <input
+                id="pickupDate"
+                type="date"
+              >
+            </div>
+
+            <div>
+              <label for="pickupPlace">
+                픽업 장소
+              </label>
+
+              <input
+                id="pickupPlace"
+                type="text"
+                value="담픽 매장"
+                readonly
+                aria-readonly="true"
+              >
+            </div>
+
+            <div>
+              <label for="paymentStatus">
+                결제상태
+              </label>
+
+              <select id="paymentStatus">
+                <option>입금 대기</option>
+                <option>입금 완료</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="orderStatus">
+                주문상태
+              </label>
+
+              <select id="orderStatus">
+                <option>주문 접수</option>
+                <option>상품 준비 중</option>
+                <option>픽업 가능</option>
+                <option>픽업 완료</option>
+              </select>
+            </div>
+
+            <div class="full">
+              <label for="orderNotice">
+                고객 안내사항
+              </label>
+
+              <textarea
+                id="orderNotice"
+                placeholder="예: 오후 5시부터 픽업 가능합니다."
+              ></textarea>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 22px;">
+            주문한 상품 선택
+          </h3>
+
+          <div
+            id="productChecks"
+            class="product-checks"
+          ></div>
+
+          <div class="total-preview">
+            <span>최종 결제금액</span>
+            <strong id="totalPreview">
+              0원
+            </strong>
+          </div>
+
+          <div class="actions">
+            <button
+              class="button"
+              type="submit"
+            >
+              이 고객의 주문 저장
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- 주문 목록 -->
+      <section class="card">
+        <h2>4. 등록된 회원 주문</h2>
+
+        <p class="section-description">
+          주문한 회원을 검색하고, 선택한 상품만 취소하거나
+          픽업 완료·전체 삭제를 처리할 수 있습니다.
+        </p>
+
+        <div class="order-tools">
+          <div>
+            <label for="orderListSearch">
+              주문 회원 검색
+            </label>
+
+            <input
+              id="orderListSearch"
+              type="search"
+              placeholder="주문한 회원 닉네임을 입력하세요"
+              autocomplete="off"
+            >
+          </div>
+
+          <button
+            id="orderListToggle"
+            class="button secondary"
+            type="button"
+          >
+            주문 목록 펼치기 ▼ (0명 / 0건)
+          </button>
+
+          <div
+            id="orderListInfo"
+            class="muted"
+          >
+            주문 목록은 처음에는 접혀 있습니다.
+          </div>
+        </div>
+
+        <div
+          id="orderList"
+          class="list"
+        ></div>
+      </section>
+
+      <!-- 월별 매출 -->
+      <section class="card">
+        <h2>5. 월별 픽업 완료 매출</h2>
+
+        <p class="section-description">
+          픽업 완료 처리된 주문만 매출에 포함됩니다.
+          날짜를 누르면 그날 고객별 주문금액을 확인할 수 있습니다.
+        </p>
+
+        <div class="sales-tools">
+          <div>
+            <label for="salesMonth">
+              확인할 달
+            </label>
+
+            <input
+              id="salesMonth"
+              type="month"
+            >
+          </div>
+
+          <button
+            id="goCurrentMonthButton"
+            class="button secondary"
+            type="button"
+          >
+            이번 달 보기
+          </button>
+        </div>
+
+        <div class="sales-summary">
+          <div class="summary-box">
+            <span class="muted">월 매출</span>
+            <strong id="monthlySalesTotal">0원</strong>
+          </div>
+
+          <div class="summary-box">
+            <span class="muted">완료 고객</span>
+            <strong id="monthlyCustomerCount">0명</strong>
+          </div>
+
+          <div class="summary-box">
+            <span class="muted">완료 주문</span>
+            <strong id="monthlyOrderCount">0건</strong>
+          </div>
+        </div>
+
+        <div class="calendar-weekdays">
+          <div>일</div>
+          <div>월</div>
+          <div>화</div>
+          <div>수</div>
+          <div>목</div>
+          <div>금</div>
+          <div>토</div>
+        </div>
+
+        <div
+          id="salesCalendar"
+          class="sales-calendar"
+        ></div>
+
+        <div
+          id="dailySalesDetail"
+          class="daily-sales-detail"
+        >
+          <div class="muted">
+            달력에서 날짜를 누르면 해당 날짜의 매출이 표시됩니다.
+          </div>
+        </div>
+
+        <div class="excel-actions">
+          <button
+            id="downloadMonthlyExcelButton"
+            class="button"
+            type="button"
+          >
+            선택 월 매출 엑셀
+          </button>
+
+          <button
+            id="downloadAllExcelButton"
+            class="button secondary"
+            type="button"
+          >
+            전체 주문 엑셀
+          </button>
+        </div>
+      </section>
     </section>
-
-    <p class="privacy-note">
-      주소와 공동현관 정보는 집 앞 배송을 선택한 경우에만
-      수집하며 관리자 결제·배송 화면에서만 확인합니다.
-    </p>
-
-    <nav
-      class="admin-links"
-      aria-label="담픽 관리자 메뉴"
-    >
-      <a
-        class="admin-link basic"
-        href="./admin.html"
-      >
-        기존 관리자
-      </a>
-
-      <a
-        class="admin-link payment"
-        href="./payments.html"
-      >
-        결제·배송 관리
-      </a>
-    </nav>
-
-    <p class="admin-guide">
-      관리자 전용 메뉴입니다.
-      회원·상품·주문 관리는 기존 관리자,
-      결제·배송 확인은 결제·배송 관리를 이용하세요.
-    </p>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="./config.js"></script>
 
   <script>
-    const FREE_DELIVERY_THRESHOLD = 40000;
-    const HOME_DELIVERY_FEE = 500;
+    const sb =
+      window.dampickSupabase;
 
-    /*
-      실제 카드결제 PG 연결 후 결제 시작 주소를 넣을 수 있습니다.
-      현재 빈 값이면 카드결제 신청만 저장합니다.
-    */
-    const CARD_PAYMENT_URL = "";
+    const loginSection =
+      document.getElementById("loginSection");
 
-    const sb = window.dampickSupabase;
+    const adminApp =
+      document.getElementById("adminApp");
 
-    const nicknameInput =
-      document.getElementById("nickname");
+    const loginMessage =
+      document.getElementById("loginMessage");
 
-    const lookupButton =
-      document.getElementById("lookupButton");
+    const appMessage =
+      document.getElementById("appMessage");
 
-    const message =
-      document.getElementById("message");
-
-    const results =
-      document.getElementById("results");
-
-    const checkoutCard =
-      document.getElementById("checkoutCard");
-
-    const submitCheckoutButton =
-      document.getElementById("submitCheckoutButton");
-
-    let currentOrders = [];
-
-    lookupButton.addEventListener(
-      "click",
-      lookupOrder
-    );
-
-    nicknameInput.addEventListener(
-      "keydown",
-      function (event) {
-        if (event.key === "Enter") {
-          lookupOrder();
-        }
-      }
-    );
+    let customers = [];
+    let products = [];
+    let orders = [];
+    let memberListOpen = false;
+    let orderListOpen = false;
+    let selectedSalesDate = "";
 
     document
-      .querySelectorAll(
-        'input[name="receiptMethod"], ' +
-        'input[name="paymentMethod"]'
-      )
-      .forEach(function (input) {
-        input.addEventListener(
-          "change",
-          updateCheckoutDisplay
-        );
-      });
+      .getElementById("loginButton")
+      .addEventListener("click", login);
 
-    results.addEventListener(
-      "change",
-      function (event) {
-        if (
-          event.target.matches(
-            ".order-check"
-          )
-        ) {
-          updateCheckoutDisplay();
+    document
+      .getElementById("logoutButton")
+      .addEventListener("click", logout);
+
+    document
+      .getElementById("customerForm")
+      .addEventListener(
+        "submit",
+        addCustomer
+      );
+
+    document
+      .getElementById("productForm")
+      .addEventListener(
+        "submit",
+        addProduct
+      );
+
+    document
+      .getElementById("orderForm")
+      .addEventListener(
+        "submit",
+        addOrder
+      );
+
+    document
+      .getElementById("customerSearch")
+      .addEventListener(
+        "input",
+        function () {
+          if (
+            document
+              .getElementById("customerSearch")
+              .value
+              .trim()
+          ) {
+            memberListOpen = true;
+          }
+
+          renderCustomers();
         }
+      );
+
+    document
+      .getElementById("customerListToggle")
+      .addEventListener(
+        "click",
+        function () {
+          memberListOpen =
+            !memberListOpen;
+
+          renderCustomers();
+        }
+      );
+
+    document
+      .getElementById("orderCustomerSearch")
+      .addEventListener(
+        "input",
+        renderCustomerSelect
+      );
+
+    document
+      .getElementById("orderCustomer")
+      .addEventListener(
+        "change",
+        function () {
+          const select =
+            document.getElementById(
+              "orderCustomer"
+            );
+
+          const selectedOption =
+            select.options[
+              select.selectedIndex
+            ];
+
+          if (
+            selectedOption &&
+            selectedOption.value
+          ) {
+            document
+              .getElementById(
+                "orderCustomerSearch"
+              )
+              .value =
+                selectedOption.textContent
+                  .trim();
+          }
+        }
+      );
+
+    document
+      .getElementById("orderListSearch")
+      .addEventListener(
+        "input",
+        function () {
+          if (
+            document
+              .getElementById("orderListSearch")
+              .value
+              .trim()
+          ) {
+            orderListOpen = true;
+          }
+
+          renderOrders();
+        }
+      );
+
+    document
+      .getElementById("orderListToggle")
+      .addEventListener(
+        "click",
+        function () {
+          orderListOpen =
+            !orderListOpen;
+
+          renderOrders();
+        }
+      );
+
+    document
+      .getElementById("salesMonth")
+      .addEventListener(
+        "change",
+        function () {
+          selectedSalesDate = "";
+          renderSalesCalendar();
+        }
+      );
+
+    document
+      .getElementById("goCurrentMonthButton")
+      .addEventListener(
+        "click",
+        function () {
+          document
+            .getElementById("salesMonth")
+            .value = getCurrentMonthKey();
+
+          selectedSalesDate = "";
+          renderSalesCalendar();
+        }
+      );
+
+    document
+      .getElementById("downloadMonthlyExcelButton")
+      .addEventListener(
+        "click",
+        downloadMonthlySalesExcel
+      );
+
+    document
+      .getElementById("downloadAllExcelButton")
+      .addEventListener(
+        "click",
+        downloadAllOrdersExcel
+      );
+
+    start();
+
+    async function start() {
+      const { data } =
+        await sb.auth.getSession();
+
+      if (data.session) {
+        showAdmin();
+        await loadAll();
       }
-    );
+    }
 
-    submitCheckoutButton.addEventListener(
-      "click",
-      submitCheckout
-    );
+    async function login() {
+      const email =
+        document
+          .getElementById("adminEmail")
+          .value
+          .trim();
 
-    async function lookupOrder() {
+      const password =
+        document
+          .getElementById("adminPassword")
+          .value;
+
+      setMessage(
+        loginMessage,
+        "",
+        ""
+      );
+
+      if (!email || !password) {
+        setMessage(
+          loginMessage,
+          "관리자 이메일과 비밀번호를 입력해주세요.",
+          "error"
+        );
+
+        return;
+      }
+
+      const { error } =
+        await sb.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) {
+        setMessage(
+          loginMessage,
+          "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.",
+          "error"
+        );
+
+        return;
+      }
+
+      showAdmin();
+      await loadAll();
+    }
+
+    async function logout() {
+      await sb.auth.signOut();
+
+      adminApp.classList.add("hidden");
+      loginSection.classList.remove("hidden");
+    }
+
+    function showAdmin() {
+      loginSection.classList.add("hidden");
+      adminApp.classList.remove("hidden");
+    }
+
+    async function loadAll() {
+      await Promise.all([
+        loadCustomers(),
+        loadProducts()
+      ]);
+
+      await loadOrders();
+    }
+
+    async function loadCustomers() {
+      const { data, error } =
+        await sb
+          .from("customers")
+          .select("*")
+          .order("nickname");
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      customers = data || [];
+
+      renderCustomers();
+      renderCustomerSelect();
+    }
+
+    async function loadProducts() {
+      const { data, error } =
+        await sb
+          .from("products")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", {
+            ascending: false
+          });
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      products = data || [];
+
+      renderProducts();
+      renderProductChecks();
+    }
+
+    async function loadOrders() {
+      const { data, error } =
+        await sb
+          .from("orders")
+          .select(`
+            id,
+            order_number,
+            order_date,
+            pickup_date,
+            pickup_place,
+            payment_status,
+            order_status,
+            notice,
+            completed_at,
+            created_at,
+            customers(nickname),
+            order_items(
+              id,
+              product_name,
+              quantity,
+              unit_name,
+              unit_price,
+              line_total
+            )
+          `)
+          .order(
+            "created_at",
+            { ascending: false }
+          );
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      orders = data || [];
+      renderOrders();
+      renderSalesCalendar();
+    }
+
+    async function addCustomer(event) {
+      event.preventDefault();
+
       const nickname =
-        nicknameInput.value.trim();
+        document
+          .getElementById("newNickname")
+          .value
+          .trim();
 
-      clearMessage();
-      results.innerHTML = "";
-      currentOrders = [];
-      checkoutCard.classList.remove("show");
+      const memo =
+        document
+          .getElementById("customerMemo")
+          .value
+          .trim();
 
       if (!nickname) {
-        showMessage(
-          "닉네임을 입력해주세요.",
-          "error"
-        );
-
-        nicknameInput.focus();
         return;
       }
 
-      if (!sb) {
-        showMessage(
-          "담픽 데이터베이스 연결정보를 불러오지 못했습니다.",
+      const { error } =
+        await sb
+          .from("customers")
+          .insert({
+            nickname,
+            memo
+          });
+
+      if (error) {
+        setMessage(
+          appMessage,
+          "회원 등록 실패: 같은 닉네임이 이미 등록되어 있는지 확인해주세요.",
           "error"
         );
+
         return;
       }
 
-      lookupButton.disabled = true;
-      lookupButton.textContent =
-        "주문을 확인하고 있습니다...";
+      event.target.reset();
 
-      try {
-        const { data, error } =
-          await sb.rpc(
-            "lookup_orders_by_nickname",
-            { p_nickname: nickname }
-          );
+      setMessage(
+        appMessage,
+        nickname +
+        " 회원을 등록했습니다.",
+        "success"
+      );
 
-        if (error) throw error;
+      memberListOpen = true;
 
-        currentOrders = normalizeOrders(data);
+      document
+        .getElementById("customerSearch")
+        .value = nickname;
 
-        if (!currentOrders.length) {
-          showMessage(
-            "해당 닉네임으로 등록된 주문이 없습니다.",
-            "error"
-          );
-          return;
-        }
+      await loadCustomers();
+    }
 
-        renderOrders(currentOrders);
+    async function addProduct(event) {
+      event.preventDefault();
 
-        showMessage(
-          "주문 상품을 확인한 뒤 결제할 주문을 선택해주세요.",
-          "success"
+      const name =
+        document
+          .getElementById("newProductName")
+          .value
+          .trim();
+
+      const unitPrice =
+        Number(
+          document
+            .getElementById("newProductPrice")
+            .value
         );
 
-        checkoutCard.classList.add("show");
-        updateCheckoutDisplay();
+      const unitName =
+        document
+          .getElementById("newProductUnit")
+          .value
+          .trim();
 
-      } catch (error) {
-        console.error(error);
+      if (
+        !name ||
+        unitPrice < 0 ||
+        !unitName
+      ) {
+        return;
+      }
 
-        showMessage(
-          error.message ||
-          "주문정보를 불러오지 못했습니다.",
+      const { error } =
+        await sb
+          .from("products")
+          .insert({
+            name,
+            unit_price: unitPrice,
+            unit_name: unitName
+          });
+
+      if (error) {
+        setMessage(
+          appMessage,
+          "상품 등록에 실패했습니다.",
           "error"
         );
 
-      } finally {
-        lookupButton.disabled = false;
-        lookupButton.textContent =
-          "주문 조회하기";
+        return;
+      }
+
+      event.target.reset();
+
+      document
+        .getElementById("newProductUnit")
+        .value = "개";
+
+      setMessage(
+        appMessage,
+        name +
+        " 상품을 등록했습니다.",
+        "success"
+      );
+
+      await loadProducts();
+    }
+
+    async function addOrder(event) {
+      event.preventDefault();
+
+      const customerId =
+        document
+          .getElementById("orderCustomer")
+          .value;
+
+      const selected =
+        products
+          .filter(
+            function (product) {
+              const checkbox =
+                document.getElementById(
+                  "check-" + product.id
+                );
+
+              return (
+                checkbox &&
+                checkbox.checked
+              );
+            }
+          )
+          .map(
+            function (product) {
+              const quantityInput =
+                document.getElementById(
+                  "qty-" + product.id
+                );
+
+              return {
+                product,
+                quantity: Math.max(
+                  1,
+                  Number(
+                    quantityInput.value || 1
+                  )
+                )
+              };
+            }
+          );
+
+      if (!customerId) {
+        setMessage(
+          appMessage,
+          "고객 닉네임을 선택해주세요.",
+          "error"
+        );
+
+        return;
+      }
+
+      if (selected.length === 0) {
+        setMessage(
+          appMessage,
+          "주문 상품을 한 개 이상 선택해주세요.",
+          "error"
+        );
+
+        return;
+      }
+
+      const orderNumber =
+        makeOrderNumber();
+
+      const { data: order, error: orderError } =
+        await sb
+          .from("orders")
+          .insert({
+            customer_id: customerId,
+            order_number: orderNumber,
+            order_date:
+              document
+                .getElementById("orderDate")
+                .value,
+            pickup_date:
+              document
+                .getElementById("pickupDate")
+                .value || null,
+            pickup_place:
+              document
+                .getElementById("pickupPlace")
+                .value
+                .trim(),
+            payment_status:
+              document
+                .getElementById("paymentStatus")
+                .value,
+            order_status:
+              document
+                .getElementById("orderStatus")
+                .value,
+            notice:
+              document
+                .getElementById("orderNotice")
+                .value
+                .trim()
+          })
+          .select()
+          .single();
+
+      if (orderError) {
+        setMessage(
+          appMessage,
+          "주문 저장에 실패했습니다.",
+          "error"
+        );
+
+        return;
+      }
+
+      const itemRows =
+        selected.map(
+          function (selection) {
+            return {
+              order_id: order.id,
+              product_id:
+                selection.product.id,
+              product_name:
+                selection.product.name,
+              quantity:
+                selection.quantity,
+              unit_name:
+                selection.product.unit_name,
+              unit_price:
+                selection.product.unit_price
+            };
+          }
+        );
+
+      const { error: itemError } =
+        await sb
+          .from("order_items")
+          .insert(itemRows);
+
+      if (itemError) {
+        await sb
+          .from("orders")
+          .delete()
+          .eq("id", order.id);
+
+        setMessage(
+          appMessage,
+          "주문상품 저장에 실패했습니다.",
+          "error"
+        );
+
+        return;
+      }
+
+      event.target.reset();
+
+      document
+        .getElementById("pickupPlace")
+        .value = "담픽 매장";
+
+      document
+        .getElementById(
+          "orderCustomerSearch"
+        )
+        .value = "";
+
+      setToday();
+      renderCustomerSelect();
+      renderProductChecks();
+      updateTotalPreview();
+
+      setMessage(
+        appMessage,
+        "주문번호 " +
+        orderNumber +
+        "을 저장했습니다.",
+        "success"
+      );
+
+      await loadOrders();
+    }
+
+    async function deleteCustomer(
+      id,
+      nickname
+    ) {
+      const accepted =
+        confirm(
+          nickname +
+          " 회원과 연결된 주문을 모두 삭제할까요?"
+        );
+
+      if (!accepted) {
+        return;
+      }
+
+      const { error } =
+        await sb
+          .from("customers")
+          .delete()
+          .eq("id", id);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      await loadAll();
+    }
+
+    async function deactivateProduct(
+      id,
+      name
+    ) {
+      const accepted =
+        confirm(
+          name +
+          " 상품을 현재 상품목록에서 내릴까요?"
+        );
+
+      if (!accepted) {
+        return;
+      }
+
+      const { error } =
+        await sb
+          .from("products")
+          .update({
+            is_active: false
+          })
+          .eq("id", id);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      await loadProducts();
+    }
+
+    async function deleteOrder(
+      id,
+      number
+    ) {
+      const accepted =
+        confirm(
+          number +
+          " 주문을 삭제할까요?"
+        );
+
+      if (!accepted) {
+        return;
+      }
+
+      const { error } =
+        await sb
+          .from("orders")
+          .delete()
+          .eq("id", id);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      await loadOrders();
+    }
+
+    function renderCustomers() {
+      const target =
+        document.getElementById(
+          "customerList"
+        );
+
+      const searchInput =
+        document.getElementById(
+          "customerSearch"
+        );
+
+      const toggleButton =
+        document.getElementById(
+          "customerListToggle"
+        );
+
+      const info =
+        document.getElementById(
+          "customerListInfo"
+        );
+
+      const keyword =
+        searchInput.value
+          .trim()
+          .toLocaleLowerCase("ko-KR");
+
+      const filteredCustomers =
+        customers.filter(
+          function (customer) {
+            const nickname =
+              String(
+                customer.nickname || ""
+              )
+                .toLocaleLowerCase(
+                  "ko-KR"
+                );
+
+            const memo =
+              String(
+                customer.memo || ""
+              )
+                .toLocaleLowerCase(
+                  "ko-KR"
+                );
+
+            return (
+              !keyword ||
+              nickname.includes(keyword) ||
+              memo.includes(keyword)
+            );
+          }
+        );
+
+      target.classList.toggle(
+        "open",
+        memberListOpen
+      );
+
+      toggleButton.textContent =
+        memberListOpen
+          ? (
+              "회원 목록 접기 ▲ (" +
+              customers.length +
+              "명)"
+            )
+          : (
+              "회원 목록 펼치기 ▼ (" +
+              customers.length +
+              "명)"
+            );
+
+      if (keyword) {
+        info.textContent =
+          "검색 결과 " +
+          filteredCustomers.length +
+          "명 / 전체 " +
+          customers.length +
+          "명";
+      } else {
+        info.textContent =
+          "전체 등록 회원 " +
+          customers.length +
+          "명";
+      }
+
+      if (!customers.length) {
+        target.innerHTML =
+          '<div class="muted">' +
+          '등록된 회원이 없습니다.' +
+          '</div>';
+
+        return;
+      }
+
+      if (!filteredCustomers.length) {
+        target.innerHTML =
+          '<div class="muted">' +
+          '일치하는 회원이 없습니다.' +
+          '</div>';
+
+        return;
+      }
+
+      target.innerHTML =
+        filteredCustomers.map(
+          function (customer) {
+            return `
+              <div class="list-row">
+
+                <div>
+                  <strong>
+                    ${escapeHtml(customer.nickname)}
+                  </strong>
+
+                  <div class="muted">
+                    ${escapeHtml(
+                      customer.memo ||
+                      "메모 없음"
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  class="button danger small"
+                  type="button"
+                  onclick='deleteCustomer(
+                    ${JSON.stringify(customer.id)},
+                    ${JSON.stringify(customer.nickname)}
+                  )'
+                >
+                  삭제
+                </button>
+
+              </div>
+            `;
+          }
+        ).join("");
+    }
+
+    function renderCustomerSelect() {
+      const target =
+        document.getElementById(
+          "orderCustomer"
+        );
+
+      const searchInput =
+        document.getElementById(
+          "orderCustomerSearch"
+        );
+
+      const info =
+        document.getElementById(
+          "orderCustomerSearchInfo"
+        );
+
+      const previousValue =
+        target.value;
+
+      const keyword =
+        searchInput.value
+          .trim()
+          .toLocaleLowerCase("ko-KR");
+
+      const matchedCustomers =
+        customers.filter(
+          function (customer) {
+            return String(
+              customer.nickname || ""
+            )
+              .toLocaleLowerCase(
+                "ko-KR"
+              )
+              .includes(keyword);
+          }
+        );
+
+      target.innerHTML =
+        '<option value="">' +
+        '닉네임을 선택하세요' +
+        '</option>' +
+        matchedCustomers.map(
+          function (customer) {
+            return `
+              <option value="${customer.id}">
+                ${escapeHtml(customer.nickname)}
+              </option>
+            `;
+          }
+        ).join("");
+
+      const previousStillExists =
+        matchedCustomers.some(
+          function (customer) {
+            return (
+              String(customer.id) ===
+              String(previousValue)
+            );
+          }
+        );
+
+      if (previousStillExists) {
+        target.value =
+          previousValue;
+      } else if (
+        keyword &&
+        matchedCustomers.length === 1
+      ) {
+        target.value =
+          matchedCustomers[0].id;
+      }
+
+      if (!keyword) {
+        info.textContent =
+          "전체 회원 " +
+          customers.length +
+          "명";
+      } else if (
+        matchedCustomers.length
+      ) {
+        info.textContent =
+          "검색 결과 " +
+          matchedCustomers.length +
+          "명";
+      } else {
+        info.textContent =
+          "일치하는 회원이 없습니다.";
       }
     }
 
-    function normalizeOrders(data) {
-      if (Array.isArray(data)) {
-        return data;
+    function renderProducts() {
+      const target =
+        document.getElementById(
+          "productList"
+        );
+
+      if (!products.length) {
+        target.innerHTML =
+          '<div class="muted">' +
+          '현재 등록된 상품이 없습니다.' +
+          '</div>';
+
+        return;
       }
 
-      if (typeof data === "string") {
-        try {
-          const parsed = JSON.parse(data);
-          return Array.isArray(parsed)
-            ? parsed
-            : [];
-        } catch (error) {
-          return [];
+      target.innerHTML =
+        products.map(
+          function (product) {
+            return `
+              <div class="list-row">
+
+                <div>
+                  <strong>
+                    ${escapeHtml(product.name)}
+                  </strong>
+
+                  <div class="muted">
+                    ${formatPrice(product.unit_price)}
+                    /
+                    ${escapeHtml(product.unit_name)}
+                  </div>
+                </div>
+
+                <button
+                  class="button danger small"
+                  type="button"
+                  onclick='deactivateProduct(
+                    ${JSON.stringify(product.id)},
+                    ${JSON.stringify(product.name)}
+                  )'
+                >
+                  상품 내리기
+                </button>
+
+              </div>
+            `;
+          }
+        ).join("");
+    }
+
+    function renderProductChecks() {
+      const target =
+        document.getElementById(
+          "productChecks"
+        );
+
+      if (!products.length) {
+        target.innerHTML =
+          '<div class="muted">' +
+          '먼저 공동구매 상품을 등록해주세요.' +
+          '</div>';
+
+        return;
+      }
+
+      target.innerHTML =
+        products.map(
+          function (product) {
+            return `
+              <label
+                class="product-choice"
+                id="choice-${product.id}"
+              >
+                <input
+                  id="check-${product.id}"
+                  type="checkbox"
+                  data-product-id="${product.id}"
+                >
+
+                <span>
+                  <strong>
+                    ${escapeHtml(product.name)}
+                  </strong>
+                  <br>
+                  <span class="muted">
+                    ${formatPrice(product.unit_price)}
+                    /
+                    ${escapeHtml(product.unit_name)}
+                  </span>
+                </span>
+
+                <input
+                  id="qty-${product.id}"
+                  type="number"
+                  min="1"
+                  value="1"
+                  data-product-id="${product.id}"
+                  aria-label="${escapeHtml(product.name)} 수량"
+                >
+              </label>
+            `;
+          }
+        ).join("");
+
+      target
+        .querySelectorAll(
+          'input[type="checkbox"]'
+        )
+        .forEach(
+          function (checkbox) {
+            checkbox.addEventListener(
+              "change",
+              function () {
+                const productId =
+                  checkbox.dataset.productId;
+
+                document
+                  .getElementById(
+                    "choice-" + productId
+                  )
+                  .classList
+                  .toggle(
+                    "selected",
+                    checkbox.checked
+                  );
+
+                updateTotalPreview();
+              }
+            );
+          }
+        );
+
+      target
+        .querySelectorAll(
+          'input[type="number"]'
+        )
+        .forEach(
+          function (quantityInput) {
+            quantityInput.addEventListener(
+              "input",
+              updateTotalPreview
+            );
+          }
+        );
+    }
+
+    function updateTotalPreview() {
+      let total = 0;
+
+      products.forEach(
+        function (product) {
+          const checkbox =
+            document.getElementById(
+              "check-" + product.id
+            );
+
+          const quantityInput =
+            document.getElementById(
+              "qty-" + product.id
+            );
+
+          if (
+            checkbox &&
+            checkbox.checked
+          ) {
+            const quantity =
+              Math.max(
+                1,
+                Number(
+                  quantityInput.value || 1
+                )
+              );
+
+            total +=
+              quantity *
+              Number(product.unit_price);
+          }
         }
-      }
+      );
 
-      return [];
+      document
+        .getElementById("totalPreview")
+        .textContent =
+          formatPrice(total);
     }
 
-    function isOrderCompleted(order) {
-      const payment =
-        String(order.payment_status || "");
+    function getUniqueOrderCustomerCount(orderRows) {
+      const nicknameSet =
+        new Set(
+          orderRows
+            .map(
+              function (order) {
+                return String(
+                  order.customers?.nickname || ""
+                ).trim();
+              }
+            )
+            .filter(Boolean)
+        );
 
-      const status =
-        String(order.order_status || "");
+      return nicknameSet.size;
+    }
 
+    function calculateOrderTotal(order) {
+      return (order.order_items || [])
+        .reduce(
+          function (sum, item) {
+            return (
+              sum +
+              Number(item.line_total || 0)
+            );
+          },
+          0
+        );
+    }
+
+    function isPickupCompleted(order) {
       return (
-        payment.includes("결제 완료") ||
-        payment.includes("입금 완료") ||
-        status.includes("픽업 완료") ||
-        status.includes("배송 완료")
+        order.order_status === "픽업 완료" &&
+        Boolean(order.completed_at)
       );
     }
 
-    function renderOrders(orders) {
-      results.innerHTML =
-        orders.map(
-          function (order, index) {
+    async function cancelSelectedOrderItems(
+      orderId,
+      orderNumber
+    ) {
+      const order =
+        orders.find(
+          function (row) {
+            return row.id === orderId;
+          }
+        );
+
+      if (!order) {
+        return;
+      }
+
+      if (isPickupCompleted(order)) {
+        alert(
+          "픽업 완료된 주문은 먼저 완료 취소를 해주세요."
+        );
+        return;
+      }
+
+      const checked =
+        Array.from(
+          document.querySelectorAll(
+            '[data-order-id="' +
+            orderId +
+            '"]:checked'
+          )
+        );
+
+      const itemIds =
+        checked.map(
+          function (checkbox) {
+            return checkbox.dataset.itemId;
+          }
+        );
+
+      if (!itemIds.length) {
+        alert(
+          "취소할 상품의 체크박스를 먼저 선택해주세요."
+        );
+        return;
+      }
+
+      const allItems =
+        order.order_items || [];
+
+      if (itemIds.length >= allItems.length) {
+        const deleteAll =
+          confirm(
+            "모든 상품을 선택했습니다. 주문 전체를 삭제할까요?"
+          );
+
+        if (!deleteAll) {
+          return;
+        }
+
+        await deleteOrder(
+          orderId,
+          orderNumber
+        );
+        return;
+      }
+
+      const accepted =
+        confirm(
+          "선택한 " +
+          itemIds.length +
+          "개 상품을 이 주문에서 취소할까요?"
+        );
+
+      if (!accepted) {
+        return;
+      }
+
+      const { error } =
+        await sb
+          .from("order_items")
+          .delete()
+          .in("id", itemIds);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(
+        appMessage,
+        "선택한 상품을 취소했습니다. 최종 결제금액이 다시 계산되었습니다.",
+        "success"
+      );
+
+      await loadOrders();
+    }
+
+    async function togglePickupComplete(
+      orderId,
+      completed
+    ) {
+      const accepted =
+        confirm(
+          completed
+            ? "픽업 완료 처리를 취소할까요? 이 주문은 매출에서 제외됩니다."
+            : "이 주문을 픽업 완료로 처리할까요? 완료 날짜의 매출에 포함됩니다."
+        );
+
+      if (!accepted) {
+        return;
+      }
+
+      const updateValues =
+        completed
+          ? {
+              order_status: "픽업 가능",
+              completed_at: null
+            }
+          : {
+              order_status: "픽업 완료",
+              payment_status: "입금 완료",
+              completed_at:
+                new Date().toISOString()
+            };
+
+      const { error } =
+        await sb
+          .from("orders")
+          .update(updateValues)
+          .eq("id", orderId);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(
+        appMessage,
+        completed
+          ? "픽업 완료를 취소했습니다."
+          : "픽업 완료 처리했습니다. 매출 달력에 반영되었습니다.",
+        "success"
+      );
+
+      await loadOrders();
+    }
+
+    function renderOrders() {
+      const target =
+        document.getElementById(
+          "orderList"
+        );
+
+      const searchInput =
+        document.getElementById(
+          "orderListSearch"
+        );
+
+      const toggleButton =
+        document.getElementById(
+          "orderListToggle"
+        );
+
+      const info =
+        document.getElementById(
+          "orderListInfo"
+        );
+
+      const keyword =
+        searchInput.value
+          .trim()
+          .toLocaleLowerCase("ko-KR");
+
+      const filteredOrders =
+        orders.filter(
+          function (order) {
+            const nickname =
+              String(
+                order.customers?.nickname || ""
+              )
+                .toLocaleLowerCase(
+                  "ko-KR"
+                );
+
+            return (
+              !keyword ||
+              nickname.includes(keyword)
+            );
+          }
+        );
+
+      const totalCustomerCount =
+        getUniqueOrderCustomerCount(orders);
+
+      const filteredCustomerCount =
+        getUniqueOrderCustomerCount(
+          filteredOrders
+        );
+
+      target.classList.toggle(
+        "open",
+        orderListOpen
+      );
+
+      toggleButton.textContent =
+        orderListOpen
+          ? (
+              "주문 목록 접기 ▲ (" +
+              totalCustomerCount +
+              "명 / " +
+              orders.length +
+              "건)"
+            )
+          : (
+              "주문 목록 펼치기 ▼ (" +
+              totalCustomerCount +
+              "명 / " +
+              orders.length +
+              "건)"
+            );
+
+      if (keyword) {
+        info.textContent =
+          "검색 결과 " +
+          filteredCustomerCount +
+          "명 · " +
+          filteredOrders.length +
+          "건 / 전체 " +
+          totalCustomerCount +
+          "명 · " +
+          orders.length +
+          "건";
+      } else {
+        info.textContent =
+          "주문 회원 " +
+          totalCustomerCount +
+          "명 · 전체 주문 " +
+          orders.length +
+          "건";
+      }
+
+      if (!orders.length) {
+        target.innerHTML =
+          '<div class="muted">' +
+          '등록된 주문이 없습니다.' +
+          '</div>';
+
+        return;
+      }
+
+      if (!filteredOrders.length) {
+        target.innerHTML =
+          '<div class="muted">' +
+          '일치하는 주문 회원이 없습니다.' +
+          '</div>';
+
+        return;
+      }
+
+      target.innerHTML =
+        filteredOrders.map(
+          function (order) {
             const items =
-              Array.isArray(order.items)
-                ? order.items
-                : [];
+              order.order_items || [];
 
             const total =
-              items.reduce(
-                function (sum, item) {
-                  return (
-                    sum +
-                    Number(
-                      item.line_total ||
-                      (
-                        Number(item.unit_price || 0) *
-                        Number(item.quantity || 0)
-                      )
-                    )
-                  );
-                },
-                0
-              );
+              calculateOrderTotal(order);
 
             const completed =
-              isOrderCompleted(order);
-
-            const itemHtml =
-              items.map(
-                function (item) {
-                  const pickupDate =
-                    item.pickup_date
-                      ? formatDate(item.pickup_date)
-                      : "날짜 미정";
-
-                  return `
-                    <div class="item-row">
-                      <div>
-                        <div class="item-name">
-                          ${escapeHtml(item.product_name || "상품")}
-                        </div>
-                        <div class="item-meta">
-                          ${Number(item.quantity || 0).toLocaleString("ko-KR")}
-                          ${escapeHtml(item.unit_name || "개")}
-                          · 픽업 ${escapeHtml(pickupDate)}
-                        </div>
-                      </div>
-
-                      <div class="item-price">
-                        ${formatWon(
-                          Number(
-                            item.line_total ||
-                            (
-                              Number(item.unit_price || 0) *
-                              Number(item.quantity || 0)
-                            )
-                          )
-                        )}
-                      </div>
-                    </div>
-                  `;
-                }
-              )
-              .join("");
-
-            const checkout =
-              order.checkout || null;
-
-            const checkoutStatus =
-              checkout
-                ? `
-                  <div class="status-line">
-                    최근 신청:
-                    ${escapeHtml(
-                      getReceiptLabel(
-                        checkout.receipt_method
-                      )
-                    )}
-                    ·
-                    ${escapeHtml(
-                      getPaymentLabel(
-                        checkout.payment_method
-                      )
-                    )}
-                    ·
-                    ${escapeHtml(
-                      checkout.payment_status || ""
-                    )}
-                  </div>
-                `
-                : "";
+              isPickupCompleted(order);
 
             return `
-              <article class="order-select-card">
-                <div class="order-select-head">
-                  <input
-                    class="order-check"
-                    type="checkbox"
-                    value="${escapeHtml(order.order_number || "")}"
-                    data-index="${index}"
-                    ${completed ? "disabled" : "checked"}
-                    aria-label="결제할 주문 선택"
-                  >
+              <article class="order-card ${completed ? "completed" : ""}">
+
+                <div class="order-head">
 
                   <div>
-                    <div class="order-number">
-                      주문 ${index + 1}
+                    <strong>
+                      ${escapeHtml(
+                        order.customers?.nickname ||
+                        "회원 없음"
+                      )}
+                    </strong>
+
+                    <div class="muted">
+                      ${escapeHtml(order.order_number)}
+                      ·
+                      ${escapeHtml(order.order_status)}
+                      ·
+                      ${escapeHtml(order.payment_status)}
                     </div>
 
-                    <div class="status-line">
-                      결제상태:
-                      ${escapeHtml(order.payment_status || "확인 중")}
-                      · 주문상태:
-                      ${escapeHtml(order.order_status || "주문 접수")}
-                    </div>
-
-                    ${checkoutStatus}
-
-                    ${
-                      completed
-                        ? `
-                          <div class="status-line">
-                            완료된 주문은 다시 결제할 수 없습니다.
-                          </div>
-                        `
-                        : ""
-                    }
+                    <span class="order-status-badge ${completed ? "completed" : ""}">
+                      ${completed
+                        ? "픽업 완료 · 매출 반영"
+                        : "진행 중 주문"}
+                    </span>
                   </div>
+
                 </div>
 
-                <div class="item-list">
-                  ${itemHtml}
+                <div class="muted">
+                  취소할 상품만 체크한 뒤
+                  ‘선택 상품 취소’를 누르세요.
                 </div>
 
-                <div class="status-line" style="text-align:right;">
-                  주문 상품 합계:
-                  <strong>${formatWon(total)}</strong>
+                <div class="order-item-edit-list">
+                  ${items.map(
+                    function (item) {
+                      return `
+                        <label class="order-item-edit-row">
+                          <input
+                            type="checkbox"
+                            data-order-id="${escapeHtml(order.id)}"
+                            data-item-id="${escapeHtml(item.id)}"
+                            ${completed ? "disabled" : ""}
+                          >
+
+                          <span>
+                            <strong>
+                              ${escapeHtml(item.product_name)}
+                            </strong>
+                            <br>
+                            <span class="muted">
+                              ${item.quantity}
+                              ${escapeHtml(item.unit_name)}
+                              · 단가 ${formatPrice(item.unit_price)}
+                              · 합계 ${formatPrice(item.line_total)}
+                            </span>
+                          </span>
+                        </label>
+                      `;
+                    }
+                  ).join("")}
                 </div>
+
+                <div class="order-total">
+                  최종 결제금액:
+                  ${formatPrice(total)}
+                </div>
+
+                <div class="muted">
+                  주문일
+                  ${escapeHtml(order.order_date || "-")}
+                  /
+                  픽업 예정일
+                  ${escapeHtml(order.pickup_date || "미정")}
+                  /
+                  ${escapeHtml(order.pickup_place || "장소 미정")}
+                  ${completed
+                    ? (
+                        " / 완료일 " +
+                        escapeHtml(
+                          formatDateTime(order.completed_at)
+                        )
+                      )
+                    : ""}
+                </div>
+
+                <div class="order-action-grid">
+                  <button
+                    class="button light small"
+                    type="button"
+                    onclick='cancelSelectedOrderItems(
+                      ${JSON.stringify(order.id)},
+                      ${JSON.stringify(order.order_number)}
+                    )'
+                    ${completed ? "disabled" : ""}
+                  >
+                    선택 상품 취소
+                  </button>
+
+                  <button
+                    class="button ${completed ? "secondary" : "success"} small"
+                    type="button"
+                    onclick='togglePickupComplete(
+                      ${JSON.stringify(order.id)},
+                      ${completed}
+                    )'
+                  >
+                    ${completed
+                      ? "완료 취소"
+                      : "픽업 완료"}
+                  </button>
+
+                  <button
+                    class="button danger small"
+                    type="button"
+                    onclick='deleteOrder(
+                      ${JSON.stringify(order.id)},
+                      ${JSON.stringify(order.order_number)}
+                    )'
+                  >
+                    전체 주문 삭제
+                  </button>
+                </div>
+
               </article>
             `;
           }
         ).join("");
     }
 
-    function getSelectedOrders() {
-      return Array.from(
-        document.querySelectorAll(
-          ".order-check:checked"
-        )
-      ).map(
-        function (checkbox) {
-          const index =
-            Number(checkbox.dataset.index);
+    function getCurrentMonthKey() {
+      const now = new Date();
 
-          return currentOrders[index];
-        }
-      ).filter(Boolean);
-    }
-
-    function getSelectedOrderNumbers() {
-      return getSelectedOrders()
-        .map(function (order) {
-          return String(
-            order.order_number || ""
-          ).trim();
-        })
-        .filter(Boolean);
-    }
-
-    function getProductAmount() {
-      return getSelectedOrders().reduce(
-        function (orderSum, order) {
-          const items =
-            Array.isArray(order.items)
-              ? order.items
-              : [];
-
-          return (
-            orderSum +
-            items.reduce(
-              function (itemSum, item) {
-                return (
-                  itemSum +
-                  Number(
-                    item.line_total ||
-                    (
-                      Number(item.unit_price || 0) *
-                      Number(item.quantity || 0)
-                    )
-                  )
-                );
-              },
-              0
-            )
-          );
-        },
-        0
-      );
-    }
-
-    function getReceiptMethod() {
       return (
-        document.querySelector(
-          'input[name="receiptMethod"]:checked'
-        )?.value || "pickup"
+        now.getFullYear() +
+        "-" +
+        String(now.getMonth() + 1)
+          .padStart(2, "0")
       );
     }
 
-    function getPaymentMethod() {
-      return (
-        document.querySelector(
-          'input[name="paymentMethod"]:checked'
-        )?.value || "pickup_pay"
-      );
-    }
-
-    function updateCheckoutDisplay() {
-      const productAmount =
-        getProductAmount();
-
-      const receiptMethod =
-        getReceiptMethod();
-
-      let paymentMethod =
-        getPaymentMethod();
-
-      const isHome =
-        receiptMethod === "home";
-
-      const pickupPayInput =
-        document.querySelector(
-          'input[name="paymentMethod"][value="pickup_pay"]'
-        );
-
-      pickupPayInput.disabled = isHome;
-
-      document.getElementById(
-        "pickupPayChoice"
-      ).style.opacity =
-        isHome ? ".45" : "1";
-
-      if (
-        isHome &&
-        paymentMethod === "pickup_pay"
-      ) {
-        document.querySelector(
-          'input[name="paymentMethod"][value="bank_transfer"]'
-        ).checked = true;
-
-        paymentMethod = "bank_transfer";
+    function toLocalDateKey(value) {
+      if (!value) {
+        return "";
       }
 
-      document.getElementById(
-        "deliveryFields"
-      ).hidden = !isHome;
-
-      document.getElementById(
-        "bankBox"
-      ).hidden =
-        paymentMethod !== "bank_transfer";
-
-      document.getElementById(
-        "cardBox"
-      ).hidden =
-        paymentMethod !== "card_online";
-
-      const deliveryFee =
-        (
-          isHome &&
-          productAmount < FREE_DELIVERY_THRESHOLD
-        )
-          ? HOME_DELIVERY_FEE
-          : 0;
-
-      const finalAmount =
-        productAmount + deliveryFee;
-
-      document.getElementById(
-        "productAmountText"
-      ).textContent =
-        formatWon(productAmount);
-
-      document.getElementById(
-        "deliveryFeeText"
-      ).textContent =
-        deliveryFee === 0
-          ? "무료"
-          : formatWon(deliveryFee);
-
-      document.getElementById(
-        "finalAmountText"
-      ).textContent =
-        formatWon(finalAmount);
-
-      const guide =
-        document.getElementById(
-          "deliveryGuide"
-        );
-
-      if (!getSelectedOrderNumbers().length) {
-        guide.textContent =
-          "결제할 주문을 하나 이상 선택해주세요.";
-      } else if (!isHome) {
-        guide.textContent =
-          "매장 픽업은 상품금액과 관계없이 배송비가 없습니다.";
-      } else if (
-        productAmount >= FREE_DELIVERY_THRESHOLD
-      ) {
-        guide.textContent =
-          "선택 상품 합계가 40,000원 이상이므로 집 앞 배송비가 무료입니다.";
-      } else {
-        guide.textContent =
-          "집 앞 배송비 500원이 추가됩니다. " +
-          formatWon(
-            FREE_DELIVERY_THRESHOLD -
-            productAmount
-          ) +
-          "을 더 주문하면 무료배송입니다.";
-      }
-    }
-
-    async function submitCheckout() {
-      clearMessage();
-
-      const nickname =
-        nicknameInput.value.trim();
-
-      const orderNumbers =
-        getSelectedOrderNumbers();
-
-      const receiptMethod =
-        getReceiptMethod();
-
-      const paymentMethod =
-        getPaymentMethod();
-
-      const address =
-        document.getElementById(
-          "deliveryAddress"
-        ).value.trim();
-
-      const entranceInfo =
-        document.getElementById(
-          "entranceInfo"
-        ).value.trim();
-
-      const deliveryRequest =
-        document.getElementById(
-          "deliveryRequest"
-        ).value.trim();
-
-      if (!orderNumbers.length) {
-        showMessage(
-          "결제할 주문을 하나 이상 선택해주세요.",
-          "error"
-        );
-        return;
-      }
-
-      if (
-        receiptMethod === "home" &&
-        (!address || !entranceInfo)
-      ) {
-        showMessage(
-          "집 앞 배송을 위해 주소와 공동현관 출입정보를 입력해주세요.",
-          "error"
-        );
-        return;
-      }
-
-      if (
-        receiptMethod === "home" &&
-        paymentMethod === "pickup_pay"
-      ) {
-        showMessage(
-          "집 앞 배송은 계좌이체 또는 카드 선결제를 선택해주세요.",
-          "error"
-        );
-        return;
-      }
-
-      submitCheckoutButton.disabled = true;
-      submitCheckoutButton.textContent =
-        "신청 내용을 저장하고 있습니다...";
-
-      try {
-        const { data, error } =
-          await sb.rpc(
-            "submit_checkout_request",
-            {
-              p_nickname: nickname,
-              p_order_numbers: orderNumbers,
-              p_receipt_method: receiptMethod,
-              p_payment_method: paymentMethod,
-              p_delivery_address: address,
-              p_entrance_info: entranceInfo,
-              p_delivery_request: deliveryRequest
-            }
-          );
-
-        if (error) throw error;
-
-        const result =
-          typeof data === "string"
-            ? JSON.parse(data)
-            : data;
-
-        const completeBox =
-          document.getElementById(
-            "checkoutComplete"
-          );
-
-        let nextGuide = "";
-
-        if (paymentMethod === "pickup_pay") {
-          nextGuide =
-            "상품을 픽업할 때 매장에서 결제해주세요.";
-        } else if (
-          paymentMethod === "bank_transfer"
-        ) {
-          nextGuide =
-            "하나은행 412-910821-25107, 예금주 담픽으로 " +
-            formatWon(result.final_amount) +
-            "을 입금해주세요.";
-        } else if (
-          paymentMethod === "card_online"
-        ) {
-          nextGuide =
-            CARD_PAYMENT_URL
-              ? "카드 결제창으로 이동합니다."
-              : "카드 PG 연결 전이므로 신청 내용만 저장되었습니다. 관리자에게 카드 결제 링크를 요청해주세요.";
-        }
-
-        completeBox.innerHTML = `
-          <strong>신청이 저장되었습니다.</strong><br>
-          신청번호:
-          ${escapeHtml(result.request_code || "")}<br>
-          상품 합계:
-          ${formatWon(result.product_amount)}<br>
-          배송비:
-          ${
-            Number(result.delivery_fee || 0) === 0
-              ? "무료"
-              : formatWon(result.delivery_fee)
-          }<br>
-          최종 결제금액:
-          <strong>${formatWon(result.final_amount)}</strong><br>
-          ${escapeHtml(nextGuide)}
-        `;
-
-        completeBox.classList.add("show");
-
-        if (
-          paymentMethod === "card_online" &&
-          CARD_PAYMENT_URL
-        ) {
-          const url =
-            new URL(
-              CARD_PAYMENT_URL,
-              window.location.href
-            );
-
-          url.searchParams.set(
-            "amount",
-            String(result.final_amount)
-          );
-
-          url.searchParams.set(
-            "requestCode",
-            String(result.request_code)
-          );
-
-          window.location.href =
-            url.toString();
-        }
-
-      } catch (error) {
-        console.error(error);
-
-        showMessage(
-          error.message ||
-          "결제·배송 신청을 저장하지 못했습니다.",
-          "error"
-        );
-
-      } finally {
-        submitCheckoutButton.disabled = false;
-        submitCheckoutButton.textContent =
-          "결제·수령 방법 신청하기";
-      }
-    }
-
-    function getReceiptLabel(value) {
-      return value === "home"
-        ? "집 앞 배송"
-        : "매장 픽업";
-    }
-
-    function getPaymentLabel(value) {
-      const labels = {
-        pickup_pay: "픽업 시 현장결제",
-        bank_transfer: "계좌이체",
-        card_online: "카드결제"
-      };
-
-      return labels[value] || "결제방법 확인";
-    }
-
-    function formatDate(value) {
-      if (!value) return "날짜 미정";
-
-      const date =
-        new Date(
-          String(value).slice(0, 10) +
-          "T00:00:00"
-        );
+      const date = new Date(value);
 
       if (Number.isNaN(date.getTime())) {
-        return String(value);
+        return "";
       }
 
-      return new Intl.DateTimeFormat(
+      return (
+        date.getFullYear() +
+        "-" +
+        String(date.getMonth() + 1)
+          .padStart(2, "0") +
+        "-" +
+        String(date.getDate())
+          .padStart(2, "0")
+      );
+    }
+
+    function formatDateTime(value) {
+      if (!value) {
+        return "-";
+      }
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "-";
+      }
+
+      return date.toLocaleString(
         "ko-KR",
         {
           year: "numeric",
-          month: "long",
-          day: "numeric"
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
         }
-      ).format(date);
+      );
     }
 
-    function formatWon(value) {
+    function getCompletedOrdersForMonth(monthKey) {
+      return orders.filter(
+        function (order) {
+          return (
+            isPickupCompleted(order) &&
+            toLocalDateKey(
+              order.completed_at
+            ).startsWith(monthKey)
+          );
+        }
+      );
+    }
+
+    function renderSalesCalendar() {
+      const monthInput =
+        document.getElementById(
+          "salesMonth"
+        );
+
+      if (!monthInput.value) {
+        monthInput.value =
+          getCurrentMonthKey();
+      }
+
+      const monthKey =
+        monthInput.value;
+
+      const monthOrders =
+        getCompletedOrdersForMonth(
+          monthKey
+        );
+
+      const totalSales =
+        monthOrders.reduce(
+          function (sum, order) {
+            return (
+              sum +
+              calculateOrderTotal(order)
+            );
+          },
+          0
+        );
+
+      document
+        .getElementById("monthlySalesTotal")
+        .textContent =
+          formatPrice(totalSales);
+
+      document
+        .getElementById("monthlyCustomerCount")
+        .textContent =
+          getUniqueOrderCustomerCount(
+            monthOrders
+          ) + "명";
+
+      document
+        .getElementById("monthlyOrderCount")
+        .textContent =
+          monthOrders.length + "건";
+
+      const dailyMap = {};
+
+      monthOrders.forEach(
+        function (order) {
+          const dateKey =
+            toLocalDateKey(
+              order.completed_at
+            );
+
+          if (!dailyMap[dateKey]) {
+            dailyMap[dateKey] = {
+              total: 0,
+              orders: []
+            };
+          }
+
+          dailyMap[dateKey].total +=
+            calculateOrderTotal(order);
+
+          dailyMap[dateKey].orders.push(
+            order
+          );
+        }
+      );
+
+      const parts =
+        monthKey.split("-");
+
+      const year = Number(parts[0]);
+      const monthIndex =
+        Number(parts[1]) - 1;
+
+      const firstDay =
+        new Date(year, monthIndex, 1);
+
+      const daysInMonth =
+        new Date(
+          year,
+          monthIndex + 1,
+          0
+        ).getDate();
+
+      const calendar =
+        document.getElementById(
+          "salesCalendar"
+        );
+
+      let html = "";
+
+      for (
+        let blank = 0;
+        blank < firstDay.getDay();
+        blank += 1
+      ) {
+        html +=
+          '<div class="calendar-empty"></div>';
+      }
+
+      for (
+        let day = 1;
+        day <= daysInMonth;
+        day += 1
+      ) {
+        const dateKey =
+          monthKey +
+          "-" +
+          String(day).padStart(2, "0");
+
+        const dayData =
+          dailyMap[dateKey];
+
+        html += `
+          <button
+            class="calendar-day ${dayData ? "has-sales" : ""} ${selectedSalesDate === dateKey ? "selected" : ""}"
+            type="button"
+            onclick='showDailySales(
+              ${JSON.stringify(dateKey)}
+            )'
+          >
+            <span class="calendar-date-number">
+              ${day}
+            </span>
+            ${dayData
+              ? (
+                  '<span class="calendar-sales-amount">' +
+                  formatPrice(dayData.total) +
+                  '<br>' +
+                  dayData.orders.length +
+                  '건</span>'
+                )
+              : ""}
+          </button>
+        `;
+      }
+
+      calendar.innerHTML = html;
+
+      if (
+        selectedSalesDate &&
+        selectedSalesDate.startsWith(
+          monthKey
+        )
+      ) {
+        renderDailySalesDetail(
+          selectedSalesDate
+        );
+      } else {
+        document
+          .getElementById(
+            "dailySalesDetail"
+          )
+          .innerHTML =
+            '<div class="muted">' +
+            '달력에서 날짜를 누르면 해당 날짜의 매출이 표시됩니다.' +
+            '</div>';
+      }
+    }
+
+    function showDailySales(dateKey) {
+      selectedSalesDate = dateKey;
+      renderSalesCalendar();
+    }
+
+    function renderDailySalesDetail(dateKey) {
+      const dayOrders =
+        orders.filter(
+          function (order) {
+            return (
+              isPickupCompleted(order) &&
+              toLocalDateKey(
+                order.completed_at
+              ) === dateKey
+            );
+          }
+        );
+
+      const target =
+        document.getElementById(
+          "dailySalesDetail"
+        );
+
+      if (!dayOrders.length) {
+        target.innerHTML =
+          '<strong>' +
+          escapeHtml(dateKey) +
+          '</strong>' +
+          '<div class="muted" style="margin-top:8px;">' +
+          '이 날짜에 완료된 매출이 없습니다.' +
+          '</div>';
+        return;
+      }
+
+      const total =
+        dayOrders.reduce(
+          function (sum, order) {
+            return (
+              sum +
+              calculateOrderTotal(order)
+            );
+          },
+          0
+        );
+
+      target.innerHTML =
+        '<strong>' +
+        escapeHtml(dateKey) +
+        ' 매출 · ' +
+        formatPrice(total) +
+        '</strong>' +
+        dayOrders.map(
+          function (order) {
+            return `
+              <div class="daily-sales-row">
+                <div>
+                  <strong>
+                    ${escapeHtml(
+                      order.customers?.nickname ||
+                      "회원 없음"
+                    )}
+                  </strong>
+                  <div class="muted">
+                    ${escapeHtml(order.order_number)}
+                  </div>
+                </div>
+                <strong>
+                  ${formatPrice(
+                    calculateOrderTotal(order)
+                  )}
+                </strong>
+              </div>
+            `;
+          }
+        ).join("");
+    }
+
+    function makeOrderExportRows(orderRows) {
+      const rows = [];
+
+      orderRows.forEach(
+        function (order) {
+          const items =
+            order.order_items || [];
+
+          const orderTotal =
+            calculateOrderTotal(order);
+
+          if (!items.length) {
+            rows.push({
+              "완료일": toLocalDateKey(order.completed_at),
+              "고객 닉네임": order.customers?.nickname || "",
+              "주문번호": order.order_number || "",
+              "상품명": "",
+              "수량": "",
+              "단위": "",
+              "단가": "",
+              "상품금액": "",
+              "최종 주문금액": orderTotal,
+              "주문일": order.order_date || "",
+              "픽업 예정일": order.pickup_date || "",
+              "결제상태": order.payment_status || "",
+              "주문상태": order.order_status || ""
+            });
+            return;
+          }
+
+          items.forEach(
+            function (item) {
+              rows.push({
+                "완료일": toLocalDateKey(order.completed_at),
+                "고객 닉네임": order.customers?.nickname || "",
+                "주문번호": order.order_number || "",
+                "상품명": item.product_name || "",
+                "수량": Number(item.quantity || 0),
+                "단위": item.unit_name || "",
+                "단가": Number(item.unit_price || 0),
+                "상품금액": Number(item.line_total || 0),
+                "최종 주문금액": orderTotal,
+                "주문일": order.order_date || "",
+                "픽업 예정일": order.pickup_date || "",
+                "결제상태": order.payment_status || "",
+                "주문상태": order.order_status || ""
+              });
+            }
+          );
+        }
+      );
+
+      return rows;
+    }
+
+    function makeDailySummaryRows(orderRows) {
+      const map = {};
+
+      orderRows.forEach(
+        function (order) {
+          const dateKey =
+            toLocalDateKey(
+              order.completed_at
+            ) || "미완료";
+
+          if (!map[dateKey]) {
+            map[dateKey] = {
+              date: dateKey,
+              total: 0,
+              orders: 0,
+              customers: new Set()
+            };
+          }
+
+          map[dateKey].total +=
+            calculateOrderTotal(order);
+          map[dateKey].orders += 1;
+          map[dateKey].customers.add(
+            order.customers?.nickname ||
+            "회원 없음"
+          );
+        }
+      );
+
+      return Object.values(map)
+        .sort(
+          function (a, b) {
+            return a.date.localeCompare(b.date);
+          }
+        )
+        .map(
+          function (row) {
+            return {
+              "날짜": row.date,
+              "고객 수": row.customers.size,
+              "주문 건수": row.orders,
+              "총 매출": row.total
+            };
+          }
+        );
+    }
+
+    function makeCustomerSummaryRows(orderRows) {
+      const map = {};
+
+      orderRows.forEach(
+        function (order) {
+          const nickname =
+            order.customers?.nickname ||
+            "회원 없음";
+
+          if (!map[nickname]) {
+            map[nickname] = {
+              nickname,
+              orders: 0,
+              total: 0
+            };
+          }
+
+          map[nickname].orders += 1;
+          map[nickname].total +=
+            calculateOrderTotal(order);
+        }
+      );
+
+      return Object.values(map)
+        .sort(
+          function (a, b) {
+            return b.total - a.total;
+          }
+        )
+        .map(
+          function (row) {
+            return {
+              "고객 닉네임": row.nickname,
+              "주문 건수": row.orders,
+              "최종 주문금액 합계": row.total
+            };
+          }
+        );
+    }
+
+    function downloadWorkbook(
+      orderRows,
+      fileName
+    ) {
+      if (!window.XLSX) {
+        alert(
+          "엑셀 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해주세요."
+        );
+        return;
+      }
+
+      if (!orderRows.length) {
+        alert(
+          "다운로드할 주문 내역이 없습니다."
+        );
+        return;
+      }
+
+      const workbook =
+        XLSX.utils.book_new();
+
+      const detailSheet =
+        XLSX.utils.json_to_sheet(
+          makeOrderExportRows(orderRows)
+        );
+
+      const dailySheet =
+        XLSX.utils.json_to_sheet(
+          makeDailySummaryRows(orderRows)
+        );
+
+      const customerSheet =
+        XLSX.utils.json_to_sheet(
+          makeCustomerSummaryRows(orderRows)
+        );
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        detailSheet,
+        "주문 상세"
+      );
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        dailySheet,
+        "날짜별 합계"
+      );
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        customerSheet,
+        "고객별 합계"
+      );
+
+      XLSX.writeFile(
+        workbook,
+        fileName
+      );
+    }
+
+    function downloadMonthlySalesExcel() {
+      const monthKey =
+        document
+          .getElementById("salesMonth")
+          .value ||
+        getCurrentMonthKey();
+
+      downloadWorkbook(
+        getCompletedOrdersForMonth(
+          monthKey
+        ),
+        "담픽_" +
+        monthKey +
+        "_픽업완료매출.xlsx"
+      );
+    }
+
+    function downloadAllOrdersExcel() {
+      downloadWorkbook(
+        orders,
+        "담픽_전체주문_" +
+        toLocalDateKey(new Date()) +
+        ".xlsx"
+      );
+    }
+
+    function setToday() {
+      document
+        .getElementById("orderDate")
+        .value =
+          new Date()
+            .toISOString()
+            .slice(0, 10);
+
+      document
+        .getElementById("pickupPlace")
+        .value = "담픽 매장";
+
+      const salesMonth =
+        document.getElementById(
+          "salesMonth"
+        );
+
+      if (
+        salesMonth &&
+        !salesMonth.value
+      ) {
+        salesMonth.value =
+          getCurrentMonthKey();
+      }
+    }
+
+    function makeOrderNumber() {
+      const now =
+        new Date();
+
+      const pad =
+        function (value) {
+          return String(value)
+            .padStart(2, "0");
+        };
+
+      const date =
+        now.getFullYear() +
+        pad(now.getMonth() + 1) +
+        pad(now.getDate());
+
+      const time =
+        pad(now.getHours()) +
+        pad(now.getMinutes()) +
+        pad(now.getSeconds());
+
+      const random =
+        Math.floor(
+          Math.random() * 900 + 100
+        );
+
+      return (
+        "DP-" +
+        date +
+        "-" +
+        time +
+        "-" +
+        random
+      );
+    }
+
+    function showAppError(error) {
+      console.error(error);
+
+      setMessage(
+        appMessage,
+        "오류: " +
+        (
+          error.message ||
+          "작업을 완료하지 못했습니다."
+        ),
+        "error"
+      );
+    }
+
+    function setMessage(
+      target,
+      text,
+      type
+    ) {
+      target.textContent = text;
+
+      target.className =
+        text
+          ? "message show " + type
+          : "message";
+    }
+
+    function formatPrice(value) {
       return (
         Number(value || 0)
           .toLocaleString("ko-KR") +
         "원"
       );
-    }
-
-    function showMessage(text, type) {
-      message.textContent = text;
-      message.className =
-        "message show " + type;
-    }
-
-    function clearMessage() {
-      message.textContent = "";
-      message.className = "message";
     }
 
     function escapeHtml(value) {
@@ -1493,6 +3297,8 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
+
+    setToday();
   </script>
 </body>
 </html>
