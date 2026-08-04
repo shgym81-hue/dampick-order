@@ -9,7 +9,9 @@
   <title>담픽 결제·배송 관리</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     :root {
       --main: #ef3f7f;
@@ -39,7 +41,11 @@
     }
 
     .wrap {
-      width: min(1050px, calc(100% - 28px));
+      width:
+        min(
+          1050px,
+          calc(100% - 28px)
+        );
       margin: 0 auto;
       padding: 28px 0 60px;
     }
@@ -47,13 +53,17 @@
     .card {
       margin-bottom: 17px;
       padding: 20px;
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
       border-radius: 18px;
       background: #fff;
-      box-shadow: 0 8px 24px rgba(0,0,0,.06);
+      box-shadow:
+        0 8px 24px rgba(0,0,0,.06);
     }
 
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
 
     h1,
     h2 {
@@ -74,7 +84,8 @@
     select {
       width: 100%;
       padding: 12px;
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
       border-radius: 10px;
     }
 
@@ -93,9 +104,23 @@
       cursor: pointer;
     }
 
-    .button.secondary { background: #333; }
-    .button.success { background: var(--success); }
-    .button.danger { background: var(--danger); }
+    .button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .button.secondary {
+      background: #333;
+    }
+
+    .button.success {
+      background: var(--success);
+    }
+
+    .button.danger {
+      background: var(--danger);
+    }
+
     .button.light {
       color: #333;
       background: #ececec;
@@ -110,7 +135,8 @@
 
     .topbar {
       display: flex;
-      justify-content: space-between;
+      justify-content:
+        space-between;
       gap: 14px;
       align-items: flex-start;
     }
@@ -122,11 +148,15 @@
       border-radius: 10px;
     }
 
-    .message.show { display: block; }
+    .message.show {
+      display: block;
+    }
+
     .message.error {
       color: #a62840;
       background: #fff0f3;
     }
+
     .message.success {
       color: #176a3e;
       background: #eaf8ef;
@@ -134,7 +164,8 @@
 
     .tools {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns:
+        1fr auto;
       gap: 10px;
       align-items: end;
     }
@@ -146,7 +177,8 @@
 
     .request-card {
       padding: 17px;
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
       border-radius: 15px;
       background: #fff;
     }
@@ -158,7 +190,8 @@
 
     .request-head {
       display: flex;
-      justify-content: space-between;
+      justify-content:
+        space-between;
       gap: 12px;
       align-items: flex-start;
     }
@@ -181,7 +214,10 @@
     .detail-grid {
       display: grid;
       grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
       gap: 9px;
       margin-top: 13px;
     }
@@ -210,9 +246,45 @@
       background: #fff5f8;
     }
 
+    .item-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 13px;
+    }
+
+    .item-row {
+      display: flex;
+      justify-content:
+        space-between;
+      gap: 12px;
+      padding: 11px;
+      border:
+        1px solid #eee;
+      border-radius: 11px;
+      background: #fff;
+    }
+
+    .item-name {
+      font-weight: 950;
+    }
+
+    .item-meta {
+      margin-top: 5px;
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .item-price {
+      flex: 0 0 auto;
+      color: var(--main-dark);
+      font-weight: 950;
+    }
+
     @media (max-width: 650px) {
       .topbar,
-      .request-head {
+      .request-head,
+      .item-row {
         flex-direction: column;
       }
 
@@ -220,27 +292,41 @@
       .detail-grid {
         grid-template-columns: 1fr;
       }
+
+      .item-price {
+        text-align: right;
+      }
     }
   </style>
 </head>
 
 <body>
   <main class="wrap">
-    <section id="loginCard" class="card">
+    <section
+      id="loginCard"
+      class="card"
+    >
       <h1>담픽 결제·배송 관리</h1>
+
       <p>
-        기존 담픽 관리자와 같은 Supabase 관리자 계정으로
-        로그인하세요.
+        기존 담픽 관리자와 같은
+        Supabase 관리자 계정으로 로그인하세요.
       </p>
 
-      <label for="email">관리자 이메일</label>
+      <label for="email">
+        관리자 이메일
+      </label>
+
       <input
         id="email"
         type="email"
         autocomplete="username"
       >
 
-      <label for="password">관리자 비밀번호</label>
+      <label for="password">
+        관리자 비밀번호
+      </label>
+
       <input
         id="password"
         type="password"
@@ -256,28 +342,41 @@
           관리자 로그인
         </button>
 
-        <a class="button secondary" href="./admin.html">
+        <a
+          class="button secondary"
+          href="./admin.html"
+        >
           기존 관리자 화면
         </a>
       </div>
     </section>
 
-    <section id="app" class="hidden">
+    <section
+      id="app"
+      class="hidden"
+    >
       <div class="topbar">
         <div>
           <h1>담픽 결제·배송 관리</h1>
+
           <p>
-            고객이 선택한 결제방법과 픽업·배송 정보를 확인하고,
-            관리자가 최종 결제 완료 후 픽업·배송을 처리합니다.
+            고객이 체크한 상품만 한 건의 결제·배송 신청으로 표시됩니다.
+            일부 상품은 계좌이체, 나머지는 픽업결제로 나누어 관리할 수 있습니다.
           </p>
         </div>
 
         <div class="actions">
-          <a class="button secondary" href="./admin.html">
+          <a
+            class="button secondary"
+            href="./admin.html"
+          >
             기존 관리자
           </a>
 
-          <a class="button light" href="./index.html">
+          <a
+            class="button light"
+            href="./index.html"
+          >
             고객 화면
           </a>
 
@@ -291,21 +390,43 @@
         </div>
       </div>
 
-      <div id="message" class="message"></div>
+      <div
+        id="message"
+        class="message"
+      ></div>
 
       <section class="card">
         <div class="tools">
           <div>
-            <label for="statusFilter">표시 조건</label>
+            <label for="statusFilter">
+              표시 조건
+            </label>
+
             <select id="statusFilter">
-              <option value="all">전체 신청</option>
-              <option value="신청">새 신청</option>
-              <option value="입금 확인 대기">입금 확인 대기</option>
-              <option value="카드 결제 대기">카드 결제 대기</option>
-              <option value="현장 결제 예정">현장 결제 예정</option>
-              <option value="결제 완료">결제 완료</option>
-              <option value="집 앞 배송 접수">집 앞 배송</option>
-              <option value="매장 픽업 예정">매장 픽업</option>
+              <option value="all">
+                전체 신청
+              </option>
+              <option value="신청">
+                새 신청
+              </option>
+              <option value="입금 확인 대기">
+                입금 확인 대기
+              </option>
+              <option value="카드 결제 대기">
+                카드 결제 대기
+              </option>
+              <option value="현장 결제 예정">
+                현장 결제 예정
+              </option>
+              <option value="결제 완료">
+                결제 완료
+              </option>
+              <option value="선결제 확인 대기">
+                집 앞 배송
+              </option>
+              <option value="매장 픽업 예정">
+                매장 픽업
+              </option>
             </select>
           </div>
 
@@ -330,49 +451,68 @@
   <script src="./config.js"></script>
 
   <script>
-    const sb = window.dampickSupabase;
+    "use strict";
+
+    const sb =
+      window.dampickSupabase;
 
     const loginCard =
-      document.getElementById("loginCard");
+      document.getElementById(
+        "loginCard"
+      );
 
     const app =
-      document.getElementById("app");
+      document.getElementById(
+        "app"
+      );
 
     const requestList =
-      document.getElementById("requestList");
+      document.getElementById(
+        "requestList"
+      );
 
     const message =
-      document.getElementById("message");
+      document.getElementById(
+        "message"
+      );
 
     let requests = [];
 
-    document.getElementById(
-      "loginButton"
-    ).addEventListener(
-      "click",
-      login
-    );
+    document
+      .getElementById(
+        "loginButton"
+      )
+      .addEventListener(
+        "click",
+        login
+      );
 
-    document.getElementById(
-      "logoutButton"
-    ).addEventListener(
-      "click",
-      logout
-    );
+    document
+      .getElementById(
+        "logoutButton"
+      )
+      .addEventListener(
+        "click",
+        logout
+      );
 
-    document.getElementById(
-      "refreshButton"
-    ).addEventListener(
-      "click",
-      loadRequests
-    );
+    document
+      .getElementById(
+        "refreshButton"
+      )
+      .addEventListener(
+        "click",
+        loadRequests
+      );
 
-    document.getElementById(
-      "statusFilter"
-    ).addEventListener(
-      "change",
-      renderRequests
-    );
+    document
+      .getElementById(
+        "statusFilter"
+      )
+      .addEventListener(
+        "change",
+        renderRequests
+      );
 
     requestList.addEventListener(
       "click",
@@ -403,20 +543,26 @@
       clearMessage();
 
       const email =
-        document.getElementById(
-          "email"
-        ).value.trim();
+        document
+          .getElementById(
+            "email"
+          )
+          .value
+          .trim();
 
       const password =
-        document.getElementById(
-          "password"
-        ).value;
+        document
+          .getElementById(
+            "password"
+          )
+          .value;
 
       const { error } =
-        await sb.auth.signInWithPassword({
-          email,
-          password
-        });
+        await sb.auth
+          .signInWithPassword({
+            email,
+            password
+          });
 
       if (error) {
         showMessage(
@@ -433,13 +579,24 @@
 
     async function logout() {
       await sb.auth.signOut();
-      app.classList.add("hidden");
-      loginCard.classList.remove("hidden");
+
+      app.classList.add(
+        "hidden"
+      );
+
+      loginCard.classList.remove(
+        "hidden"
+      );
     }
 
     function showApp() {
-      loginCard.classList.add("hidden");
-      app.classList.remove("hidden");
+      loginCard.classList.add(
+        "hidden"
+      );
+
+      app.classList.remove(
+        "hidden"
+      );
     }
 
     async function loadRequests() {
@@ -447,11 +604,31 @@
 
       const { data, error } =
         await sb
-          .from("checkout_requests")
-          .select("*")
-          .order("updated_at", {
-            ascending: false
-          });
+          .from(
+            "checkout_requests"
+          )
+          .select(`
+            *,
+            checkout_request_items(
+              id,
+              order_item_id,
+              order_number,
+              product_id,
+              product_name,
+              quantity,
+              unit_name,
+              unit_price,
+              line_total,
+              pickup_date,
+              created_at
+            )
+          `)
+          .order(
+            "updated_at",
+            {
+              ascending: false
+            }
+          );
 
       if (error) {
         showMessage(
@@ -472,9 +649,11 @@
 
     function renderRequests() {
       const filter =
-        document.getElementById(
-          "statusFilter"
-        ).value;
+        document
+          .getElementById(
+            "statusFilter"
+          )
+          .value;
 
       const filtered =
         filter === "all"
@@ -499,12 +678,17 @@
       }
 
       requestList.innerHTML =
-        filtered.map(renderRequest).join("");
+        filtered
+          .map(renderRequest)
+          .join("");
     }
 
-    function renderRequest(request) {
+    function renderRequest(
+      request
+    ) {
       const isHome =
-        request.receipt_method === "home";
+        request.receipt_method ===
+        "home";
 
       const isPaid =
         isPaymentCompleted(
@@ -512,13 +696,72 @@
         );
 
       const orderNumbers =
-        Array.isArray(request.order_numbers)
+        Array.isArray(
+          request.order_numbers
+        )
           ? request.order_numbers
           : [];
 
+      const items =
+        Array.isArray(
+          request.checkout_request_items
+        )
+          ? [
+              ...request.checkout_request_items
+            ].sort(
+              function (a, b) {
+                return String(
+                  a.pickup_date || ""
+                ).localeCompare(
+                  String(
+                    b.pickup_date || ""
+                  )
+                );
+              }
+            )
+          : [];
+
+      const itemsHtml =
+        items.length
+          ? items.map(
+              function (item) {
+                return `
+                  <div class="item-row">
+                    <div>
+                      <div class="item-name">
+                        ${escapeHtml(item.product_name || "상품")}
+                      </div>
+
+                      <div class="item-meta">
+                        ${Number(item.quantity || 0).toLocaleString("ko-KR")}
+                        ${escapeHtml(item.unit_name || "개")}
+                        · 픽업
+                        ${formatDate(item.pickup_date)}
+                        · 주문
+                        ${escapeHtml(item.order_number || "")}
+                      </div>
+                    </div>
+
+                    <div class="item-price">
+                      ${formatWon(item.line_total)}
+                    </div>
+                  </div>
+                `;
+              }
+            ).join("")
+          : `
+              <div class="item-row">
+                이전 버전에서 접수된 신청이라
+                선택 상품 상세가 없습니다.
+              </div>
+            `;
+
       return `
         <article
-          class="request-card ${isHome ? "home" : ""}"
+          class="
+            request-card
+            ${isHome ? "home" : ""}
+          "
           data-id="${escapeHtml(request.id)}"
         >
           <div class="request-head">
@@ -549,37 +792,53 @@
                 </span>
 
                 <span class="badge">
-                  ${escapeHtml(request.payment_status)}
+                  ${escapeHtml(
+                    request.payment_status
+                  )}
                 </span>
 
                 <span class="badge">
-                  ${escapeHtml(request.fulfillment_status)}
+                  ${escapeHtml(
+                    request.fulfillment_status
+                  )}
                 </span>
               </div>
             </div>
 
             <div class="amount">
-              ${formatWon(request.final_amount)}
+              ${formatWon(
+                request.final_amount
+              )}
             </div>
+          </div>
+
+          <div class="item-list">
+            ${itemsHtml}
           </div>
 
           <div class="detail-grid">
             <div class="detail-box">
-              <strong>주문번호</strong>
+              <strong>연결된 주문번호</strong>
               ${orderNumbers
                 .map(escapeHtml)
                 .join("<br>")}
             </div>
 
             <div class="detail-box">
-              <strong>금액</strong>
-              상품:
-              ${formatWon(request.product_amount)}<br>
+              <strong>이번 신청금액</strong>
+              선택 상품:
+              ${formatWon(
+                request.product_amount
+              )}<br>
               배송비:
               ${
-                Number(request.delivery_fee || 0) === 0
+                Number(
+                  request.delivery_fee || 0
+                ) === 0
                   ? "무료"
-                  : formatWon(request.delivery_fee)
+                  : formatWon(
+                      request.delivery_fee
+                    )
               }
             </div>
 
@@ -588,18 +847,23 @@
                 ? `
                   <div class="detail-box sensitive">
                     <strong>배송 주소</strong>
-                    ${escapeHtml(request.delivery_address)}
+                    ${escapeHtml(
+                      request.delivery_address
+                    )}
                   </div>
 
                   <div class="detail-box sensitive">
                     <strong>공동현관 출입정보</strong>
-                    ${escapeHtml(request.entrance_info)}
+                    ${escapeHtml(
+                      request.entrance_info
+                    )}
                   </div>
 
                   <div class="detail-box sensitive">
                     <strong>배송 요청사항</strong>
                     ${escapeHtml(
-                      request.delivery_request || "없음"
+                      request.delivery_request ||
+                      "없음"
                     )}
                   </div>
                 `
@@ -612,8 +876,17 @@
               class="button success"
               type="button"
               data-action="payment-complete"
+              ${
+                isPaid
+                  ? "disabled"
+                  : ""
+              }
             >
-              결제 완료 처리
+              ${
+                isPaid
+                  ? "결제 완료됨"
+                  : "결제 완료 처리"
+              }
             </button>
 
             ${
@@ -625,7 +898,11 @@
                     data-action="delivery-ready"
                     ${isPaid ? "" : "disabled"}
                   >
-                    ${isPaid ? "배송 준비" : "결제 완료 후 배송 준비"}
+                    ${
+                      isPaid
+                        ? "배송 준비"
+                        : "결제 완료 후 배송 준비"
+                    }
                   </button>
 
                   <button
@@ -644,7 +921,11 @@
                     data-action="pickup-complete"
                     ${isPaid ? "" : "disabled"}
                   >
-                    ${isPaid ? "픽업 완료" : "결제 완료 후 픽업"}
+                    ${
+                      isPaid
+                        ? "픽업 완료"
+                        : "결제 완료 후 픽업"
+                    }
                   </button>
                 `
             }
@@ -661,16 +942,22 @@
       `;
     }
 
-    async function handleAction(event) {
+    async function handleAction(
+      event
+    ) {
       const button =
         event.target.closest(
           "button[data-action]"
         );
 
-      if (!button) return;
+      if (!button) {
+        return;
+      }
 
       const card =
-        button.closest(".request-card");
+        button.closest(
+          ".request-card"
+        );
 
       const id =
         card?.dataset.id;
@@ -682,106 +969,46 @@
           }
         );
 
-      if (!request) return;
+      if (!request) {
+        return;
+      }
 
       const action =
         button.dataset.action;
 
       if (
-        [
-          "delivery-ready",
-          "delivery-complete",
-          "pickup-complete"
-        ].includes(action) &&
-        !isPaymentCompleted(
-          request.payment_status
-        )
+        action === "cancel"
       ) {
-        alert(
-          "먼저 결제 완료 처리를 해주세요. 집 앞 배송과 픽업 완료는 결제 완료 후 가능합니다."
-        );
-        return;
+        const confirmed =
+          window.confirm(
+            "이 신청을 취소할까요? 취소된 상품은 고객이 다시 선택할 수 있습니다."
+          );
+
+        if (!confirmed) {
+          return;
+        }
       }
 
       button.disabled = true;
 
       try {
-        if (action === "payment-complete") {
-          await updateRequestAndOrders(
-            request,
+        const { data, error } =
+          await sb.rpc(
+            "process_checkout_request",
             {
-              payment_status: "결제 완료",
-              request_status: "확인 완료",
-              fulfillment_status:
-                request.receipt_method === "home"
-                  ? "배송 준비 가능"
-                  : request.fulfillment_status
-            },
-            {
-              payment_status: "결제 완료"
+              p_request_id:
+                request.id,
+              p_action:
+                action
             }
           );
-        }
 
-        if (action === "delivery-ready") {
-          await updateRequestAndOrders(
-            request,
-            {
-              fulfillment_status: "배송 준비 중"
-            },
-            {
-              order_status: "배송 준비 중"
-            }
-          );
-        }
-
-        if (action === "delivery-complete") {
-          await updateRequestAndOrders(
-            request,
-            {
-              fulfillment_status: "배송 완료",
-              request_status: "완료"
-            },
-            {
-              order_status: "배송 완료"
-            }
-          );
-        }
-
-        if (action === "pickup-complete") {
-          await updateRequestAndOrders(
-            request,
-            {
-              fulfillment_status: "픽업 완료",
-              request_status: "완료"
-            },
-            {
-              order_status: "픽업 완료"
-            }
-          );
-        }
-
-        if (action === "cancel") {
-          const confirmed =
-            window.confirm(
-              "이 결제·수령 신청을 취소 처리할까요?"
-            );
-
-          if (!confirmed) return;
-
-          await updateRequestAndOrders(
-            request,
-            {
-              request_status: "취소",
-              fulfillment_status: "취소"
-            },
-            {
-              payment_status: "고객 선택 대기"
-            }
-          );
+        if (error) {
+          throw error;
         }
 
         showMessage(
+          data?.message ||
           "처리가 완료되었습니다.",
           "success"
         );
@@ -802,40 +1029,9 @@
       }
     }
 
-    async function updateRequestAndOrders(
-      request,
-      requestValues,
-      orderValues
+    function getReceiptLabel(
+      value
     ) {
-      const requestResult =
-        await sb
-          .from("checkout_requests")
-          .update(requestValues)
-          .eq("id", request.id);
-
-      if (requestResult.error) {
-        throw requestResult.error;
-      }
-
-      const orderNumbers =
-        Array.isArray(request.order_numbers)
-          ? request.order_numbers
-          : [];
-
-      if (orderNumbers.length) {
-        const orderResult =
-          await sb
-            .from("orders")
-            .update(orderValues)
-            .in("order_number", orderNumbers);
-
-        if (orderResult.error) {
-          throw orderResult.error;
-        }
-      }
-    }
-
-    function getReceiptLabel(value) {
       return value === "home"
         ? "집 앞 배송"
         : "매장 픽업";
@@ -848,38 +1044,91 @@
         String(status || "");
 
       return (
-        value.includes("결제 완료") ||
-        value.includes("입금 완료")
+        value.includes(
+          "결제 완료"
+        ) ||
+        value.includes(
+          "입금 완료"
+        )
       );
     }
 
-    function getPaymentLabel(value) {
+    function getPaymentLabel(
+      value
+    ) {
       const labels = {
-        pickup_pay: "픽업 시 현장결제",
-        bank_transfer: "계좌이체",
-        card_online: "카드결제"
+        pickup_pay:
+          "픽업 시 결제",
+        bank_transfer:
+          "계좌이체",
+        card_online:
+          "카드결제"
       };
 
-      return labels[value] || value;
+      return (
+        labels[value] ||
+        value
+      );
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return "날짜 미정";
+      }
+
+      const date =
+        new Date(
+          String(value)
+            .slice(0, 10) +
+          "T00:00:00"
+        );
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return String(value);
+      }
+
+      return new Intl.DateTimeFormat(
+        "ko-KR",
+        {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        }
+      ).format(date);
     }
 
     function formatWon(value) {
       return (
         Number(value || 0)
-          .toLocaleString("ko-KR") +
+          .toLocaleString(
+            "ko-KR"
+          ) +
         "원"
       );
     }
 
-    function showMessage(text, type) {
-      message.textContent = text;
+    function showMessage(
+      text,
+      type
+    ) {
+      message.textContent =
+        text;
+
       message.className =
-        "message show " + type;
+        "message show " +
+        type;
     }
 
     function clearMessage() {
-      message.textContent = "";
-      message.className = "message";
+      message.textContent =
+        "";
+
+      message.className =
+        "message";
     }
 
     function escapeHtml(value) {
