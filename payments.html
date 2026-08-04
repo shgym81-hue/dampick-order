@@ -267,8 +267,8 @@
         <div>
           <h1>담픽 결제·배송 관리</h1>
           <p>
-            고객이 선택한 결제방법과 픽업·배송 정보를
-            확인합니다.
+            고객이 선택한 결제방법과 픽업·배송 정보를 확인하고,
+            관리자가 최종 결제 완료 후 픽업·배송을 처리합니다.
           </p>
         </div>
 
@@ -506,6 +506,11 @@
       const isHome =
         request.receipt_method === "home";
 
+      const isPaid =
+        isPaymentCompleted(
+          request.payment_status
+        );
+
       const orderNumbers =
         Array.isArray(request.order_numbers)
           ? request.order_numbers
@@ -618,14 +623,16 @@
                     class="button"
                     type="button"
                     data-action="delivery-ready"
+                    ${isPaid ? "" : "disabled"}
                   >
-                    배송 준비
+                    ${isPaid ? "배송 준비" : "결제 완료 후 배송 준비"}
                   </button>
 
                   <button
                     class="button secondary"
                     type="button"
                     data-action="delivery-complete"
+                    ${isPaid ? "" : "disabled"}
                   >
                     배송 완료
                   </button>
@@ -635,8 +642,9 @@
                     class="button secondary"
                     type="button"
                     data-action="pickup-complete"
+                    ${isPaid ? "" : "disabled"}
                   >
-                    픽업 완료
+                    ${isPaid ? "픽업 완료" : "결제 완료 후 픽업"}
                   </button>
                 `
             }
@@ -679,6 +687,22 @@
       const action =
         button.dataset.action;
 
+      if (
+        [
+          "delivery-ready",
+          "delivery-complete",
+          "pickup-complete"
+        ].includes(action) &&
+        !isPaymentCompleted(
+          request.payment_status
+        )
+      ) {
+        alert(
+          "먼저 결제 완료 처리를 해주세요. 집 앞 배송과 픽업 완료는 결제 완료 후 가능합니다."
+        );
+        return;
+      }
+
       button.disabled = true;
 
       try {
@@ -687,7 +711,11 @@
             request,
             {
               payment_status: "결제 완료",
-              request_status: "확인 완료"
+              request_status: "확인 완료",
+              fulfillment_status:
+                request.receipt_method === "home"
+                  ? "배송 준비 가능"
+                  : request.fulfillment_status
             },
             {
               payment_status: "결제 완료"
@@ -748,7 +776,7 @@
               fulfillment_status: "취소"
             },
             {
-              payment_status: "입금 대기"
+              payment_status: "고객 선택 대기"
             }
           );
         }
@@ -811,6 +839,18 @@
       return value === "home"
         ? "집 앞 배송"
         : "매장 픽업";
+    }
+
+    function isPaymentCompleted(
+      status
+    ) {
+      const value =
+        String(status || "");
+
+      return (
+        value.includes("결제 완료") ||
+        value.includes("입금 완료")
+      );
     }
 
     function getPaymentLabel(value) {
