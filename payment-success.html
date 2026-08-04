@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <title>담픽 카드결제 확인</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      color: #292733;
+      background: #fff7fa;
+      font-family:
+        Arial,
+        "Noto Sans KR",
+        sans-serif;
+    }
+
+    .card {
+      width: min(520px, 100%);
+      padding: 28px;
+      border-radius: 22px;
+      background: #fff;
+      box-shadow:
+        0 18px 48px rgba(186, 39, 96, .13);
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #d91d68;
+    }
+
+    .status {
+      margin: 18px 0;
+      padding: 16px;
+      border-radius: 14px;
+      background: #fff2f7;
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+
+    .status.success {
+      color: #176a3e;
+      background: #eaf8ef;
+    }
+
+    .status.error {
+      color: #a62840;
+      background: #fff0f4;
+    }
+
+    a {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 12px;
+      color: #fff;
+      background: #ef3f7f;
+      font-weight: 900;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <h1>담픽 카드결제</h1>
+
+    <p>
+      카드 승인 결과를 확인하고 있습니다.
+      이 창을 닫지 마세요.
+    </p>
+
+    <div
+      id="status"
+      class="status"
+    >
+      결제를 최종 승인하고 있습니다...
+    </div>
+
+    <a
+      id="backLink"
+      href="./index.html"
+    >
+      내 주문으로 돌아가기
+    </a>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./config.js"></script>
+
+  <script>
+    "use strict";
+
+    const sb =
+      window.dampickSupabase;
+
+    const statusBox =
+      document.getElementById(
+        "status"
+      );
+
+    const backLink =
+      document.getElementById(
+        "backLink"
+      );
+
+    const nickname =
+      localStorage.getItem(
+        "dampickLastNickname"
+      ) || "";
+
+    if (nickname) {
+      backLink.href =
+        "./index.html?nickname=" +
+        encodeURIComponent(nickname);
+    }
+
+    confirmPayment();
+
+    async function confirmPayment() {
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+      const paymentKey =
+        params.get("paymentKey");
+
+      const orderId =
+        params.get("orderId");
+
+      const amount =
+        Number(
+          params.get("amount")
+        );
+
+      if (
+        !paymentKey ||
+        !orderId ||
+        !Number.isInteger(amount)
+      ) {
+        showError(
+          "결제 확인 정보가 올바르지 않습니다."
+        );
+        return;
+      }
+
+      try {
+        const { data, error } =
+          await sb.functions.invoke(
+            "confirm-toss-payment",
+            {
+              body: {
+                paymentKey,
+                orderId,
+                amount
+              }
+            }
+          );
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data?.success) {
+          throw new Error(
+            data?.message ||
+            "카드 결제를 확인하지 못했습니다."
+          );
+        }
+
+        statusBox.className =
+          "status success";
+
+        statusBox.innerHTML = `
+          <strong>카드 결제가 완료되었습니다.</strong><br>
+          결제금액:
+          ${Number(
+            data.amount || amount
+          ).toLocaleString("ko-KR")}원<br>
+          관리자 화면에도 자동으로 결제 완료가 반영되었습니다.
+        `;
+
+      } catch (error) {
+        console.error(error);
+
+        showError(
+          error?.message ||
+          "결제 승인을 확인하는 중 오류가 발생했습니다."
+        );
+      }
+    }
+
+    function showError(text) {
+      statusBox.className =
+        "status error";
+
+      statusBox.textContent =
+        text;
+    }
+  </script>
+</body>
+</html>
