@@ -15,5 +15,5 @@
 */
 
 window.DAMPICK_PAYMENT_CONFIG = {
-  tossClientKey: "여기에_토스_클라이언트_키를_붙여넣으세요"
+  tossClientKey: "test_ck_본인에게_발급된_클라이언트키"
 };
