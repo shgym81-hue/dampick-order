@@ -2,1272 +2,702 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
-
+  <meta name="theme-color" content="#ee2f78">
   <meta
     name="description"
-    content="담픽 공동구매 주문조회"
+    content="담픽 공동구매 주문조회·결제·배송 신청"
   >
-
-  <meta name="theme-color" content="#ee2f78">
-
-  <title>담픽 공동구매 주문조회</title>
+  <title>담픽 주문조회·결제</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --main: #f2387d;
       --main-dark: #d91d68;
-      --main-deep: #bd1457;
-      --main-soft: #fff0f6;
-      --main-pale: #fff7fa;
-      --navy: #141b3d;
-      --text: #252533;
-      --subtext: #71717d;
+      --navy: #171a37;
+      --text: #292733;
+      --sub: #74717a;
       --border: #f0dce5;
-      --success: #26744b;
-      --success-bg: #eef9f2;
-      --warning: #a76b00;
-      --shadow: 0 20px 55px rgba(186, 39, 96, 0.14);
+      --soft: #fff2f7;
+      --success: #176a3e;
+      --danger: #a62840;
+      --shadow: 0 18px 48px rgba(186, 39, 96, 0.13);
     }
 
     html {
-      width: 100%;
-      max-width: 100%;
-      min-height: 100%;
-      overflow-x: clip;
-      overscroll-behavior-x: none;
-      overscroll-behavior-y: none;
+      background: #fff7fa;
       scroll-behavior: smooth;
-      background: #fff8fb;
     }
 
     body {
-      position: relative;
-      width: 100%;
-      max-width: 100%;
       min-height: 100svh;
       margin: 0;
-      overflow-x: clip;
-      overscroll-behavior-x: none;
-      overscroll-behavior-y: none;
-      touch-action: pan-y;
+      color: var(--text);
+      background:
+        radial-gradient(
+          circle at 90% 8%,
+          rgba(246, 74, 139, .17),
+          transparent 24%
+        ),
+        linear-gradient(
+          180deg,
+          #fff4f8,
+          #ffffff 60%
+        );
       font-family:
         "Pretendard",
         "Noto Sans KR",
         "Apple SD Gothic Neo",
         Arial,
         sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(
-          circle at 10% 10%,
-          rgba(255, 144, 187, 0.20) 0,
-          rgba(255, 144, 187, 0) 25%
-        ),
-        radial-gradient(
-          circle at 92% 16%,
-          rgba(244, 47, 123, 0.17) 0,
-          rgba(244, 47, 123, 0) 23%
-        ),
-        linear-gradient(
-          180deg,
-          #fff4f8 0%,
-          #fffafc 48%,
-          #ffffff 100%
-        );
-    }
-
-    body::before,
-    body::after {
-      position: fixed;
-      z-index: -1;
-      content: "";
-      pointer-events: none;
-      filter: blur(0.2px);
-    }
-
-    body::before {
-      top: 118px;
-      right: -22px;
-      width: 148px;
-      height: 170px;
-      border-radius: 50%;
-      background:
-        radial-gradient(
-          circle at 30% 25%,
-          #ffb7d1 0%,
-          #f83f85 48%,
-          #d81360 100%
-        );
-      box-shadow:
-        inset 16px 18px 28px rgba(255, 255, 255, 0.30),
-        0 24px 48px rgba(218, 28, 99, 0.15);
-      opacity: 0.72;
-    }
-
-    body::after {
-      top: 190px;
-      left: 7%;
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
-      background:
-        radial-gradient(
-          circle at 30% 25%,
-          #ffd1e0 0%,
-          #f94586 55%,
-          #cc0f57 100%
-        );
-      box-shadow:
-        inset 4px 4px 8px rgba(255, 255, 255, 0.45),
-        0 9px 18px rgba(209, 23, 89, 0.20);
-      opacity: 0.8;
     }
 
     button,
-    input {
+    input,
+    textarea {
       font: inherit;
     }
 
-    button,
-    a {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .top-accent {
-      position: fixed;
-      top: 0;
-      right: 0;
-      left: 0;
-      width: 100%;
-      max-width: 100vw;
-      z-index: 50;
-      height: max(7px, env(safe-area-inset-top));
-      background:
-        linear-gradient(
-          90deg,
-          #ff4b8f,
-          #e92170,
-          #d81360
-        );
-      box-shadow: 0 2px 10px rgba(217, 29, 104, 0.12);
+    button {
+      cursor: pointer;
     }
 
     .page {
-      position: relative;
-      width: 100%;
-      max-width: 560px;
-      min-height: 100svh;
+      width: min(640px, 100%);
       margin: 0 auto;
-      overflow-x: clip;
       padding:
-        calc(42px + env(safe-area-inset-top))
-        18px
-        calc(16px + env(safe-area-inset-bottom));
-    }
-
-    .page::before {
-      position: absolute;
-      top: 260px;
-      left: 50%;
-      z-index: -1;
-      width: min(720px, 145vw);
-      height: 250px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.55);
-      transform: translateX(-50%) rotate(-8deg);
-      content: "";
-      pointer-events: none;
+        calc(34px + env(safe-area-inset-top))
+        16px
+        calc(60px + env(safe-area-inset-bottom));
     }
 
     .brand {
-      position: relative;
-      z-index: 3;
-      margin-bottom: 62px;
+      margin-bottom: 34px;
       text-align: center;
     }
 
-    .brand-bag {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 6px;
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      border-radius: 16px;
+    .brand-mark {
+      display: grid;
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 10px;
+      place-items: center;
+      border-radius: 18px;
       color: #fff;
       background:
-        linear-gradient(
-          145deg,
-          #ff6da4,
-          #ed2d79 55%,
-          #c9165e
-        );
-      box-shadow:
-        inset 0 5px 10px rgba(255, 255, 255, 0.30),
-        0 12px 25px rgba(226, 31, 107, 0.22);
-      transform: rotate(-3deg);
+        linear-gradient(145deg, #ff6da4, #d91d68);
+      box-shadow: 0 13px 28px rgba(217, 29, 104, .23);
+      font-size: 28px;
     }
 
-    .brand-bag svg {
-      width: 26px;
-      height: 26px;
-    }
-
-    .brand-title {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 10px;
+    .brand h1 {
       margin: 0;
       color: var(--main-dark);
-      font-size: clamp(42px, 11vw, 57px);
+      font-size: 44px;
       font-weight: 950;
-      letter-spacing: -2.5px;
-      line-height: 1;
-      text-shadow: 0 8px 24px rgba(232, 36, 113, 0.10);
+      letter-spacing: -2px;
     }
 
-    .brand-title span {
-      color: var(--main-deep);
-      font-size: clamp(19px, 5vw, 25px);
-      font-weight: 950;
-      letter-spacing: -1px;
+    .brand h1 span {
+      margin-left: 7px;
+      font-size: 21px;
     }
 
-    .brand-slogan {
-      position: relative;
-      z-index: 4;
-      margin: 20px 0 0;
-      color: #686875;
-      font-size: 16px;
-      font-weight: 750;
-      line-height: 1.55;
-      letter-spacing: -0.35px;
+    .brand p {
+      margin: 11px 0 0;
+      color: var(--sub);
+      font-weight: 700;
+      line-height: 1.6;
     }
 
-    .brand-slogan strong {
-      color: var(--main);
-      font-weight: 950;
-    }
-
-    .lookup-card {
-      position: relative;
-      isolation: isolate;
-      padding: 76px 28px 28px;
-      border: 1px solid rgba(255, 255, 255, 0.95);
-      border-radius: 34px;
-      background: rgba(255, 255, 255, 0.96);
+    .card {
+      margin-top: 16px;
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 25px;
+      background: rgba(255,255,255,.97);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
     }
 
-    .lookup-card::before {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      border-radius: inherit;
-      background:
-        linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.78),
-          rgba(255, 255, 255, 0) 45%
-        );
-      content: "";
-      pointer-events: none;
-    }
-
-    .lookup-card > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    .card-icon {
-      position: absolute;
-      top: -39px;
-      left: 50%;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 82px;
-      height: 82px;
-      border: 8px solid rgba(255, 255, 255, 0.95);
-      border-radius: 50%;
-      color: var(--main);
-      background:
-        linear-gradient(
-          145deg,
-          #fff5f9,
-          #ffe2ed
-        );
-      box-shadow:
-        0 16px 30px rgba(215, 36, 104, 0.15),
-        inset 0 3px 7px rgba(255, 255, 255, 0.85);
-      transform: translateX(-50%);
-    }
-
-    .card-icon svg {
-      width: 38px;
-      height: 38px;
-    }
-
-    .card-title {
-      margin: 0;
+    h2,
+    h3 {
+      margin-top: 0;
       color: var(--navy);
-      text-align: center;
-      font-size: clamp(31px, 8vw, 39px);
-      font-weight: 950;
-      letter-spacing: -1.7px;
-      line-height: 1.2;
-    }
-
-    .title-divider {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 13px;
-      margin: 16px auto 18px;
-      color: var(--main);
-    }
-
-    .title-divider::before,
-    .title-divider::after {
-      width: 55px;
-      height: 2px;
-      border-radius: 999px;
-      background:
-        linear-gradient(
-          90deg,
-          transparent,
-          #ff6a9f
-        );
-      content: "";
-    }
-
-    .title-divider::after {
-      background:
-        linear-gradient(
-          90deg,
-          #ff6a9f,
-          transparent
-        );
-    }
-
-    .title-divider svg {
-      width: 17px;
-      height: 17px;
-      fill: currentColor;
+      letter-spacing: -.7px;
     }
 
     .description {
-      max-width: 430px;
-      margin: 0 auto 30px;
-      color: #595966;
-      text-align: center;
-      font-size: 15px;
-      font-weight: 600;
-      line-height: 1.75;
-      letter-spacing: -0.3px;
+      color: var(--sub);
+      line-height: 1.7;
       word-break: keep-all;
     }
 
-    .field {
-      margin-bottom: 17px;
-    }
-
-    .field label {
+    label.field-label {
       display: block;
-      margin: 0 0 10px 2px;
+      margin: 16px 0 8px;
       color: var(--navy);
-      font-size: 15px;
-      font-weight: 950;
-      letter-spacing: -0.3px;
+      font-size: 14px;
+      font-weight: 900;
     }
 
-    .input-shell {
-      position: relative;
-      display: flex;
-      align-items: center;
-      min-height: 64px;
-      overflow: hidden;
-      border: 1.5px solid #f4bfd3;
-      border-radius: 18px;
-      background: #fff;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.9),
-        0 8px 20px rgba(199, 30, 94, 0.04);
-      transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        transform 0.2s ease;
-    }
-
-    .input-shell:focus-within {
-      border-color: var(--main);
-      box-shadow:
-        0 0 0 5px rgba(242, 56, 125, 0.10),
-        0 13px 28px rgba(199, 30, 94, 0.08);
-      transform: translateY(-1px);
-    }
-
-    .input-icon {
-      display: flex;
-      flex: 0 0 58px;
-      align-items: center;
-      justify-content: center;
-      color: #f56a9c;
-    }
-
-    .input-icon svg {
-      width: 25px;
-      height: 25px;
-    }
-
-    .field input {
+    input[type="text"],
+    textarea {
       width: 100%;
-      height: 64px;
-      padding: 0 17px 0 0;
-      border: 0;
-      background: transparent;
-      color: var(--text);
-      font-size: 18px;
-      font-weight: 700;
+      padding: 14px;
+      border: 1px solid #e5d7dd;
+      border-radius: 13px;
+      background: #fff;
       outline: none;
     }
 
-    .field input::placeholder {
-      color: #a6a4ab;
-      font-weight: 500;
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: var(--main);
+      box-shadow: 0 0 0 4px rgba(242, 56, 125, .10);
     }
 
-    .lookup-button {
-      position: relative;
+    textarea {
+      min-height: 85px;
+      resize: vertical;
+    }
+
+    .primary-button {
       width: 100%;
-      min-height: 66px;
-      overflow: hidden;
+      min-height: 56px;
+      margin-top: 14px;
       border: 0;
-      border-radius: 18px;
+      border-radius: 15px;
       color: #fff;
       background:
-        linear-gradient(
-          105deg,
-          #fa397e 0%,
-          #eb2472 52%,
-          #d91767 100%
-        );
-      box-shadow:
-        0 16px 27px rgba(226, 29, 105, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
-      font-size: 20px;
+        linear-gradient(105deg, #fa397e, #d91767);
+      box-shadow: 0 14px 25px rgba(226, 29, 105, .25);
+      font-size: 17px;
       font-weight: 950;
-      letter-spacing: -0.5px;
-      cursor: pointer;
-      transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        opacity 0.18s ease;
     }
 
-    .lookup-button::before {
-      position: absolute;
-      top: -130%;
-      left: -20%;
-      width: 32%;
-      height: 350%;
-      background: rgba(255, 255, 255, 0.16);
-      transform: rotate(28deg);
-      content: "";
-      transition: left 0.5s ease;
-    }
-
-    .lookup-button::after {
-      position: absolute;
-      top: 50%;
-      right: 22px;
-      width: 28px;
-      height: 28px;
-      border: 2px solid rgba(255, 255, 255, 0.95);
-      border-radius: 50%;
-      background:
-        linear-gradient(
-          135deg,
-          transparent 44%,
-          #fff 45% 55%,
-          transparent 56%
-        );
-      background-size: 8px 8px;
-      background-position: 8px center;
-      background-repeat: no-repeat;
-      content: "";
-      transform: translateY(-50%);
-    }
-
-    .lookup-button:hover::before {
-      left: 108%;
-    }
-
-    .lookup-button:active {
-      transform: translateY(2px) scale(0.995);
-      box-shadow:
-        0 9px 18px rgba(226, 29, 105, 0.24),
-        inset 0 1px 0 rgba(255, 255, 255, 0.22);
-    }
-
-    .lookup-button:disabled {
-      opacity: 0.68;
+    .primary-button:disabled {
+      opacity: .6;
       cursor: wait;
-      transform: none;
+    }
+
+    .secondary-button {
+      min-height: 45px;
+      padding: 10px 14px;
+      border: 1px solid #e5d7dd;
+      border-radius: 12px;
+      color: #333;
+      background: #fff;
+      font-weight: 900;
     }
 
     .message {
       display: none;
-      margin-top: 20px;
-      padding: 15px 16px;
-      border: 1px solid transparent;
-      border-radius: 15px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 750;
+      margin-top: 15px;
+      padding: 13px;
+      border-radius: 12px;
       line-height: 1.55;
+      text-align: center;
       word-break: keep-all;
     }
+
+    .message.show { display: block; }
 
     .message.error {
-      display: block;
-      color: #b32954;
-      border-color: #ffd0df;
-      background: #fff0f5;
+      color: var(--danger);
+      background: #fff0f4;
     }
 
-    .privacy-note {
-      display: grid;
-      grid-template-columns: 42px minmax(0, 1fr);
-      align-items: center;
-      gap: 12px;
-      margin: 24px 0 0;
-      padding: 15px 16px;
-      border: 1px solid #f5dce6;
-      border-radius: 16px;
-      color: #74727b;
-      background:
-        linear-gradient(
-          135deg,
-          #fffafa,
-          #fff4f8
-        );
-      font-size: 12.5px;
-      font-weight: 600;
-      line-height: 1.65;
-      word-break: keep-all;
-    }
-
-    .privacy-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      color: var(--main);
-      background: #ffe4ee;
-    }
-
-    .privacy-icon svg {
-      width: 22px;
-      height: 22px;
+    .message.success {
+      color: var(--success);
+      background: #eaf8ef;
     }
 
     .results {
-      margin-top: 26px;
-      scroll-margin-top: 16px;
-    }
-
-    .order-card {
       margin-top: 18px;
-      padding: 17px;
-      border: 1px solid #f0dce5;
-      border-radius: 22px;
-      background:
-        linear-gradient(
-          180deg,
-          #ffffff 0%,
-          #fffafd 100%
-        );
-      box-shadow: 0 13px 30px rgba(133, 35, 75, 0.08);
     }
 
-    .results .order-card:first-child {
+    .order-select-card {
+      margin-top: 11px;
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: #fffafd;
+    }
+
+    .order-select-card:first-child {
       margin-top: 0;
     }
 
-    .merged-order-card .customer-name {
-      margin-bottom: 0;
+    .order-select-head {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
     }
 
-    .order-head {
-      position: relative;
-      overflow: hidden;
-      padding: 18px;
-      border: 1px solid rgba(246, 188, 212, 0.55);
-      border-radius: 17px;
-      background:
-        linear-gradient(
-          135deg,
-          #fff2f7,
-          #fff8fb 60%,
-          #ffeaf2
-        );
-    }
-
-    .order-head::after {
-      position: absolute;
-      top: -35px;
-      right: -24px;
-      width: 95px;
-      height: 95px;
-      border-radius: 50%;
-      background: rgba(244, 65, 132, 0.08);
-      content: "";
-    }
-
-    .customer-name {
-      position: relative;
-      z-index: 1;
-      margin: 0 0 7px;
-      color: var(--navy);
-      font-size: 19px;
-      font-weight: 950;
-      letter-spacing: -0.5px;
+    .order-select-head input {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--main);
     }
 
     .order-number {
-      position: relative;
-      z-index: 1;
-      margin: 0;
-      color: #85838b;
-      font-size: 12.5px;
-      font-weight: 650;
-      word-break: break-all;
+      color: var(--navy);
+      font-weight: 950;
     }
 
-    .badges {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
+    .status-line {
+      margin-top: 5px;
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .item-list {
+      display: grid;
+      gap: 8px;
       margin-top: 13px;
     }
 
-    .badge {
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 11.5px;
-      font-weight: 900;
-    }
-
-    .badge.order {
-      color: var(--warning);
-      background: #fff1ce;
-    }
-
-    .badge.payment {
-      color: var(--success);
-      background: #e6f7ec;
-    }
-
-    .section-title {
+    .item-row {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 23px 2px 11px;
-      color: var(--navy);
-      font-size: 16px;
+      justify-content: space-between;
+      gap: 13px;
+      padding: 10px 0;
+      border-top: 1px dashed #eadce2;
+    }
+
+    .item-name {
+      font-weight: 850;
+    }
+
+    .item-meta {
+      margin-top: 4px;
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .item-price {
+      flex: 0 0 auto;
       font-weight: 950;
-      letter-spacing: -0.3px;
     }
 
-    .section-title::before {
-      width: 5px;
-      height: 17px;
-      border-radius: 999px;
-      background:
-        linear-gradient(
-          180deg,
-          #ff699e,
-          #d91767
-        );
-      content: "";
+    .checkout-card {
+      display: none;
     }
 
-    .product-list {
-      overflow: hidden;
-      border: 1px solid #f0e2e8;
-      border-radius: 16px;
+    .checkout-card.show {
+      display: block;
+    }
+
+    .summary-box {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 15px;
+      color: #fff;
+      background: #25232c;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+    }
+
+    .summary-row.final {
+      margin-top: 5px;
+      padding-top: 13px;
+      border-top: 1px solid rgba(255,255,255,.18);
+      font-size: 18px;
+    }
+
+    .summary-row.final strong {
+      color: #ff91b8;
+      font-size: 22px;
+    }
+
+    .choice-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .choice {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid #eadde3;
+      border-radius: 14px;
       background: #fff;
     }
 
-    .product-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 14px;
-      padding: 16px;
-      border-bottom: 1px solid #f1e8ec;
+    .choice:has(input:checked) {
+      border-color: #f27fa9;
+      background: #fff4f8;
     }
 
-    .product-row:last-child {
-      border-bottom: 0;
+    .choice input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--main);
     }
 
-    .product-name {
-      margin: 0 0 6px;
-      color: #272733;
-      font-size: 15px;
+    .choice strong {
+      display: block;
+      color: var(--navy);
+    }
+
+    .choice small {
+      display: block;
+      margin-top: 4px;
+      color: var(--sub);
+      line-height: 1.5;
+    }
+
+    .delivery-fields,
+    .bank-box,
+    .card-box {
+      margin-top: 14px;
+      padding: 15px;
+      border: 1px solid #f1c9d8;
+      border-radius: 14px;
+      background: #fff7fa;
+    }
+
+    .delivery-fields[hidden],
+    .bank-box[hidden],
+    .card-box[hidden] {
+      display: none;
+    }
+
+    .bank-account {
+      margin: 6px 0;
+      color: var(--main-dark);
+      font-size: 18px;
       font-weight: 950;
-      line-height: 1.45;
+    }
+
+    .notice {
+      margin-top: 13px;
+      padding: 12px;
+      border-radius: 12px;
+      color: #6a5400;
+      background: #fff8da;
+      font-size: 13px;
+      line-height: 1.6;
       word-break: keep-all;
     }
 
-    .product-option {
-      margin: 0;
-      color: #797780;
-      font-size: 12.5px;
-      font-weight: 600;
-      line-height: 1.65;
-    }
-
-    .pickup-date {
-      display: inline-block;
-      margin-top: 8px;
-      padding: 6px 9px;
-      border: 1px solid #ffd4e3;
-      border-radius: 9px;
-      color: var(--main-dark);
-      background: var(--main-soft);
-      font-size: 11.5px;
-      font-weight: 900;
-      line-height: 1.4;
-    }
-
-    .product-price {
-      align-self: start;
-      min-width: 72px;
-      padding-top: 1px;
-      color: var(--main-deep);
-      text-align: right;
-      font-size: 14px;
-      font-weight: 950;
-      white-space: nowrap;
-    }
-
-    .notice-box {
-      padding: 15px 16px;
-      border: 1px solid #f5e3b2;
-      border-radius: 15px;
-      color: #63500f;
-      background:
-        linear-gradient(
-          135deg,
-          #fff9df,
-          #fffdf1
-        );
-      font-size: 13px;
-      font-weight: 600;
+    .complete-box {
+      display: none;
+      margin-top: 16px;
+      padding: 18px;
+      border: 1px solid #afe0c5;
+      border-radius: 17px;
+      color: #155e39;
+      background: #effbf4;
       line-height: 1.75;
-      white-space: pre-wrap;
+    }
+
+    .complete-box.show {
+      display: block;
+    }
+
+    .privacy-note {
+      margin-top: 19px;
+      color: #888;
+      font-size: 12px;
+      line-height: 1.65;
+      text-align: center;
     }
 
     .admin-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      margin-top: 28px;
-      padding: 9px 13px;
-      color: #87858e;
+      display: block;
+      margin-top: 24px;
+      color: #aaa;
+      font-size: 12px;
       text-align: center;
       text-decoration: none;
-      font-size: 12.5px;
-      font-weight: 700;
-      transition:
-        color 0.2s ease,
-        transform 0.2s ease;
-    }
-
-    .admin-link:hover {
-      color: var(--main-dark);
-      transform: translateY(-1px);
-    }
-
-    .admin-link svg {
-      width: 16px;
-      height: 16px;
-    }
-
-    .admin-link-wrap {
-      text-align: center;
-    }
-
-    .bottom-wave {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      z-index: -1;
-      width: 100%;
-      height: 105px;
-      border-radius: 55% 55% 0 0;
-      background:
-        linear-gradient(
-          120deg,
-          rgba(255, 195, 218, 0.42),
-          rgba(239, 56, 125, 0.18),
-          rgba(255, 232, 241, 0.65)
-        );
-      transform: none;
-      pointer-events: none;
-    }
-
-    @supports not (overflow: clip) {
-      html,
-      body,
-      .page {
-        overflow-x: hidden;
-      }
-    }
-
-    @media (min-width: 720px) {
-      .page {
-        max-width: 660px;
-        padding-right: 32px;
-        padding-left: 32px;
-      }
-
-      .lookup-card {
-        padding-right: 38px;
-        padding-left: 38px;
-      }
     }
 
     @media (max-width: 420px) {
-      body::before {
-        right: -28px;
-        width: 132px;
-        height: 132px;
-      }
-
-      .page {
-        padding-right: 16px;
-        padding-left: 16px;
-      }
-
-      .brand {
-        margin-bottom: 58px;
-      }
-
-      .brand-bag {
-        width: 43px;
-        height: 43px;
-        border-radius: 14px;
-      }
-
-      .brand-title {
-        gap: 7px;
-        font-size: 42px;
-      }
-
-      .brand-title span {
-        font-size: 20px;
-      }
-
-      .brand-slogan {
-        margin-top: 16px;
-        font-size: 14px;
-      }
-
-      .lookup-card {
-        padding: 69px 20px 23px;
-        border-radius: 29px;
-      }
-
-      .card-icon {
-        top: -35px;
-        width: 72px;
-        height: 72px;
-        border-width: 7px;
-      }
-
-      .card-icon svg {
-        width: 33px;
-        height: 33px;
-      }
-
-      .card-title {
-        font-size: 32px;
-      }
-
-      .description {
-        margin-bottom: 25px;
-        font-size: 14px;
-        line-height: 1.7;
-      }
-
-      .input-shell,
-      .field input {
-        min-height: 60px;
-        height: 60px;
-      }
-
-      .lookup-button {
-        min-height: 62px;
-        padding-right: 50px;
-        padding-left: 50px;
-        font-size: 18px;
-      }
-
-      .lookup-button::after {
-        right: 18px;
-        width: 26px;
-        height: 26px;
-      }
-
-      .privacy-note {
-        grid-template-columns: 38px minmax(0, 1fr);
-        gap: 10px;
-        padding: 14px;
-        font-size: 11.5px;
-      }
-
-      .privacy-icon {
-        width: 38px;
-        height: 38px;
-      }
-
-      .order-card {
-        padding: 14px;
-        border-radius: 19px;
-      }
-
-      .product-row {
-        padding: 14px;
-      }
-    }
-
-    @media (max-width: 350px) {
-      .brand-title {
-        font-size: 37px;
-      }
-
-      .brand-title span {
-        font-size: 18px;
-      }
-
-      .lookup-card {
-        padding-right: 17px;
-        padding-left: 17px;
-      }
-
-      .lookup-button {
-        padding-right: 42px;
-        padding-left: 22px;
-        font-size: 17px;
-      }
-
-      .product-row {
-        grid-template-columns: 1fr;
-      }
-
-      .product-price {
-        text-align: left;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto;
-      }
-
-      *,
-      *::before,
-      *::after {
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-      }
+      .card { padding: 18px; }
+      .brand h1 { font-size: 38px; }
+      .item-row { flex-direction: column; }
+      .item-price { text-align: right; }
     }
   </style>
 </head>
 
 <body>
-  <div class="top-accent"></div>
-
   <main class="page">
     <header class="brand">
-      <div class="brand-bag" aria-hidden="true">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M6.5 8.5H17.5L18.4 20H5.6L6.5 8.5Z"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M9 9V6.7C9 5.2 10.3 4 12 4C13.7 4 15 5.2 15 6.7V9"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-          <path
-            d="M12 17.1L9.9 15.2C8.6 14 10.4 11.9 12 13.4C13.6 11.9 15.4 14 14.1 15.2L12 17.1Z"
-            fill="currentColor"
-          />
-        </svg>
-      </div>
-
-      <h1 class="brand-title">
-        DAMPICK
-        <span>담픽</span>
-      </h1>
-
-      <p class="brand-slogan">
-        모일수록 더 좋아진다,<br>
-        <strong>담픽 공동구매</strong>
+      <div class="brand-mark" aria-hidden="true">🛍️</div>
+      <h1>DAMPICK <span>담픽</span></h1>
+      <p>
+        닉네임으로 주문을 확인하고<br>
+        결제방법과 수령방법을 직접 선택하세요.
       </p>
     </header>
 
-    <section class="lookup-card">
-      <div class="card-icon" aria-hidden="true">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M6.5 3.8H13.7L17.5 7.6V13.2"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M15 3.8V8H19.1"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M12.4 20.2H5.4C4.6 20.2 4 19.6 4 18.8V5.2C4 4.4 4.6 3.8 5.4 3.8H6.5"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-          <path
-            d="M8 10.5H13"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-          <path
-            d="M8 14H11"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-          <circle
-            cx="16.8"
-            cy="16.8"
-            r="3.2"
-            stroke="currentColor"
-            stroke-width="1.8"
-          />
-          <path
-            d="M19.2 19.2L21 21"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-        </svg>
-      </div>
-
-      <h2 class="card-title">
-        내 주문 조회
-      </h2>
-
-      <div class="title-divider" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 21S3 15.4 3 8.6C3 5.5 5.3 3.4 8.1 3.4C9.8 3.4 11.2 4.3 12 5.5C12.8 4.3 14.2 3.4 15.9 3.4C18.7 3.4 21 5.5 21 8.6C21 15.4 12 21 12 21Z" />
-        </svg>
-      </div>
+    <section class="card">
+      <h2>내 주문 조회</h2>
 
       <p class="description">
-        닉네임을 입력하면 주문 상품과<br>
-        상품별 픽업 날짜를 바로 확인할 수 있습니다.
+        기존처럼 닉네임을 입력하면 주문 상품과
+        상품별 픽업 날짜를 확인할 수 있습니다.
       </p>
 
-      <div class="field">
-        <label for="nickname">
-          닉네임
-        </label>
+      <label class="field-label" for="nickname">
+        닉네임
+      </label>
 
-        <div class="input-shell">
-          <span class="input-icon" aria-hidden="true">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="12"
-                cy="8"
-                r="3.5"
-                stroke="currentColor"
-                stroke-width="1.8"
-              />
-              <path
-                d="M5 20C5.4 15.9 8 13.8 12 13.8C16 13.8 18.6 15.9 19 20"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-              />
-            </svg>
-          </span>
-
-          <input
-            id="nickname"
-            type="text"
-            lang="ko"
-            inputmode="text"
-            placeholder="예: 담픽1234"
-            autocomplete="off"
-            autocapitalize="off"
-            spellcheck="false"
-          >
-        </div>
-      </div>
+      <input
+        id="nickname"
+        type="text"
+        lang="ko"
+        inputmode="text"
+        placeholder="예: 담픽1234"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+      >
 
       <button
         id="lookupButton"
-        class="lookup-button"
+        class="primary-button"
         type="button"
       >
         주문 조회하기
       </button>
 
-      <div
-        id="message"
-        class="message"
-      ></div>
+      <div id="message" class="message"></div>
 
-      <section
-        id="results"
-        class="results"
-      ></section>
-
-      <div class="privacy-note">
-        <span class="privacy-icon" aria-hidden="true">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M12 3L19 6V11.2C19 15.8 16.2 19.1 12 21C7.8 19.1 5 15.8 5 11.2V6L12 3Z"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M9.7 11.4V10.2C9.7 8.9 10.7 7.9 12 7.9C13.3 7.9 14.3 8.9 14.3 10.2V11.4"
-              stroke="currentColor"
-              stroke-width="1.6"
-              stroke-linecap="round"
-            />
-            <rect
-              x="8.7"
-              y="11.2"
-              width="6.6"
-              height="5.1"
-              rx="1.2"
-              stroke="currentColor"
-              stroke-width="1.6"
-            />
-          </svg>
-        </span>
-
-        <span>
-          닉네임만으로 조회하며 전화번호와 주소 같은
-          민감한 개인정보는 표시하지 않습니다.
-        </span>
-      </div>
+      <section id="results" class="results"></section>
     </section>
 
-    <div class="admin-link-wrap">
-      <a
-        class="admin-link"
-        href="./admin.html"
+    <section
+      id="checkoutCard"
+      class="card checkout-card"
+    >
+      <h2>결제·수령 방법 선택</h2>
+
+      <p class="description">
+        결제할 주문을 위에서 선택한 뒤
+        픽업 또는 집 앞 배송을 선택하세요.
+      </p>
+
+      <div class="summary-box">
+        <div class="summary-row">
+          <span>선택 상품 합계</span>
+          <strong id="productAmountText">0원</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>배송비</span>
+          <strong id="deliveryFeeText">0원</strong>
+        </div>
+
+        <div class="summary-row final">
+          <span>최종 결제금액</span>
+          <strong id="finalAmountText">0원</strong>
+        </div>
+      </div>
+
+      <h3 style="margin-top:22px;">수령 방법</h3>
+
+      <div class="choice-grid">
+        <label class="choice">
+          <input
+            type="radio"
+            name="receiptMethod"
+            value="pickup"
+            checked
+          >
+          <span>
+            <strong>매장 픽업</strong>
+            <small>
+              배송비 0원 · 픽업할 때 결제 또는 미리 결제 가능
+            </small>
+          </span>
+        </label>
+
+        <label class="choice">
+          <input
+            type="radio"
+            name="receiptMethod"
+            value="home"
+          >
+          <span>
+            <strong>집 앞 배송</strong>
+            <small>
+              선결제 필수 · 4만원 미만 500원 ·
+              4만원 이상 무료
+            </small>
+          </span>
+        </label>
+      </div>
+
+      <div
+        id="deliveryFields"
+        class="delivery-fields"
+        hidden
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
+        <label class="field-label" for="deliveryAddress">
+          주소
+        </label>
+
+        <input
+          id="deliveryAddress"
+          type="text"
+          placeholder="예: ○○아파트 101동 1203호"
+          autocomplete="street-address"
         >
-          <rect
-            x="6"
-            y="10"
-            width="12"
-            height="10"
-            rx="2"
-            stroke="currentColor"
-            stroke-width="1.8"
-          />
-          <path
-            d="M8.5 10V7.5C8.5 5.6 10.1 4 12 4C13.9 4 15.5 5.6 15.5 7.5V10"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-          />
-        </svg>
-        관리자 페이지
-      </a>
-    </div>
 
-    <div class="bottom-wave" aria-hidden="true"></div>
+        <label class="field-label" for="entranceInfo">
+          공동현관 비밀번호 또는 출입방법
+        </label>
+
+        <input
+          id="entranceInfo"
+          type="text"
+          placeholder="예: 종 모양 버튼 후 1234"
+          autocomplete="off"
+        >
+
+        <label class="field-label" for="deliveryRequest">
+          배송 요청사항
+        </label>
+
+        <textarea
+          id="deliveryRequest"
+          placeholder="예: 문 앞에 두고 문자 주세요."
+        ></textarea>
+      </div>
+
+      <h3 style="margin-top:22px;">결제 방법</h3>
+
+      <div class="choice-grid">
+        <label
+          id="pickupPayChoice"
+          class="choice"
+        >
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="pickup_pay"
+            checked
+          >
+          <span>
+            <strong>픽업할 때 결제</strong>
+            <small>
+              상품 수령 시 현금 또는 매장 카드단말기로 결제합니다.
+            </small>
+          </span>
+        </label>
+
+        <label class="choice">
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="bank_transfer"
+          >
+          <span>
+            <strong>계좌이체로 미리 결제</strong>
+            <small>
+              입금 확인 후 픽업 또는 배송이 준비됩니다.
+            </small>
+          </span>
+        </label>
+
+        <label class="choice">
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="card_online"
+          >
+          <span>
+            <strong>카드로 미리 결제</strong>
+            <small>
+              카드 PG 연결 후 온라인 결제가 진행됩니다.
+            </small>
+          </span>
+        </label>
+      </div>
+
+      <div
+        id="bankBox"
+        class="bank-box"
+        hidden
+      >
+        <strong>현금입금 계좌</strong>
+        <p class="bank-account">
+          하나은행 412-910821-25107
+        </p>
+        <p style="margin:0;">예금주: 담픽</p>
+        <p style="margin-bottom:0;color:#777;font-size:12px;">
+          입금자명은 주문 닉네임과 같게 입력해 주세요.
+        </p>
+      </div>
+
+      <div
+        id="cardBox"
+        class="card-box"
+        hidden
+      >
+        <strong>카드결제 안내</strong>
+        <p style="margin-bottom:0;line-height:1.65;">
+          카드결제 방법을 선택하면 카드 결제 대기로 저장됩니다.
+          실제 온라인 카드 승인은 PG 결제 연결이 완료된 뒤
+          이 화면에서 진행할 수 있습니다.
+        </p>
+      </div>
+
+      <p id="deliveryGuide" class="notice"></p>
+
+      <button
+        id="submitCheckoutButton"
+        class="primary-button"
+        type="button"
+      >
+        결제·수령 방법 신청하기
+      </button>
+
+      <div
+        id="checkoutComplete"
+        class="complete-box"
+      ></div>
+    </section>
+
+    <p class="privacy-note">
+      집 앞 배송은 계좌이체 또는 카드 선결제 완료 후 진행됩니다.
+      주소와 공동현관 정보는 배송 관리자 화면에서만 확인합니다.
+    </p>
   </main>
-
-  <script>
-    if ("scrollRestoration" in history) {
-      history.scrollRestoration = "manual";
-    }
-
-    window.addEventListener("pageshow", function () {
-      if (!window.location.hash) {
-        window.scrollTo(0, 0);
-      }
-    });
-  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./config.js"></script>
 
   <script>
-    const sb =
-      window.dampickSupabase;
+    const FREE_DELIVERY_THRESHOLD = 40000;
+    const HOME_DELIVERY_FEE = 500;
+
+    /*
+      실제 카드결제 PG 연결 후 결제 시작 주소를 넣을 수 있습니다.
+      현재 빈 값이면 카드결제 신청만 저장합니다.
+    */
+    const CARD_PAYMENT_URL = "";
+
+    const sb = window.dampickSupabase;
 
     const nicknameInput =
       document.getElementById("nickname");
@@ -1280,6 +710,14 @@
 
     const results =
       document.getElementById("results");
+
+    const checkoutCard =
+      document.getElementById("checkoutCard");
+
+    const submitCheckoutButton =
+      document.getElementById("submitCheckoutButton");
+
+    let currentOrders = [];
 
     lookupButton.addEventListener(
       "click",
@@ -1295,12 +733,44 @@
       }
     );
 
+    document
+      .querySelectorAll(
+        'input[name="receiptMethod"], ' +
+        'input[name="paymentMethod"]'
+      )
+      .forEach(function (input) {
+        input.addEventListener(
+          "change",
+          updateCheckoutDisplay
+        );
+      });
+
+    results.addEventListener(
+      "change",
+      function (event) {
+        if (
+          event.target.matches(
+            ".order-check"
+          )
+        ) {
+          updateCheckoutDisplay();
+        }
+      }
+    );
+
+    submitCheckoutButton.addEventListener(
+      "click",
+      submitCheckout
+    );
+
     async function lookupOrder() {
       const nickname =
         nicknameInput.value.trim();
 
       clearMessage();
       results.innerHTML = "";
+      currentOrders = [];
+      checkoutCard.classList.remove("show");
 
       if (!nickname) {
         showMessage(
@@ -1317,7 +787,6 @@
           "담픽 데이터베이스 연결정보를 불러오지 못했습니다.",
           "error"
         );
-
         return;
       }
 
@@ -1329,34 +798,37 @@
         const { data, error } =
           await sb.rpc(
             "lookup_orders_by_nickname",
-            {
-              p_nickname: nickname
-            }
+            { p_nickname: nickname }
           );
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
 
-        const orderRows =
-          normalizeOrders(data);
+        currentOrders = normalizeOrders(data);
 
-        if (!orderRows.length) {
+        if (!currentOrders.length) {
           showMessage(
-            "해당 닉네임으로 등록된 주문이 없습니다. 닉네임을 정확히 확인해주세요.",
+            "해당 닉네임으로 등록된 주문이 없습니다.",
             "error"
           );
-
           return;
         }
 
-        renderOrders(orderRows);
+        renderOrders(currentOrders);
+
+        showMessage(
+          "주문 상품을 확인한 뒤 결제할 주문을 선택해주세요.",
+          "success"
+        );
+
+        checkoutCard.classList.add("show");
+        updateCheckoutDisplay();
 
       } catch (error) {
         console.error(error);
 
         showMessage(
-          "주문정보를 불러오지 못했습니다. 관리자에게 문의해주세요.",
+          error.message ||
+          "주문정보를 불러오지 못했습니다.",
           "error"
         );
 
@@ -1374,9 +846,7 @@
 
       if (typeof data === "string") {
         try {
-          const parsed =
-            JSON.parse(data);
-
+          const parsed = JSON.parse(data);
           return Array.isArray(parsed)
             ? parsed
             : [];
@@ -1388,286 +858,555 @@
       return [];
     }
 
-    function getPickupDateSortValue(value) {
-      if (!value) {
-        return Number.POSITIVE_INFINITY;
-      }
+    function isOrderCompleted(order) {
+      const payment =
+        String(order.payment_status || "");
 
-      const normalizedValue =
-        String(value).slice(0, 10);
+      const status =
+        String(order.order_status || "");
 
-      const date =
-        new Date(normalizedValue + "T00:00:00");
-
-      if (Number.isNaN(date.getTime())) {
-        return Number.POSITIVE_INFINITY;
-      }
-
-      return date.getTime();
+      return (
+        payment.includes("결제 완료") ||
+        payment.includes("입금 완료") ||
+        status.includes("픽업 완료") ||
+        status.includes("배송 완료")
+      );
     }
 
-    function mergeOrderItems(orderRows) {
-      const itemMap =
-        new Map();
+    function renderOrders(orders) {
+      results.innerHTML =
+        orders.map(
+          function (order, index) {
+            const items =
+              Array.isArray(order.items)
+                ? order.items
+                : [];
 
-      orderRows.forEach(
-        function (order) {
+            const total =
+              items.reduce(
+                function (sum, item) {
+                  return (
+                    sum +
+                    Number(
+                      item.line_total ||
+                      (
+                        Number(item.unit_price || 0) *
+                        Number(item.quantity || 0)
+                      )
+                    )
+                  );
+                },
+                0
+              );
+
+            const completed =
+              isOrderCompleted(order);
+
+            const itemHtml =
+              items.map(
+                function (item) {
+                  const pickupDate =
+                    item.pickup_date
+                      ? formatDate(item.pickup_date)
+                      : "날짜 미정";
+
+                  return `
+                    <div class="item-row">
+                      <div>
+                        <div class="item-name">
+                          ${escapeHtml(item.product_name || "상품")}
+                        </div>
+                        <div class="item-meta">
+                          ${Number(item.quantity || 0).toLocaleString("ko-KR")}
+                          ${escapeHtml(item.unit_name || "개")}
+                          · 픽업 ${escapeHtml(pickupDate)}
+                        </div>
+                      </div>
+
+                      <div class="item-price">
+                        ${formatWon(
+                          Number(
+                            item.line_total ||
+                            (
+                              Number(item.unit_price || 0) *
+                              Number(item.quantity || 0)
+                            )
+                          )
+                        )}
+                      </div>
+                    </div>
+                  `;
+                }
+              )
+              .join("");
+
+            const checkout =
+              order.checkout || null;
+
+            const checkoutStatus =
+              checkout
+                ? `
+                  <div class="status-line">
+                    최근 신청:
+                    ${escapeHtml(
+                      getReceiptLabel(
+                        checkout.receipt_method
+                      )
+                    )}
+                    ·
+                    ${escapeHtml(
+                      getPaymentLabel(
+                        checkout.payment_method
+                      )
+                    )}
+                    ·
+                    ${escapeHtml(
+                      checkout.payment_status || ""
+                    )}
+                  </div>
+                `
+                : "";
+
+            return `
+              <article class="order-select-card">
+                <div class="order-select-head">
+                  <input
+                    class="order-check"
+                    type="checkbox"
+                    value="${escapeHtml(order.order_number || "")}"
+                    data-index="${index}"
+                    ${completed ? "disabled" : "checked"}
+                    aria-label="결제할 주문 선택"
+                  >
+
+                  <div>
+                    <div class="order-number">
+                      주문 ${index + 1}
+                    </div>
+
+                    <div class="status-line">
+                      결제상태:
+                      ${escapeHtml(order.payment_status || "확인 중")}
+                      · 주문상태:
+                      ${escapeHtml(order.order_status || "주문 접수")}
+                    </div>
+
+                    ${checkoutStatus}
+
+                    ${
+                      completed
+                        ? `
+                          <div class="status-line">
+                            완료된 주문은 다시 결제할 수 없습니다.
+                          </div>
+                        `
+                        : ""
+                    }
+                  </div>
+                </div>
+
+                <div class="item-list">
+                  ${itemHtml}
+                </div>
+
+                <div class="status-line" style="text-align:right;">
+                  주문 상품 합계:
+                  <strong>${formatWon(total)}</strong>
+                </div>
+              </article>
+            `;
+          }
+        ).join("");
+    }
+
+    function getSelectedOrders() {
+      return Array.from(
+        document.querySelectorAll(
+          ".order-check:checked"
+        )
+      ).map(
+        function (checkbox) {
+          const index =
+            Number(checkbox.dataset.index);
+
+          return currentOrders[index];
+        }
+      ).filter(Boolean);
+    }
+
+    function getSelectedOrderNumbers() {
+      return getSelectedOrders()
+        .map(function (order) {
+          return String(
+            order.order_number || ""
+          ).trim();
+        })
+        .filter(Boolean);
+    }
+
+    function getProductAmount() {
+      return getSelectedOrders().reduce(
+        function (orderSum, order) {
           const items =
             Array.isArray(order.items)
               ? order.items
               : [];
 
-          items.forEach(
-            function (item) {
-              const productName =
-                String(
-                  item.product_name || "상품"
-                ).trim();
-
-              const pickupDate =
-                item.pickup_date
-                  ? String(
-                      item.pickup_date
-                    ).slice(0, 10)
-                  : "";
-
-              const unitName =
-                String(
-                  item.unit_name || "개"
-                ).trim();
-
-              const unitPrice =
-                Number(
-                  item.unit_price || 0
-                );
-
-              const quantity =
-                Math.max(
-                  0,
+          return (
+            orderSum +
+            items.reduce(
+              function (itemSum, item) {
+                return (
+                  itemSum +
                   Number(
-                    item.quantity || 0
+                    item.line_total ||
+                    (
+                      Number(item.unit_price || 0) *
+                      Number(item.quantity || 0)
+                    )
                   )
                 );
-
-              /*
-                같은 상품이라도 픽업 날짜, 단위, 가격이 다르면
-                서로 다른 상품으로 표시합니다.
-              */
-              const itemKey =
-                [
-                  productName,
-                  pickupDate,
-                  unitName,
-                  unitPrice
-                ].join("|");
-
-              if (!itemMap.has(itemKey)) {
-                itemMap.set(
-                  itemKey,
-                  {
-                    product_name:
-                      productName,
-                    pickup_date:
-                      pickupDate,
-                    unit_name:
-                      unitName,
-                    unit_price:
-                      unitPrice,
-                    quantity: 0,
-                    line_total: 0
-                  }
-                );
-              }
-
-              const mergedItem =
-                itemMap.get(itemKey);
-
-              mergedItem.quantity +=
-                quantity;
-
-              mergedItem.line_total +=
-                Number(
-                  item.line_total ??
-                  quantity * unitPrice
-                );
-            }
+              },
+              0
+            )
           );
-        }
-      );
-
-      return Array.from(
-        itemMap.values()
-      ).sort(
-        function (a, b) {
-          const aDate =
-            getPickupDateSortValue(
-              a.pickup_date
-            );
-
-          const bDate =
-            getPickupDateSortValue(
-              b.pickup_date
-            );
-
-          if (aDate !== bDate) {
-            return aDate - bDate;
-          }
-
-          return String(
-            a.product_name || ""
-          ).localeCompare(
-            String(
-              b.product_name || ""
-            ),
-            "ko-KR"
-          );
-        }
+        },
+        0
       );
     }
 
-    function getCombinedNotices(orderRows) {
-      const uniqueNotices =
-        new Set();
-
-      orderRows.forEach(
-        function (order) {
-          const notice =
-            String(
-              order.notice || ""
-            ).trim();
-
-          if (notice) {
-            uniqueNotices.add(notice);
-          }
-        }
-      );
-
-      return Array.from(
-        uniqueNotices
+    function getReceiptMethod() {
+      return (
+        document.querySelector(
+          'input[name="receiptMethod"]:checked'
+        )?.value || "pickup"
       );
     }
 
-    function renderOrders(orderRows) {
-      const mergedItems =
-        mergeOrderItems(orderRows);
+    function getPaymentMethod() {
+      return (
+        document.querySelector(
+          'input[name="paymentMethod"]:checked'
+        )?.value || "pickup_pay"
+      );
+    }
 
-      if (!mergedItems.length) {
-        showMessage(
-          "등록된 주문 상품이 없습니다.",
-          "error"
+    function updateCheckoutDisplay() {
+      const productAmount =
+        getProductAmount();
+
+      const receiptMethod =
+        getReceiptMethod();
+
+      let paymentMethod =
+        getPaymentMethod();
+
+      const isHome =
+        receiptMethod === "home";
+
+      const pickupPayInput =
+        document.querySelector(
+          'input[name="paymentMethod"][value="pickup_pay"]'
         );
 
+      pickupPayInput.disabled = isHome;
+
+      document.getElementById(
+        "pickupPayChoice"
+      ).style.opacity =
+        isHome ? ".45" : "1";
+
+      if (
+        isHome &&
+        paymentMethod === "pickup_pay"
+      ) {
+        document.querySelector(
+          'input[name="paymentMethod"][value="bank_transfer"]'
+        ).checked = true;
+
+        paymentMethod = "bank_transfer";
+      }
+
+      document.getElementById(
+        "deliveryFields"
+      ).hidden = !isHome;
+
+      document.getElementById(
+        "bankBox"
+      ).hidden =
+        paymentMethod !== "bank_transfer";
+
+      document.getElementById(
+        "cardBox"
+      ).hidden =
+        paymentMethod !== "card_online";
+
+      const deliveryFee =
+        (
+          isHome &&
+          productAmount < FREE_DELIVERY_THRESHOLD
+        )
+          ? HOME_DELIVERY_FEE
+          : 0;
+
+      const finalAmount =
+        productAmount + deliveryFee;
+
+      document.getElementById(
+        "productAmountText"
+      ).textContent =
+        formatWon(productAmount);
+
+      document.getElementById(
+        "deliveryFeeText"
+      ).textContent =
+        deliveryFee === 0
+          ? "무료"
+          : formatWon(deliveryFee);
+
+      document.getElementById(
+        "finalAmountText"
+      ).textContent =
+        formatWon(finalAmount);
+
+      const guide =
+        document.getElementById(
+          "deliveryGuide"
+        );
+
+      if (!getSelectedOrderNumbers().length) {
+        guide.textContent =
+          "결제할 주문을 하나 이상 선택해주세요.";
+      } else if (!isHome) {
+        guide.textContent =
+          "매장 픽업은 배송비가 없으며, 픽업할 때 결제하거나 미리 결제할 수 있습니다.";
+      } else if (
+        productAmount >= FREE_DELIVERY_THRESHOLD
+      ) {
+        guide.textContent =
+          "선택 상품 합계가 40,000원 이상이므로 집 앞 배송비가 무료입니다. 선결제 완료 후 배송됩니다.";
+      } else {
+        guide.textContent =
+          "집 앞 배송비 500원이 추가됩니다. " +
+          formatWon(
+            FREE_DELIVERY_THRESHOLD -
+            productAmount
+          ) +
+          "을 더 주문하면 무료배송입니다. 선결제 완료 후 배송됩니다.";
+      }
+    }
+
+    async function submitCheckout() {
+      clearMessage();
+
+      const nickname =
+        nicknameInput.value.trim();
+
+      const orderNumbers =
+        getSelectedOrderNumbers();
+
+      const receiptMethod =
+        getReceiptMethod();
+
+      const paymentMethod =
+        getPaymentMethod();
+
+      const address =
+        document.getElementById(
+          "deliveryAddress"
+        ).value.trim();
+
+      const entranceInfo =
+        document.getElementById(
+          "entranceInfo"
+        ).value.trim();
+
+      const deliveryRequest =
+        document.getElementById(
+          "deliveryRequest"
+        ).value.trim();
+
+      if (!orderNumbers.length) {
+        showMessage(
+          "결제할 주문을 하나 이상 선택해주세요.",
+          "error"
+        );
         return;
       }
 
-      const nicknameOrder =
-        orderRows.find(
-          function (order) {
-            return String(
-              order.nickname || ""
-            ).trim();
-          }
+      if (
+        receiptMethod === "home" &&
+        (!address || !entranceInfo)
+      ) {
+        showMessage(
+          "집 앞 배송을 위해 주소와 공동현관 출입정보를 입력해주세요.",
+          "error"
+        );
+        return;
+      }
+
+      if (
+        receiptMethod === "home" &&
+        paymentMethod === "pickup_pay"
+      ) {
+        showMessage(
+          "집 앞 배송은 계좌이체 또는 카드 선결제를 선택해주세요.",
+          "error"
+        );
+        return;
+      }
+
+      submitCheckoutButton.disabled = true;
+      submitCheckoutButton.textContent =
+        "신청 내용을 저장하고 있습니다...";
+
+      try {
+        const { data, error } =
+          await sb.rpc(
+            "submit_checkout_request",
+            {
+              p_nickname: nickname,
+              p_order_numbers: orderNumbers,
+              p_receipt_method: receiptMethod,
+              p_payment_method: paymentMethod,
+              p_delivery_address: address,
+              p_entrance_info: entranceInfo,
+              p_delivery_request: deliveryRequest
+            }
+          );
+
+        if (error) throw error;
+
+        const result =
+          typeof data === "string"
+            ? JSON.parse(data)
+            : data;
+
+        const completeBox =
+          document.getElementById(
+            "checkoutComplete"
+          );
+
+        let nextGuide = "";
+
+        if (paymentMethod === "pickup_pay") {
+          nextGuide =
+            "상품을 픽업할 때 매장에서 결제해주세요.";
+        } else if (
+          paymentMethod === "bank_transfer"
+        ) {
+          nextGuide =
+            "하나은행 412-910821-25107, 예금주 담픽으로 " +
+            formatWon(result.final_amount) +
+            "을 입금해주세요.";
+        } else if (
+          paymentMethod === "card_online"
+        ) {
+          nextGuide =
+            CARD_PAYMENT_URL
+              ? "카드 결제창으로 이동합니다."
+              : "카드 PG 연결 전이므로 신청 내용만 저장되었습니다. 관리자에게 카드 결제 링크를 요청해주세요.";
+        }
+
+        completeBox.innerHTML = `
+          <strong>신청이 저장되었습니다.</strong><br>
+          신청번호:
+          ${escapeHtml(result.request_code || "")}<br>
+          상품 합계:
+          ${formatWon(result.product_amount)}<br>
+          배송비:
+          ${
+            Number(result.delivery_fee || 0) === 0
+              ? "무료"
+              : formatWon(result.delivery_fee)
+          }<br>
+          최종 결제금액:
+          <strong>${formatWon(result.final_amount)}</strong><br>
+          ${escapeHtml(nextGuide)}
+        `;
+
+        completeBox.classList.add("show");
+
+        if (
+          paymentMethod === "card_online" &&
+          CARD_PAYMENT_URL
+        ) {
+          const url =
+            new URL(
+              CARD_PAYMENT_URL,
+              window.location.href
+            );
+
+          url.searchParams.set(
+            "amount",
+            String(result.final_amount)
+          );
+
+          url.searchParams.set(
+            "requestCode",
+            String(result.request_code)
+          );
+
+          window.location.href =
+            url.toString();
+        }
+
+      } catch (error) {
+        console.error(error);
+
+        showMessage(
+          error.message ||
+          "결제·배송 신청을 저장하지 못했습니다.",
+          "error"
         );
 
-      const nickname =
-        nicknameOrder?.nickname ||
-        nicknameInput.value.trim() ||
-        "고객";
-
-      const itemHtml =
-        mergedItems.map(
-          function (item) {
-            return `
-              <div class="product-row">
-                <div>
-                  <p class="product-name">
-                    ${escapeHtml(item.product_name)}
-                  </p>
-
-                  <p class="product-option">
-                    수량
-                    ${escapeHtml(String(item.quantity))}
-                    ${escapeHtml(item.unit_name || "개")}
-                    · 개당
-                    ${formatPrice(item.unit_price)}
-                  </p>
-
-                  <span class="pickup-date">
-                    픽업 날짜:
-                    ${formatDate(item.pickup_date)}
-                  </span>
-                </div>
-
-                <div class="product-price">
-                  ${formatPrice(item.line_total)}
-                </div>
-              </div>
-            `;
-          }
-        ).join("");
-
-      const notices =
-        getCombinedNotices(orderRows);
-
-      const noticeHtml =
-        notices.length
-          ? `
-              <h3 class="section-title">
-                담픽 안내
-              </h3>
-
-              <div class="notice-box">
-                ${notices
-                  .map(escapeHtml)
-                  .join("\n\n")}
-              </div>
-            `
-          : "";
-
-      results.innerHTML = `
-        <article class="order-card merged-order-card">
-          <div class="order-head">
-            <p class="customer-name">
-              ${escapeHtml(nickname)}
-              고객님의 주문
-            </p>
-          </div>
-
-          <h3 class="section-title">
-            주문 상품
-          </h3>
-
-          <div class="product-list">
-            ${itemHtml}
-          </div>
-
-          ${noticeHtml}
-        </article>
-      `;
-
-      window.setTimeout(
-        function () {
-          results.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        },
-        100
-      );
+      } finally {
+        submitCheckoutButton.disabled = false;
+        submitCheckoutButton.textContent =
+          "결제·수령 방법 신청하기";
+      }
     }
 
-    function showMessage(text, type) {
-      message.textContent = text;
-      message.className =
-        "message " + type;
+    function getReceiptLabel(value) {
+      return value === "home"
+        ? "집 앞 배송"
+        : "매장 픽업";
     }
 
-    function clearMessage() {
-      message.textContent = "";
-      message.className = "message";
+    function getPaymentLabel(value) {
+      const labels = {
+        pickup_pay: "픽업 시 현장결제",
+        bank_transfer: "계좌이체",
+        card_online: "카드결제"
+      };
+
+      return labels[value] || "결제방법 확인";
     }
 
-    function formatPrice(value) {
+    function formatDate(value) {
+      if (!value) return "날짜 미정";
+
+      const date =
+        new Date(
+          String(value).slice(0, 10) +
+          "T00:00:00"
+        );
+
+      if (Number.isNaN(date.getTime())) {
+        return String(value);
+      }
+
+      return new Intl.DateTimeFormat(
+        "ko-KR",
+        {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        }
+      ).format(date);
+    }
+
+    function formatWon(value) {
       return (
         Number(value || 0)
           .toLocaleString("ko-KR") +
@@ -1675,28 +1414,15 @@
       );
     }
 
-    function formatDate(value) {
-      if (!value) {
-        return "미정";
-      }
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className =
+        "message show " + type;
+    }
 
-      const parts =
-        String(value)
-          .slice(0, 10)
-          .split("-");
-
-      if (parts.length !== 3) {
-        return escapeHtml(value);
-      }
-
-      return (
-        Number(parts[0]) +
-        "년 " +
-        Number(parts[1]) +
-        "월 " +
-        Number(parts[2]) +
-        "일"
-      );
+    function clearMessage() {
+      message.textContent = "";
+      message.className = "message";
     }
 
     function escapeHtml(value) {
@@ -1707,42 +1433,6 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
-  </script>
-
-  <script>
-    document.addEventListener(
-      "DOMContentLoaded",
-      function () {
-        document.documentElement.lang = "ko";
-
-        const koreanFields =
-          document.querySelectorAll(
-            'input[type="text"], input[type="search"], textarea'
-          );
-
-        koreanFields.forEach(
-          function (field) {
-            field.setAttribute("lang", "ko");
-            field.setAttribute(
-              "inputmode",
-              "text"
-            );
-            field.setAttribute(
-              "autocomplete",
-              "off"
-            );
-            field.setAttribute(
-              "autocapitalize",
-              "off"
-            );
-            field.setAttribute(
-              "spellcheck",
-              "false"
-            );
-          }
-        );
-      }
-    );
   </script>
 </body>
 </html>
