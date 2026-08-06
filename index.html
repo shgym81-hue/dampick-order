@@ -227,6 +227,45 @@
       border-bottom: 1px solid #ececef;
     }
 
+    .lookup-card > h2 {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .lookup-description {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 0 0 24px;
+      border-bottom: 1px solid #ececef;
+      text-align: center;
+    }
+
+    .lookup-description p {
+      margin: 0;
+      color: var(--sub);
+      font-size: 16px;
+      line-height: 1.65;
+      letter-spacing: -.25px;
+      word-break: keep-all;
+    }
+
+    .lookup-description .default-order-guide {
+      display: inline-block;
+      margin-top: 11px;
+      padding: 10px 15px;
+      border: 1px solid rgba(244, 20, 104, .12);
+      border-radius: 12px;
+      color: #5c5360;
+      background: #fff5f8;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .lookup-description strong {
+      color: var(--main-dark);
+      font-weight: 900;
+    }
+
     label.field-label {
       display: block;
       margin: 24px 0 10px;
@@ -603,30 +642,36 @@
     }
 
     .privacy-note {
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
       margin: 25px auto 0;
-      padding-left: 28px;
-      color: #5f6570;
+      padding: 0;
+      color: #111827;
       font-size: 13px;
-      line-height: 1.7;
+      font-weight: 900;
+      line-height: 1.35;
+      letter-spacing: -.45px;
       text-align: center;
-      word-break: keep-all;
+      white-space: nowrap;
     }
 
     .privacy-note::before {
-      position: absolute;
-      top: 1px;
-      margin-left: -25px;
+      display: inline-grid;
+      flex: 0 0 19px;
       width: 19px;
       height: 19px;
-      border: 2px solid var(--main);
+      margin: 0;
+      place-items: center;
+      border: 2px solid #111827;
       border-radius: 50%;
-      color: var(--main);
+      color: #111827;
       content: "i";
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 950;
-      line-height: 15px;
-      text-align: center;
+      line-height: 1;
     }
 
     .admin-page-link {
@@ -695,6 +740,32 @@
         font-size: 28px;
       }
 
+      .lookup-card > h2 {
+        margin-bottom: 14px;
+        font-size: 27px;
+        line-height: 1.25;
+        text-align: center;
+      }
+
+      .lookup-description {
+        padding-bottom: 20px;
+      }
+
+      .lookup-description p {
+        padding: 0 4px;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .lookup-description .default-order-guide {
+        display: block;
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 11px;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
       .description {
         font-size: 14px;
         line-height: 1.75;
@@ -708,6 +779,21 @@
       .lookup-card #lookupButton {
         min-height: 62px;
         font-size: 20px;
+      }
+
+      .privacy-note {
+        gap: 5px;
+        font-size: clamp(8.8px, 2.45vw, 10.8px);
+        font-weight: 950;
+        letter-spacing: -.72px;
+      }
+
+      .privacy-note::before {
+        flex-basis: 16px;
+        width: 16px;
+        height: 16px;
+        border-width: 1.5px;
+        font-size: 9px;
       }
 
       .product-bottom {
@@ -765,11 +851,16 @@
     <section class="card lookup-card">
       <h2>내 주문 조회</h2>
 
-      <p class="description">
-        닉네임을 입력하면 주문한 상품과 픽업 날짜를 확인할 수 있습니다.<br>
-        별도 신청이 없는 상품은 기본적으로
-        매장 픽업 · 픽업 시 결제로 진행됩니다.
-      </p>
+      <div class="lookup-description">
+        <p>
+          닉네임으로 주문 상품과 픽업 날짜를 확인하세요.
+        </p>
+
+        <p class="default-order-guide">
+          별도 신청이 없으면
+          <strong>매장 픽업 · 픽업 시 결제</strong>로 진행됩니다.
+        </p>
+      </div>
 
       <label
         class="field-label"
