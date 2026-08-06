@@ -4,33 +4,39 @@
   <meta charset="UTF-8">
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
-  <title>담픽 결제·배송 관리</title>
+  <title>담픽 주문·결제·배송 통합 관리</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     :root {
       --main: #ef3f7f;
-      --main-dark: #d92d69;
-      --dark: #28252a;
-      --sub: #777;
-      --border: #e8e1e4;
+      --main-dark: #cf1f62;
+      --navy: #17203b;
+      --text: #292733;
+      --sub: #737781;
+      --border: #e9e2e6;
       --bg: #fff7fa;
       --success: #197348;
       --danger: #c83b54;
+      --warning: #8a6500;
     }
 
     body {
       margin: 0;
-      color: var(--dark);
-      background: var(--bg);
+      color: var(--text);
+      background:
+        linear-gradient(
+          180deg,
+          #fff7fa,
+          #fffdfd
+        );
       font-family:
-        Arial,
+        "Pretendard",
         "Noto Sans KR",
+        Arial,
         sans-serif;
     }
 
@@ -40,165 +46,265 @@
       font: inherit;
     }
 
+    button { cursor: pointer; }
+
     .wrap {
-      width:
-        min(
-          1050px,
-          calc(100% - 28px)
-        );
+      width: min(1180px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 28px 0 60px;
+      padding:
+        calc(28px + env(safe-area-inset-top))
+        0
+        calc(60px + env(safe-area-inset-bottom));
     }
 
+    .hidden { display: none !important; }
+
     .card {
-      margin-bottom: 17px;
+      margin-bottom: 16px;
       padding: 20px;
-      border:
-        1px solid var(--border);
+      border: 1px solid var(--border);
       border-radius: 18px;
       background: #fff;
       box-shadow:
-        0 8px 24px rgba(0,0,0,.06);
-    }
-
-    .hidden {
-      display: none !important;
+        0 9px 28px rgba(63, 27, 43, .07);
     }
 
     h1,
-    h2 {
+    h2,
+    h3,
+    p {
       margin-top: 0;
     }
 
     h1 {
       color: var(--main-dark);
+      letter-spacing: -1px;
+    }
+
+    h2,
+    h3 {
+      color: var(--navy);
+      letter-spacing: -.7px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .topbar p {
+      margin-bottom: 0;
+      color: var(--sub);
+      line-height: 1.7;
+      word-break: keep-all;
     }
 
     label {
       display: block;
-      margin: 12px 0 7px;
+      margin: 10px 0 7px;
+      color: var(--navy);
       font-weight: 900;
     }
 
     input,
     select {
       width: 100%;
-      padding: 12px;
-      border:
-        1px solid var(--border);
-      border-radius: 10px;
+      min-height: 46px;
+      padding: 11px 13px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: #fff;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--main);
+      box-shadow:
+        0 0 0 4px rgba(239, 63, 127, .09);
     }
 
     .button {
       display: inline-flex;
-      min-height: 42px;
+      min-height: 43px;
       align-items: center;
       justify-content: center;
-      padding: 9px 13px;
+      padding: 9px 14px;
       border: 0;
       border-radius: 10px;
       color: #fff;
       background: var(--main);
       font-weight: 900;
       text-decoration: none;
-      cursor: pointer;
+    }
+
+    .button.secondary { background: #34363d; }
+    .button.success { background: var(--success); }
+    .button.danger { background: var(--danger); }
+    .button.light {
+      color: #333;
+      background: #ececee;
     }
 
     .button:disabled {
-      opacity: .5;
+      opacity: .48;
       cursor: not-allowed;
-    }
-
-    .button.secondary {
-      background: #333;
-    }
-
-    .button.success {
-      background: var(--success);
-    }
-
-    .button.danger {
-      background: var(--danger);
-    }
-
-    .button.light {
-      color: #333;
-      background: #ececec;
     }
 
     .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 14px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content:
-        space-between;
-      gap: 14px;
-      align-items: flex-start;
+      margin-top: 13px;
     }
 
     .message {
       display: none;
       margin-bottom: 15px;
-      padding: 12px;
-      border-radius: 10px;
+      padding: 13px;
+      border-radius: 11px;
+      line-height: 1.55;
     }
 
-    .message.show {
-      display: block;
-    }
-
+    .message.show { display: block; }
     .message.error {
       color: #a62840;
       background: #fff0f3;
     }
-
     .message.success {
       color: #176a3e;
       background: #eaf8ef;
     }
 
-    .tools {
+    .search-grid {
       display: grid;
       grid-template-columns:
-        1fr auto;
+        minmax(240px, 1fr)
+        minmax(180px, .45fr)
+        auto;
       gap: 10px;
       align-items: end;
     }
 
-    .request-list {
-      display: grid;
-      gap: 13px;
-    }
-
-    .request-card {
-      padding: 17px;
-      border:
-        1px solid var(--border);
-      border-radius: 15px;
-      background: #fff;
-    }
-
-    .request-card.home {
-      border-color: #f0b4ca;
-      background: #fffafd;
-    }
-
-    .request-head {
+    .search-actions {
       display: flex;
-      justify-content:
-        space-between;
+      gap: 7px;
+    }
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 15px;
+    }
+
+    .summary-box {
+      padding: 13px;
+      border-radius: 12px;
+      background: #faf7f9;
+    }
+
+    .summary-box span {
+      display: block;
+      color: var(--sub);
+      font-size: 12px;
+    }
+
+    .summary-box strong {
+      display: block;
+      margin-top: 5px;
+      color: var(--navy);
+      font-size: 20px;
+    }
+
+    .customer-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .customer-card {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow:
+        0 8px 24px rgba(0,0,0,.055);
+    }
+
+    .customer-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 20px;
+      color: #fff;
+      background:
+        linear-gradient(
+          100deg,
+          #ef3f7f,
+          #cf1f62
+        );
+    }
+
+    .customer-name {
+      font-size: 23px;
+      font-weight: 950;
+    }
+
+    .customer-meta {
+      margin-top: 5px;
+      font-size: 12px;
+      opacity: .9;
+    }
+
+    .customer-total {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .customer-total strong {
+      display: block;
+      font-size: 22px;
+    }
+
+    .customer-body {
+      padding: 18px;
+    }
+
+    .order-block {
+      margin-bottom: 16px;
+      padding: 15px;
+      border: 1px solid #eee7ea;
+      border-radius: 14px;
+      background: #fffdfd;
+    }
+
+    .order-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .order-head {
+      display: flex;
+      justify-content: space-between;
       gap: 12px;
       align-items: flex-start;
     }
 
-    .request-code {
+    .order-number {
       color: var(--main-dark);
       font-weight: 950;
+    }
+
+    .order-note {
+      margin-top: 7px;
+      padding: 9px 11px;
+      border-radius: 10px;
+      color: #654d00;
+      background: #fff8dc;
+      font-size: 12px;
+      line-height: 1.55;
     }
 
     .badge {
@@ -206,65 +312,51 @@
       margin: 4px 5px 0 0;
       padding: 5px 8px;
       border-radius: 999px;
-      background: #f0f0f0;
+      color: #454650;
+      background: #f0f0f2;
       font-size: 11px;
       font-weight: 900;
     }
 
-    .detail-grid {
-      display: grid;
-      grid-template-columns:
-        repeat(
-          2,
-          minmax(0, 1fr)
-        );
-      gap: 9px;
-      margin-top: 13px;
+    .badge.default {
+      color: #7a5000;
+      background: #fff0c7;
     }
 
-    .detail-box {
-      padding: 11px;
-      border-radius: 11px;
-      background: #fafafa;
-      line-height: 1.6;
+    .badge.success {
+      color: #176a3e;
+      background: #e7f7ed;
     }
 
-    .detail-box strong {
-      display: block;
-      margin-bottom: 3px;
-      font-size: 12px;
-    }
-
-    .amount {
-      color: var(--main-dark);
-      font-size: 20px;
-      font-weight: 950;
-    }
-
-    .sensitive {
-      border: 1px solid #f2cad8;
-      background: #fff5f8;
+    .badge.home {
+      color: #9b2452;
+      background: #ffe8f0;
     }
 
     .item-list {
       display: grid;
-      gap: 8px;
+      gap: 9px;
       margin-top: 13px;
     }
 
     .item-row {
-      display: flex;
-      justify-content:
-        space-between;
+      display: grid;
+      grid-template-columns: 1fr auto;
       gap: 12px;
-      padding: 11px;
-      border:
-        1px solid #eee;
-      border-radius: 11px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid #eee;
+      border-radius: 12px;
       background: #fff;
     }
 
+    .item-row.default-item {
+      border-color: #f0d49a;
+      background: #fffdf5;
+    }
+
     .item-name {
+      color: var(--navy);
       font-weight: 950;
     }
 
@@ -276,25 +368,113 @@
     }
 
     .item-price {
-      flex: 0 0 auto;
       color: var(--main-dark);
+      font-weight: 950;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .item-button {
+      margin-top: 8px;
+    }
+
+    .request-section {
+      margin-top: 18px;
+      padding-top: 17px;
+      border-top: 1px dashed #e9dce1;
+    }
+
+    .request-card {
+      margin-top: 11px;
+      padding: 15px;
+      border: 1px solid #e8dce1;
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .request-card.home {
+      border-color: #efb0c8;
+      background: #fff9fb;
+    }
+
+    .request-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .request-code {
+      color: var(--main-dark);
+      font-size: 12px;
       font-weight: 950;
     }
 
-    @media (max-width: 650px) {
+    .amount {
+      color: var(--main-dark);
+      font-size: 20px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 12px;
+    }
+
+    .detail-box {
+      padding: 11px;
+      border-radius: 11px;
+      background: #f8f8f9;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .detail-box strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--navy);
+      font-size: 12px;
+    }
+
+    .detail-box.sensitive {
+      border: 1px solid #f2cad8;
+      background: #fff3f7;
+    }
+
+    .empty {
+      padding: 34px 20px;
+      text-align: center;
+      color: var(--sub);
+    }
+
+    @media (max-width: 760px) {
       .topbar,
-      .request-head,
-      .item-row {
+      .customer-head,
+      .order-head,
+      .request-head {
         flex-direction: column;
       }
 
-      .tools,
+      .search-grid,
+      .summary-strip,
       .detail-grid {
         grid-template-columns: 1fr;
       }
 
+      .customer-total {
+        text-align: left;
+      }
+
+      .item-row {
+        grid-template-columns: 1fr;
+      }
+
       .item-price {
-        text-align: right;
+        text-align: left;
       }
     }
   </style>
@@ -306,7 +486,7 @@
       id="loginCard"
       class="card"
     >
-      <h1>담픽 결제·배송 관리</h1>
+      <h1>담픽 주문·결제·배송 관리</h1>
 
       <p>
         기존 담픽 관리자와 같은
@@ -346,7 +526,7 @@
           class="button secondary"
           href="./admin.html"
         >
-          기존 관리자 화면
+          메인 관리자
         </a>
       </div>
     </section>
@@ -357,11 +537,12 @@
     >
       <div class="topbar">
         <div>
-          <h1>담픽 결제·배송 관리</h1>
+          <h1>담픽 주문·결제·배송 통합 관리</h1>
 
           <p>
-            고객이 체크한 상품만 한 건의 결제·배송 신청으로 표시됩니다.
-            일부 상품은 계좌이체, 나머지는 픽업결제로 나누어 관리할 수 있습니다.
+            관리자가 등록한 모든 주문을 먼저 보여줍니다.
+            고객이 별도 신청하지 않은 상품은
+            ‘매장 픽업·픽업 시 결제’로 표시됩니다.
           </p>
         </div>
 
@@ -370,7 +551,7 @@
             class="button secondary"
             href="./admin.html"
           >
-            기존 관리자
+            메인 관리자
           </a>
 
           <a
@@ -396,7 +577,20 @@
       ></div>
 
       <section class="card">
-        <div class="tools">
+        <div class="search-grid">
+          <div>
+            <label for="nicknameSearch">
+              고객 닉네임 검색
+            </label>
+
+            <input
+              id="nicknameSearch"
+              type="search"
+              placeholder="닉네임을 입력하세요"
+              autocomplete="off"
+            >
+          </div>
+
           <div>
             <label for="statusFilter">
               표시 조건
@@ -404,45 +598,80 @@
 
             <select id="statusFilter">
               <option value="all">
-                전체 신청
+                전체 주문
               </option>
-              <option value="신청">
-                새 신청
+
+              <option value="default">
+                기본 매장 픽업
               </option>
-              <option value="입금 확인 대기">
-                입금 확인 대기
+
+              <option value="payment-wait">
+                결제 확인 필요
               </option>
-              <option value="카드 결제 대기">
-                카드 결제 대기
-              </option>
-              <option value="현장 결제 예정">
-                현장 결제 예정
-              </option>
-              <option value="결제 완료">
-                결제 완료
-              </option>
-              <option value="선결제 확인 대기">
+
+              <option value="home">
                 집 앞 배송
               </option>
-              <option value="매장 픽업 예정">
-                매장 픽업
+
+              <option value="complete">
+                완료 주문
               </option>
             </select>
           </div>
 
-          <button
-            id="refreshButton"
-            class="button"
-            type="button"
-          >
-            새로고침
-          </button>
+          <div class="search-actions">
+            <button
+              id="searchButton"
+              class="button"
+              type="button"
+            >
+              고객 조회
+            </button>
+
+            <button
+              id="clearButton"
+              class="button light"
+              type="button"
+            >
+              전체 보기
+            </button>
+
+            <button
+              id="refreshButton"
+              class="button secondary"
+              type="button"
+            >
+              새로고침
+            </button>
+          </div>
+        </div>
+
+        <div class="summary-strip">
+          <div class="summary-box">
+            <span>표시 고객</span>
+            <strong id="customerCount">0명</strong>
+          </div>
+
+          <div class="summary-box">
+            <span>표시 주문</span>
+            <strong id="orderCount">0건</strong>
+          </div>
+
+          <div class="summary-box">
+            <span>기본 픽업 상품</span>
+            <strong id="defaultItemCount">0개</strong>
+          </div>
+
+          <div class="summary-box">
+            <span>완료 주문</span>
+            <strong id="completedOrderCount">0건</strong>
+          </div>
         </div>
       </section>
 
       <section
-        id="requestList"
-        class="request-list"
+        id="customerList"
+        class="customer-list"
       ></section>
     </section>
   </main>
@@ -466,9 +695,9 @@
         "app"
       );
 
-    const requestList =
+    const customerList =
       document.getElementById(
-        "requestList"
+        "customerList"
       );
 
     const message =
@@ -476,7 +705,14 @@
         "message"
       );
 
+    const nicknameSearch =
+      document.getElementById(
+        "nicknameSearch"
+      );
+
+    let orders = [];
     let requests = [];
+    let customers = [];
 
     document
       .getElementById(
@@ -502,8 +738,48 @@
       )
       .addEventListener(
         "click",
-        loadRequests
+        loadAll
       );
+
+    document
+      .getElementById(
+        "searchButton"
+      )
+      .addEventListener(
+        "click",
+        render
+      );
+
+    document
+      .getElementById(
+        "clearButton"
+      )
+      .addEventListener(
+        "click",
+        function () {
+          nicknameSearch.value = "";
+          document
+            .getElementById(
+              "statusFilter"
+            )
+            .value = "all";
+          render();
+        }
+      );
+
+    nicknameSearch.addEventListener(
+      "keydown",
+      function (event) {
+        if (event.key === "Enter") {
+          render();
+        }
+      }
+    );
+
+    nicknameSearch.addEventListener(
+      "input",
+      render
+    );
 
     document
       .getElementById(
@@ -511,10 +787,10 @@
       )
       .addEventListener(
         "change",
-        renderRequests
+        render
       );
 
-    requestList.addEventListener(
+    customerList.addEventListener(
       "click",
       handleAction
     );
@@ -535,7 +811,7 @@
 
       if (data.session) {
         showApp();
-        loadRequests();
+        await loadAll();
       }
     }
 
@@ -574,7 +850,7 @@
       }
 
       showApp();
-      loadRequests();
+      await loadAll();
     }
 
     async function logout() {
@@ -599,11 +875,51 @@
       );
     }
 
-    async function loadRequests() {
+    async function loadAll() {
       clearMessage();
 
-      const { data, error } =
-        await sb
+      const [
+        ordersResult,
+        requestsResult
+      ] = await Promise.all([
+        sb
+          .from("orders")
+          .select(`
+            id,
+            customer_id,
+            order_number,
+            order_date,
+            payment_status,
+            order_status,
+            notice,
+            completed_at,
+            created_at,
+            is_visible,
+            customers(
+              id,
+              nickname
+            ),
+            order_items(
+              id,
+              product_id,
+              product_name,
+              quantity,
+              unit_name,
+              unit_price,
+              line_total,
+              pickup_date,
+              created_at
+            )
+          `)
+          .eq("is_visible", true)
+          .order(
+            "created_at",
+            {
+              ascending: false
+            }
+          ),
+
+        sb
           .from(
             "checkout_requests"
           )
@@ -628,59 +944,797 @@
             {
               ascending: false
             }
-          );
+          )
+      ]);
 
-      if (error) {
+      if (ordersResult.error) {
         showMessage(
-          error.message ||
-          "신청 목록을 불러오지 못했습니다.",
+          ordersResult.error.message ||
+          "주문 목록을 불러오지 못했습니다.",
           "error"
         );
         return;
       }
 
-      requests =
-        Array.isArray(data)
-          ? data
+      if (requestsResult.error) {
+        showMessage(
+          requestsResult.error.message ||
+          "결제·배송 신청을 불러오지 못했습니다. 먼저 1단계 SQL을 실행했는지 확인해주세요.",
+          "error"
+        );
+        return;
+      }
+
+      orders =
+        Array.isArray(
+          ordersResult.data
+        )
+          ? ordersResult.data
           : [];
 
-      renderRequests();
+      requests =
+        Array.isArray(
+          requestsResult.data
+        )
+          ? requestsResult.data
+          : [];
+
+      buildCustomers();
+      render();
     }
 
-    function renderRequests() {
-      const filter =
+    function buildCustomers() {
+      const map =
+        new Map();
+
+      orders.forEach(
+        function (order) {
+          const customerId =
+            String(
+              order.customer_id || ""
+            );
+
+          if (!map.has(customerId)) {
+            map.set(
+              customerId,
+              {
+                id:
+                  customerId,
+                nickname:
+                  order.customers?.nickname ||
+                  "고객",
+                orders: [],
+                requests: []
+              }
+            );
+          }
+
+          map.get(customerId)
+            .orders.push(order);
+        }
+      );
+
+      requests.forEach(
+        function (request) {
+          const customerId =
+            String(
+              request.customer_id || ""
+            );
+
+          if (!map.has(customerId)) {
+            map.set(
+              customerId,
+              {
+                id:
+                  customerId,
+                nickname:
+                  request.nickname_snapshot ||
+                  "고객",
+                orders: [],
+                requests: []
+              }
+            );
+          }
+
+          map.get(customerId)
+            .requests.push(request);
+        }
+      );
+
+      customers =
+        Array.from(
+          map.values()
+        ).sort(
+          function (a, b) {
+            return String(a.nickname)
+              .localeCompare(
+                String(b.nickname),
+                "ko"
+              );
+          }
+        );
+    }
+
+    function getActiveRequests(
+      customer
+    ) {
+      return customer.requests.filter(
+        function (request) {
+          return ![
+            "취소",
+            "신청 취소",
+            "결제 실패"
+          ].includes(
+            String(
+              request.request_status ||
+              ""
+            )
+          );
+        }
+      );
+    }
+
+    function makeItemRequestMap(
+      customer
+    ) {
+      const map =
+        new Map();
+
+      getActiveRequests(customer)
+        .forEach(
+          function (request) {
+            const items =
+              Array.isArray(
+                request.checkout_request_items
+              )
+                ? request.checkout_request_items
+                : [];
+
+            items.forEach(
+              function (item) {
+                const id =
+                  String(
+                    item.order_item_id ||
+                    ""
+                  );
+
+                if (
+                  id &&
+                  !map.has(id)
+                ) {
+                  map.set(
+                    id,
+                    request
+                  );
+                }
+              }
+            );
+          }
+        );
+
+      return map;
+    }
+
+    function getCustomerState(
+      customer
+    ) {
+      const itemMap =
+        makeItemRequestMap(
+          customer
+        );
+
+      const allItems =
+        customer.orders.flatMap(
+          function (order) {
+            return Array.isArray(
+              order.order_items
+            )
+              ? order.order_items
+              : [];
+          }
+        );
+
+      const defaultItems =
+        allItems.filter(
+          function (item) {
+            return !itemMap.has(
+              String(item.id)
+            );
+          }
+        );
+
+      const activeRequests =
+        getActiveRequests(
+          customer
+        );
+
+      const paymentWait =
+        activeRequests.some(
+          function (request) {
+            return !isPaymentCompleted(
+              request.payment_status
+            );
+          }
+        );
+
+      const hasHome =
+        activeRequests.some(
+          function (request) {
+            return request.receipt_method ===
+              "home";
+          }
+        );
+
+      const allOrdersComplete =
+        customer.orders.length > 0 &&
+        customer.orders.every(
+          function (order) {
+            return Boolean(
+              order.completed_at
+            );
+          }
+        );
+
+      return {
+        itemMap,
+        allItems,
+        defaultItems,
+        activeRequests,
+        paymentWait,
+        hasHome,
+        allOrdersComplete
+      };
+    }
+
+    function getFilteredCustomers() {
+      const query =
+        normalize(
+          nicknameSearch.value
+        );
+
+      const status =
         document
           .getElementById(
             "statusFilter"
           )
           .value;
 
-      const filtered =
-        filter === "all"
-          ? requests
-          : requests.filter(
-              function (request) {
-                return (
-                  request.request_status === filter ||
-                  request.payment_status === filter ||
-                  request.fulfillment_status === filter
-                );
-              }
+      let matched =
+        customers;
+
+      if (query) {
+        const exact =
+          customers.filter(
+            function (customer) {
+              return (
+                normalize(
+                  customer.nickname
+                ) === query
+              );
+            }
+          );
+
+        matched =
+          exact.length
+            ? exact
+            : customers.filter(
+                function (customer) {
+                  return normalize(
+                    customer.nickname
+                  ).includes(query);
+                }
+              );
+      }
+
+      return matched.filter(
+        function (customer) {
+          const state =
+            getCustomerState(
+              customer
             );
 
+          if (status === "default") {
+            return (
+              state.defaultItems.length > 0
+            );
+          }
+
+          if (
+            status ===
+            "payment-wait"
+          ) {
+            return state.paymentWait;
+          }
+
+          if (status === "home") {
+            return state.hasHome;
+          }
+
+          if (
+            status ===
+            "complete"
+          ) {
+            return (
+              state.allOrdersComplete
+            );
+          }
+
+          return true;
+        }
+      );
+    }
+
+    function render() {
+      const filtered =
+        getFilteredCustomers();
+
+      updateSummary(filtered);
+
       if (!filtered.length) {
-        requestList.innerHTML = `
-          <section class="card">
-            표시할 결제·배송 신청이 없습니다.
+        customerList.innerHTML = `
+          <section class="card empty">
+            조건에 맞는 고객 주문이 없습니다.
           </section>
         `;
         return;
       }
 
-      requestList.innerHTML =
+      customerList.innerHTML =
         filtered
-          .map(renderRequest)
+          .map(renderCustomer)
           .join("");
+    }
+
+    function updateSummary(
+      filtered
+    ) {
+      const states =
+        filtered.map(
+          getCustomerState
+        );
+
+      const orderCount =
+        filtered.reduce(
+          function (sum, customer) {
+            return (
+              sum +
+              customer.orders.length
+            );
+          },
+          0
+        );
+
+      const defaultCount =
+        states.reduce(
+          function (sum, state) {
+            return (
+              sum +
+              state.defaultItems.length
+            );
+          },
+          0
+        );
+
+      const completedCount =
+        filtered.reduce(
+          function (sum, customer) {
+            return (
+              sum +
+              customer.orders.filter(
+                function (order) {
+                  return Boolean(
+                    order.completed_at
+                  );
+                }
+              ).length
+            );
+          },
+          0
+        );
+
+      document
+        .getElementById(
+          "customerCount"
+        )
+        .textContent =
+          filtered.length + "명";
+
+      document
+        .getElementById(
+          "orderCount"
+        )
+        .textContent =
+          orderCount + "건";
+
+      document
+        .getElementById(
+          "defaultItemCount"
+        )
+        .textContent =
+          defaultCount + "개";
+
+      document
+        .getElementById(
+          "completedOrderCount"
+        )
+        .textContent =
+          completedCount + "건";
+    }
+
+    function renderCustomer(
+      customer
+    ) {
+      const state =
+        getCustomerState(
+          customer
+        );
+
+      const total =
+        state.allItems.reduce(
+          function (sum, item) {
+            return (
+              sum +
+              Number(
+                item.line_total ??
+                (
+                  Number(
+                    item.unit_price || 0
+                  ) *
+                  Number(
+                    item.quantity || 0
+                  )
+                )
+              )
+            );
+          },
+          0
+        );
+
+      const ordersHtml =
+        customer.orders
+          .map(
+            function (order) {
+              return renderOrder(
+                order,
+                state.itemMap
+              );
+            }
+          )
+          .join("");
+
+      const requestHtml =
+        state.activeRequests.length
+          ? `
+              <section class="request-section">
+                <h3>
+                  고객 결제·배송 변경 신청
+                </h3>
+
+                ${state.activeRequests
+                  .map(renderRequest)
+                  .join("")}
+              </section>
+            `
+          : "";
+
+      return `
+        <article class="customer-card">
+          <header class="customer-head">
+            <div>
+              <div class="customer-name">
+                ${escapeHtml(
+                  customer.nickname
+                )}
+              </div>
+
+              <div class="customer-meta">
+                주문 ${customer.orders.length}건 ·
+                상품 ${state.allItems.length}개
+              </div>
+            </div>
+
+            <div class="customer-total">
+              <span>전체 주문금액</span>
+              <strong>
+                ${formatWon(total)}
+              </strong>
+            </div>
+          </header>
+
+          <div class="customer-body">
+            ${ordersHtml}
+            ${requestHtml}
+          </div>
+        </article>
+      `;
+    }
+
+    function renderOrder(
+      order,
+      itemMap
+    ) {
+      const items =
+        Array.isArray(
+          order.order_items
+        )
+          ? [...order.order_items]
+              .sort(
+                function (a, b) {
+                  return String(
+                    a.pickup_date || ""
+                  ).localeCompare(
+                    String(
+                      b.pickup_date || ""
+                    )
+                  );
+                }
+              )
+          : [];
+
+      const total =
+        items.reduce(
+          function (sum, item) {
+            return (
+              sum +
+              Number(
+                item.line_total ??
+                (
+                  Number(
+                    item.unit_price || 0
+                  ) *
+                  Number(
+                    item.quantity || 0
+                  )
+                )
+              )
+            );
+          },
+          0
+        );
+
+      const itemsHtml =
+        items.map(
+          function (item) {
+            return renderItem(
+              item,
+              itemMap.get(
+                String(item.id)
+              )
+            );
+          }
+        ).join("");
+
+      return `
+        <section class="order-block">
+          <div class="order-head">
+            <div>
+              <div class="order-number">
+                주문 ${escapeHtml(
+                  order.order_number || ""
+                )}
+              </div>
+
+              <div>
+                <span class="badge">
+                  주문일
+                  ${formatDate(
+                    order.order_date ||
+                    order.created_at
+                  )}
+                </span>
+
+                <span class="badge">
+                  ${escapeHtml(
+                    order.payment_status ||
+                    "현장 결제 예정"
+                  )}
+                </span>
+
+                <span class="
+                  badge
+                  ${order.completed_at
+                    ? "success"
+                    : ""}
+                ">
+                  ${escapeHtml(
+                    order.order_status ||
+                    "주문 접수"
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <strong>
+              ${formatWon(total)}
+            </strong>
+          </div>
+
+          ${
+            order.notice
+              ? `
+                <div class="order-note">
+                  고객 안내:
+                  ${escapeHtml(
+                    order.notice
+                  )}
+                </div>
+              `
+              : ""
+          }
+
+          <div class="item-list">
+            ${itemsHtml}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderItem(
+      item,
+      request
+    ) {
+      const total =
+        Number(
+          item.line_total ??
+          (
+            Number(
+              item.unit_price || 0
+            ) *
+            Number(
+              item.quantity || 0
+            )
+          )
+        );
+
+      if (!request) {
+        return `
+          <div class="
+            item-row
+            default-item
+          ">
+            <div>
+              <div class="item-name">
+                ${escapeHtml(
+                  item.product_name ||
+                  "상품"
+                )}
+              </div>
+
+              <div class="item-meta">
+                ${Number(
+                  item.quantity || 0
+                ).toLocaleString("ko-KR")}
+                ${escapeHtml(
+                  item.unit_name ||
+                  "개"
+                )}
+                · 픽업
+                ${formatDate(
+                  item.pickup_date
+                )}
+              </div>
+
+              <div>
+                <span class="
+                  badge
+                  default
+                ">
+                  기본: 매장 픽업
+                </span>
+
+                <span class="
+                  badge
+                  default
+                ">
+                  픽업 시 결제
+                </span>
+              </div>
+
+              <button
+                class="
+                  button
+                  success
+                  item-button
+                "
+                type="button"
+                data-action="default-complete"
+                data-item-id="${escapeHtml(
+                  item.id
+                )}"
+              >
+                현장 결제·픽업 완료
+              </button>
+            </div>
+
+            <div class="item-price">
+              ${formatWon(total)}
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="item-row">
+          <div>
+            <div class="item-name">
+              ${escapeHtml(
+                item.product_name ||
+                "상품"
+              )}
+            </div>
+
+            <div class="item-meta">
+              ${Number(
+                item.quantity || 0
+              ).toLocaleString("ko-KR")}
+              ${escapeHtml(
+                item.unit_name ||
+                "개"
+              )}
+              · 픽업
+              ${formatDate(
+                item.pickup_date
+              )}
+            </div>
+
+            <div>
+              <span class="
+                badge
+                ${request.receipt_method ===
+                  "home"
+                    ? "home"
+                    : ""}
+              ">
+                ${escapeHtml(
+                  getReceiptLabel(
+                    request.receipt_method
+                  )
+                )}
+              </span>
+
+              <span class="badge">
+                ${escapeHtml(
+                  getPaymentLabel(
+                    request.payment_method
+                  )
+                )}
+              </span>
+
+              <span class="
+                badge
+                ${isPaymentCompleted(
+                  request.payment_status
+                )
+                  ? "success"
+                  : ""}
+              ">
+                ${escapeHtml(
+                  request.payment_status ||
+                  ""
+                )}
+              </span>
+
+              <span class="
+                badge
+                ${isFulfillmentCompleted(
+                  request.fulfillment_status
+                )
+                  ? "success"
+                  : ""}
+              ">
+                ${escapeHtml(
+                  request.fulfillment_status ||
+                  ""
+                )}
+              </span>
+            </div>
+          </div>
+
+          <div class="item-price">
+            ${formatWon(total)}
+          </div>
+        </div>
+      `;
     }
 
     function renderRequest(
@@ -695,66 +1749,10 @@
           request.payment_status
         );
 
-      const orderNumbers =
-        Array.isArray(
-          request.order_numbers
-        )
-          ? request.order_numbers
-          : [];
-
-      const items =
-        Array.isArray(
-          request.checkout_request_items
-        )
-          ? [
-              ...request.checkout_request_items
-            ].sort(
-              function (a, b) {
-                return String(
-                  a.pickup_date || ""
-                ).localeCompare(
-                  String(
-                    b.pickup_date || ""
-                  )
-                );
-              }
-            )
-          : [];
-
-      const itemsHtml =
-        items.length
-          ? items.map(
-              function (item) {
-                return `
-                  <div class="item-row">
-                    <div>
-                      <div class="item-name">
-                        ${escapeHtml(item.product_name || "상품")}
-                      </div>
-
-                      <div class="item-meta">
-                        ${Number(item.quantity || 0).toLocaleString("ko-KR")}
-                        ${escapeHtml(item.unit_name || "개")}
-                        · 픽업
-                        ${formatDate(item.pickup_date)}
-                        · 주문
-                        ${escapeHtml(item.order_number || "")}
-                      </div>
-                    </div>
-
-                    <div class="item-price">
-                      ${formatWon(item.line_total)}
-                    </div>
-                  </div>
-                `;
-              }
-            ).join("")
-          : `
-              <div class="item-row">
-                이전 버전에서 접수된 신청이라
-                선택 상품 상세가 없습니다.
-              </div>
-            `;
+      const isCompleted =
+        isFulfillmentCompleted(
+          request.fulfillment_status
+        );
 
       return `
         <article
@@ -762,20 +1760,24 @@
             request-card
             ${isHome ? "home" : ""}
           "
-          data-id="${escapeHtml(request.id)}"
+          data-request-id="${escapeHtml(
+            request.id
+          )}"
         >
           <div class="request-head">
             <div>
               <div class="request-code">
-                ${escapeHtml(request.request_code)}
+                ${escapeHtml(
+                  request.request_code ||
+                  ""
+                )}
               </div>
 
-              <strong>
-                ${escapeHtml(request.nickname_snapshot)}
-              </strong>
-
               <div>
-                <span class="badge">
+                <span class="
+                  badge
+                  ${isHome ? "home" : ""}
+                ">
                   ${escapeHtml(
                     getReceiptLabel(
                       request.receipt_method
@@ -791,15 +1793,27 @@
                   )}
                 </span>
 
-                <span class="badge">
+                <span class="
+                  badge
+                  ${isPaid
+                    ? "success"
+                    : ""}
+                ">
                   ${escapeHtml(
-                    request.payment_status
+                    request.payment_status ||
+                    ""
                   )}
                 </span>
 
-                <span class="badge">
+                <span class="
+                  badge
+                  ${isCompleted
+                    ? "success"
+                    : ""}
+                ">
                   ${escapeHtml(
-                    request.fulfillment_status
+                    request.fulfillment_status ||
+                    ""
                   )}
                 </span>
               </div>
@@ -812,21 +1826,9 @@
             </div>
           </div>
 
-          <div class="item-list">
-            ${itemsHtml}
-          </div>
-
           <div class="detail-grid">
             <div class="detail-box">
-              <strong>연결된 주문번호</strong>
-              ${orderNumbers
-                .map(escapeHtml)
-                .join("<br>")}
-            </div>
-
-            <div class="detail-box">
-              <strong>이번 신청금액</strong>
-              선택 상품:
+              <strong>선택 상품금액</strong>
               ${formatWon(
                 request.product_amount
               )}<br>
@@ -842,70 +1844,54 @@
               }
             </div>
 
-            ${
-              request.payment_method === "card_online"
-                ? `
-                  <div class="detail-box">
-                    <strong>온라인 카드 승인</strong>
-                    ${
-                      isPaymentCompleted(
-                        request.payment_status
-                      )
-                        ? `
-                          카드 자동 결제 완료<br>
-                          승인시각:
-                          ${escapeHtml(
-                            formatDateTime(
-                              request.toss_approved_at
-                            )
-                          )}
-                          ${
-                            request.toss_receipt_url
-                              ? `
-                                <br>
-                                <a
-                                  href="${escapeHtml(
-                                    request.toss_receipt_url
-                                  )}"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  카드 영수증 보기
-                                </a>
-                              `
-                              : ""
-                          }
-                        `
-                        : `
-                          ${escapeHtml(
-                            request.payment_status ||
-                            "카드 인증 대기"
-                          )}
-                        `
-                    }
-                  </div>
-                `
-                : ""
-            }
+            <div class="detail-box">
+              <strong>신청 상태</strong>
+              ${escapeHtml(
+                request.request_status ||
+                ""
+              )}
+            </div>
 
             ${
               isHome
                 ? `
-                  <div class="detail-box sensitive">
+                  <div class="
+                    detail-box
+                    sensitive
+                  ">
+                    <strong>휴대폰 번호</strong>
+                    ${escapeHtml(
+                      request.delivery_phone ||
+                      "미입력"
+                    )}
+                  </div>
+
+                  <div class="
+                    detail-box
+                    sensitive
+                  ">
                     <strong>배송 주소</strong>
                     ${escapeHtml(
-                      request.delivery_address
+                      request.delivery_address ||
+                      ""
                     )}
                   </div>
 
-                  <div class="detail-box sensitive">
+                  <div class="
+                    detail-box
+                    sensitive
+                  ">
                     <strong>공동현관 출입정보</strong>
                     ${escapeHtml(
-                      request.entrance_info
+                      request.entrance_info ||
+                      ""
                     )}
                   </div>
 
-                  <div class="detail-box sensitive">
+                  <div class="
+                    detail-box
+                    sensitive
+                  ">
                     <strong>배송 요청사항</strong>
                     ${escapeHtml(
                       request.delivery_request ||
@@ -915,25 +1901,84 @@
                 `
                 : ""
             }
+
+            ${
+              request.payment_method ===
+                "card_online"
+                ? `
+                  <div class="detail-box">
+                    <strong>카드 승인정보</strong>
+                    승인시각:
+                    ${escapeHtml(
+                      formatDateTime(
+                        request.toss_approved_at
+                      )
+                    )}
+                    ${
+                      request.toss_receipt_url
+                        ? `
+                          <br>
+                          <a
+                            href="${escapeHtml(
+                              request.toss_receipt_url
+                            )}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            카드 영수증 보기
+                          </a>
+                        `
+                        : ""
+                    }
+                  </div>
+                `
+                : ""
+            }
           </div>
 
           <div class="actions">
-            <button
-              class="button success"
-              type="button"
-              data-action="payment-complete"
-              ${
-                isPaid
-                  ? "disabled"
-                  : ""
-              }
-            >
-              ${
-                isPaid
-                  ? "결제 완료됨"
-                  : "결제 완료 처리"
-              }
-            </button>
+            ${
+              (
+                request.receipt_method ===
+                  "pickup" &&
+                request.payment_method ===
+                  "pickup_pay" &&
+                !isPaid
+              )
+                ? `
+                  <button
+                    class="
+                      button
+                      success
+                    "
+                    type="button"
+                    data-action="
+                      payment-and-pickup-complete
+                    "
+                  >
+                    현장 결제·픽업 완료
+                  </button>
+                `
+                : `
+                  <button
+                    class="
+                      button
+                      success
+                    "
+                    type="button"
+                    data-action="
+                      payment-complete
+                    "
+                    ${isPaid
+                      ? "disabled"
+                      : ""}
+                  >
+                    ${isPaid
+                      ? "결제 완료됨"
+                      : "결제 완료 처리"}
+                  </button>
+                `
+            }
 
             ${
               isHome
@@ -941,47 +1986,63 @@
                   <button
                     class="button"
                     type="button"
-                    data-action="delivery-ready"
-                    ${isPaid ? "" : "disabled"}
+                    data-action="
+                      delivery-ready
+                    "
+                    ${isPaid && !isCompleted
+                      ? ""
+                      : "disabled"}
                   >
-                    ${
-                      isPaid
-                        ? "배송 준비"
-                        : "결제 완료 후 배송 준비"
-                    }
+                    배송 준비
                   </button>
 
                   <button
-                    class="button secondary"
+                    class="
+                      button
+                      secondary
+                    "
                     type="button"
-                    data-action="delivery-complete"
-                    ${isPaid ? "" : "disabled"}
+                    data-action="
+                      delivery-complete
+                    "
+                    ${isPaid && !isCompleted
+                      ? ""
+                      : "disabled"}
                   >
                     배송 완료
                   </button>
                 `
                 : `
                   <button
-                    class="button secondary"
+                    class="
+                      button
+                      secondary
+                    "
                     type="button"
-                    data-action="pickup-complete"
-                    ${isPaid ? "" : "disabled"}
+                    data-action="
+                      pickup-complete
+                    "
+                    ${isPaid && !isCompleted
+                      ? ""
+                      : "disabled"}
                   >
-                    ${
-                      isPaid
-                        ? "픽업 완료"
-                        : "결제 완료 후 픽업"
-                    }
+                    픽업 완료
                   </button>
                 `
             }
 
             <button
-              class="button danger"
+              class="
+                button
+                danger
+              "
               type="button"
               data-action="cancel"
+              ${isCompleted
+                ? "disabled"
+                : ""}
             >
-              신청 취소
+              변경 신청 취소
             </button>
           </div>
         </article>
@@ -1000,37 +2061,85 @@
         return;
       }
 
-      const card =
+      const action =
+        String(
+          button.dataset.action ||
+          ""
+        ).trim();
+
+      if (
+        action ===
+        "default-complete"
+      ) {
+        const accepted =
+          window.confirm(
+            "이 상품의 현장 결제와 픽업을 완료 처리할까요?"
+          );
+
+        if (!accepted) {
+          return;
+        }
+
+        button.disabled = true;
+
+        try {
+          const { data, error } =
+            await sb.rpc(
+              "complete_default_pickup_item",
+              {
+                p_order_item_id:
+                  button.dataset.itemId
+              }
+            );
+
+          if (error) {
+            throw error;
+          }
+
+          showMessage(
+            data?.message ||
+            "현장 결제와 픽업을 완료 처리했습니다.",
+            "success"
+          );
+
+          await loadAll();
+
+        } catch (error) {
+          console.error(error);
+
+          showMessage(
+            error.message ||
+            "기본 주문상품을 완료 처리하지 못했습니다.",
+            "error"
+          );
+
+        } finally {
+          button.disabled = false;
+        }
+
+        return;
+      }
+
+      const requestCard =
         button.closest(
           ".request-card"
         );
 
-      const id =
-        card?.dataset.id;
+      const requestId =
+        requestCard?.dataset
+          .requestId;
 
-      const request =
-        requests.find(
-          function (item) {
-            return item.id === id;
-          }
-        );
-
-      if (!request) {
+      if (!requestId) {
         return;
       }
 
-      const action =
-        button.dataset.action;
-
-      if (
-        action === "cancel"
-      ) {
-        const confirmed =
+      if (action === "cancel") {
+        const accepted =
           window.confirm(
-            "이 신청을 취소할까요? 취소된 상품은 고객이 다시 선택할 수 있습니다."
+            "이 결제·배송 변경 신청을 취소할까요? 취소된 상품은 고객이 다시 선택할 수 있습니다."
           );
 
-        if (!confirmed) {
+        if (!accepted) {
           return;
         }
       }
@@ -1043,7 +2152,7 @@
             "process_checkout_request",
             {
               p_request_id:
-                request.id,
+                requestId,
               p_action:
                 action
             }
@@ -1059,7 +2168,7 @@
           "success"
         );
 
-        await loadRequests();
+        await loadAll();
 
       } catch (error) {
         console.error(error);
@@ -1073,14 +2182,6 @@
       } finally {
         button.disabled = false;
       }
-    }
-
-    function getReceiptLabel(
-      value
-    ) {
-      return value === "home"
-        ? "집 앞 배송"
-        : "매장 픽업";
     }
 
     function isPaymentCompleted(
@@ -1099,6 +2200,30 @@
       );
     }
 
+    function isFulfillmentCompleted(
+      status
+    ) {
+      const value =
+        String(status || "");
+
+      return (
+        value.includes(
+          "픽업 완료"
+        ) ||
+        value.includes(
+          "배송 완료"
+        )
+      );
+    }
+
+    function getReceiptLabel(
+      value
+    ) {
+      return value === "home"
+        ? "집 앞 배송"
+        : "매장 픽업";
+    }
+
     function getPaymentLabel(
       value
     ) {
@@ -1113,8 +2238,21 @@
 
       return (
         labels[value] ||
-        value
+        value ||
+        ""
       );
+    }
+
+    function normalize(value) {
+      return String(
+        value || ""
+      )
+        .trim()
+        .toLowerCase()
+        .replace(
+          /\s+/g,
+          ""
+        );
     }
 
     function formatDate(value) {
@@ -1122,11 +2260,15 @@
         return "날짜 미정";
       }
 
+      const text =
+        String(value);
+
       const date =
         new Date(
-          String(value)
-            .slice(0, 10) +
-          "T00:00:00"
+          text.length >= 10
+            ? text.slice(0, 10) +
+              "T00:00:00"
+            : text
         );
 
       if (
@@ -1134,7 +2276,7 @@
           date.getTime()
         )
       ) {
-        return String(value);
+        return text;
       }
 
       return new Intl.DateTimeFormat(
@@ -1178,9 +2320,7 @@
     function formatWon(value) {
       return (
         Number(value || 0)
-          .toLocaleString(
-            "ko-KR"
-          ) +
+          .toLocaleString("ko-KR") +
         "원"
       );
     }
@@ -1195,12 +2335,15 @@
       message.className =
         "message show " +
         type;
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
     }
 
     function clearMessage() {
-      message.textContent =
-        "";
-
+      message.textContent = "";
       message.className =
         "message";
     }
