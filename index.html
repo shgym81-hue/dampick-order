@@ -959,8 +959,8 @@
           <span>
             <strong>집 앞 배송</strong>
             <small>
-              선결제 필수 · 선택 상품 합계 4만원 미만 500원 ·
-              4만원 이상 무료
+              휴대폰 번호·주소 입력 및 선결제 필수 ·
+              선택 상품 합계 4만원 미만 500원 · 4만원 이상 무료
             </small>
           </span>
         </label>
@@ -971,6 +971,21 @@
         class="delivery-fields"
         hidden
       >
+        <label
+          class="field-label"
+          for="deliveryPhone"
+        >
+          휴대폰 번호
+        </label>
+
+        <input
+          id="deliveryPhone"
+          type="tel"
+          inputmode="tel"
+          placeholder="예: 010-1234-5678"
+          autocomplete="tel"
+        >
+
         <label
           class="field-label"
           for="deliveryAddress"
@@ -1976,6 +1991,14 @@
       const paymentMethod =
         getPaymentMethod();
 
+      const deliveryPhone =
+        document
+          .getElementById(
+            "deliveryPhone"
+          )
+          .value
+          .trim();
+
       const address =
         document
           .getElementById(
@@ -2009,14 +2032,32 @@
       }
 
       if (
-        receiptMethod === "home" &&
-        (!address || !entranceInfo)
+        receiptMethod === "home"
       ) {
-        showMessage(
-          "집 앞 배송을 위해 주소와 공동현관 출입정보를 입력해주세요.",
-          "error"
-        );
-        return;
+        const phoneDigits =
+          deliveryPhone.replace(
+            /\D/g,
+            ""
+          );
+
+        if (
+          phoneDigits.length < 10 ||
+          phoneDigits.length > 11
+        ) {
+          showMessage(
+            "집 앞 배송을 위해 휴대폰 번호를 정확히 입력해주세요.",
+            "error"
+          );
+          return;
+        }
+
+        if (!address || !entranceInfo) {
+          showMessage(
+            "집 앞 배송을 위해 주소와 공동현관 출입정보를 입력해주세요.",
+            "error"
+          );
+          return;
+        }
       }
 
       if (
@@ -2056,7 +2097,7 @@
       try {
         const { data, error } =
           await sb.rpc(
-            "submit_checkout_item_request",
+            "submit_checkout_item_request_v2",
             {
               p_nickname:
                 nickname,
@@ -2066,6 +2107,8 @@
                 receiptMethod,
               p_payment_method:
                 paymentMethod,
+              p_delivery_phone:
+                deliveryPhone,
               p_delivery_address:
                 address,
               p_entrance_info:
