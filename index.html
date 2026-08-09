@@ -765,7 +765,6 @@
         font-size: 13px;
         line-height: 1.55;
       }
-      
 
       .description {
         font-size: 14px;
@@ -805,41 +804,6 @@
       .product-price {
         text-align: right;
       }
-    }
-
-    .product-price {
-        text-align: right;
-      }
-    }
-
-    .door-delivery-guide {
-      display: block !important;
-      max-width: 430px;
-      margin: 14px auto 0 !important;
-      padding: 14px 16px !important;
-      border: 1px solid rgba(244, 20, 104, .18) !important;
-      border-radius: 14px !important;
-      background: #fff5f8 !important;
-      text-align: left !important;
-      color: #252a38 !important;
-    }
-
-    .door-delivery-guide strong {
-      display: block;
-      margin-bottom: 8px;
-      color: #d80656 !important;
-      font-size: 15px;
-      font-weight: 950;
-      text-align: center;
-    }
-
-    .door-delivery-guide span {
-      display: block;
-      margin-top: 5px;
-      color: #333;
-      font-size: 14px;
-      font-weight: 800;
-      line-height: 1.45;
     }
   </style>
 </head>
@@ -892,11 +856,10 @@
           닉네임으로 주문 상품과 픽업 날짜를 확인하세요.
         </p>
 
-       <div class="default-order-guide door-delivery-guide">
-  <strong>문고리 배송 안내</strong>
-  <span>- 월·화 픽업 상품 → 수요일 새벽 배송</span>
-  <span>- 수·목·금 픽업 상품 → 금요일 오후 배송</span>
-</div>
+        <p class="default-order-guide">
+          별도 신청이 없으면
+          <strong>매장 픽업 · 픽업 시 결제</strong>로 진행됩니다.
+        </p>
       </div>
 
       <label
@@ -940,11 +903,13 @@
       id="checkoutCard"
       class="card checkout-card"
     >
-      <h2>선택 상품 결제</h2>
+      <h2>선택 상품 결제·수령 방법</h2>
 
-     <p class="description">
-  문고리 배송을 원하는 상품만 체크한 뒤 결제 방법을 선택해주세요.
-</p>
+      <p class="description">
+        체크된 상품만 이번 신청에 포함됩니다.
+        일부 상품을 먼저 결제한 뒤 남은 상품은
+        다시 조회해 다른 결제방법으로 신청할 수 있습니다.
+      </p>
 
       <div class="summary-box">
         <div class="summary-row">
@@ -963,23 +928,43 @@
         </div>
       </div>
 
-      <div class="choice-grid" style="margin-top:22px;">
-  <label class="choice">
-    <input
-      type="radio"
-      name="receiptMethod"
-      value="home"
-      checked
-    >
+      <h3 style="margin-top:22px;">
+        수령 방법
+      </h3>
 
-    <span>
-      <strong>문고리 배송</strong>
-      <small>
-        문고리 배송을 원하는 경우만 결제 바랍니다.
-      </small>
-    </span>
-  </label>
-</div>
+      <div class="choice-grid">
+        <label class="choice">
+          <input
+            type="radio"
+            name="receiptMethod"
+            value="pickup"
+            checked
+          >
+
+          <span>
+            <strong>매장 픽업</strong>
+            <small>
+              배송비 0원 · 픽업할 때 결제 또는 미리 결제 가능
+            </small>
+          </span>
+        </label>
+
+        <label class="choice">
+          <input
+            type="radio"
+            name="receiptMethod"
+            value="home"
+          >
+
+          <span>
+            <strong>집 앞 배송</strong>
+            <small>
+              휴대폰 번호·주소 입력 및 선결제 필수 ·
+              선택 상품 합계 4만원 미만 500원 · 4만원 이상 무료
+            </small>
+          </span>
+        </label>
+      </div>
 
       <div
         id="deliveryFields"
@@ -1047,7 +1032,25 @@
       </h3>
 
       <div class="choice-grid">
-        
+        <label
+          id="pickupPayChoice"
+          class="choice"
+        >
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="pickup_pay"
+            checked
+          >
+
+          <span>
+            <strong>픽업할 때 결제</strong>
+            <small>
+              선택한 상품을 받을 때 현금 또는 매장 카드단말기로 결제합니다.
+            </small>
+          </span>
+        </label>
+
         <label class="choice">
           <input
             type="radio"
@@ -1056,9 +1059,9 @@
           >
 
           <span>
-            <strong>계좌이체</strong>
+            <strong>계좌이체로 미리 결제</strong>
             <small>
-                문고리 배송을 원하는 경우만 결제 바랍니다.
+              관리자가 입금을 확인한 뒤 픽업 또는 배송을 준비합니다.
             </small>
           </span>
         </label>
@@ -1071,9 +1074,10 @@
           >
 
           <span>
-            <strong>카드 결제</strong>
+            <strong>카드로 미리 결제</strong>
             <small>
-             문고리 배송을 원하는 경우만 결제 바랍니다.
+              토스페이먼츠 카드·간편결제 창에서 바로 결제합니다.
+              승인되면 관리자 화면에 자동으로 결제 완료가 표시됩니다.
             </small>
           </span>
         </label>
@@ -1139,7 +1143,7 @@
     </section>
 
     <p class="privacy-note">
-      문고리 배송은 선결제(카드/계좌이체) 완료 후 이용할 수 있습니다.
+      집 앞 배송은 선결제(카드/계좌이체) 완료 후 이용할 수 있습니다.
     </p>
 
     <a
@@ -1337,6 +1341,11 @@
         if (availableCount) {
           checkoutCard.classList.add(
             "show"
+          );
+
+          showMessage(
+            "결제방법을 선택할 상품을 체크해주세요. 전체 선택 또는 일부 선택이 가능합니다.",
+            "success"
           );
         } else {
           showMessage(
@@ -1636,28 +1645,30 @@
                       ${formatDate(group.pickupDate)}
                     </span>
 
-                  ${
-  assigned
-    ? `
-      <span class="status-badge">
-        ${escapeHtml(statusText)}
-      </span>
-    `
-    : ""
-}
+                    ${
+                      assigned
+                        ? `
+                          <span class="status-badge">
+                            ${escapeHtml(statusText)}
+                          </span>
+                        `
+                        : `
+                          <span class="status-badge">
+                            기본: 매장 픽업 · 픽업할 때 결제
+                          </span>
+                        `
+                    }
                   </div>
                 </div>
 
                 <div class="product-bottom">
-                  ${
-  assigned
-    ? `
-      <span class="product-meta">
-        이미 결제·수령 방법을 신청한 상품입니다.
-      </span>
-    `
-    : `<span></span>`
-}
+                  <span class="product-meta">
+                    ${
+                      assigned
+                        ? "이미 결제·수령 방법을 신청한 상품입니다."
+                        : "변경하지 않으면 매장 픽업·픽업할 때 결제입니다."
+                    }
+                  </span>
 
                   <span class="product-price">
                     ${formatWon(group.lineTotal)}
@@ -1844,17 +1855,36 @@
       const isHome =
         receiptMethod === "home";
 
-     if (
-  paymentMethod ===
-    "pickup_pay"
-) {
-  document.querySelector(
-    'input[name="paymentMethod"][value="bank_transfer"]'
-  ).checked = true;
+      const pickupPayInput =
+        document.querySelector(
+          'input[name="paymentMethod"][value="pickup_pay"]'
+        );
 
-  paymentMethod =
-    "bank_transfer";
-}
+      pickupPayInput.disabled =
+        isHome;
+
+      document
+        .getElementById(
+          "pickupPayChoice"
+        )
+        .style.opacity =
+          isHome
+            ? ".45"
+            : "1";
+
+      if (
+        isHome &&
+        paymentMethod ===
+          "pickup_pay"
+      ) {
+        document.querySelector(
+          'input[name="paymentMethod"][value="bank_transfer"]'
+        ).checked = true;
+
+        paymentMethod =
+          "bank_transfer";
+      }
+
       document
         .getElementById(
           "deliveryFields"
@@ -1933,7 +1963,7 @@
           "이번에 결제할 상품을 한 개 이상 체크해주세요.";
       } else if (!isHome) {
         guide.textContent =
-          "문고리 배송을 원하는 경우만 결제 바랍니다.";
+          "체크한 상품만 결제방법이 변경됩니다. 체크하지 않은 상품은 자동으로 매장 픽업·픽업할 때 결제입니다.";
       } else if (
         productAmount >=
           FREE_DELIVERY_THRESHOLD
@@ -2193,7 +2223,7 @@
           false;
 
         submitCheckoutButton.textContent =
-          "선택 상품 결제·문고리 배송 신청하기";
+          "선택 상품 결제·수령 신청하기";
       }
     }
 
@@ -2372,52 +2402,35 @@
       );
     }
 
-   function formatDate(value) {
-  if (!value) {
-    return "날짜 미정";
-  }
+    function formatDate(value) {
+      if (!value) {
+        return "날짜 미정";
+      }
 
-  const date =
-    new Date(
-      String(value)
-        .slice(0, 10) +
-      "T00:00:00"
-    );
+      const date =
+        new Date(
+          String(value)
+            .slice(0, 10) +
+          "T00:00:00"
+        );
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-    return String(value);
-  }
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return String(value);
+      }
 
-  const weekdays = [
-    "일",
-    "월",
-    "화",
-    "수",
-    "목",
-    "금",
-    "토"
-  ];
-
-  const year =
-    date.getFullYear();
-
-  const month =
-    date.getMonth() + 1;
-
-  const day =
-    date.getDate();
-
-  const weekday =
-    weekdays[
-      date.getDay()
-    ];
-
-  return `${year}년 ${month}월 ${day}일(${weekday})`;
-}
+      return new Intl.DateTimeFormat(
+        "ko-KR",
+        {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        }
+      ).format(date);
+    }
 
     function formatWon(value) {
       return (
