@@ -940,13 +940,11 @@
       id="checkoutCard"
       class="card checkout-card"
     >
-      <h2>선택 상품 결제·수령 방법</h2>
+      <h2>선택 상품 결제</h2>
 
-      <p class="description">
-        체크된 상품만 이번 신청에 포함됩니다.
-        일부 상품을 먼저 결제한 뒤 남은 상품은
-        다시 조회해 다른 결제방법으로 신청할 수 있습니다.
-      </p>
+     <p class="description">
+  문고리 배송을 원하는 상품만 체크한 뒤 결제 방법을 선택해주세요.
+</p>
 
       <div class="summary-box">
         <div class="summary-row">
@@ -965,43 +963,23 @@
         </div>
       </div>
 
-      <h3 style="margin-top:22px;">
-        수령 방법
-      </h3>
+      <div class="choice-grid" style="margin-top:22px;">
+  <label class="choice">
+    <input
+      type="radio"
+      name="receiptMethod"
+      value="home"
+      checked
+    >
 
-      <div class="choice-grid">
-        <label class="choice">
-          <input
-            type="radio"
-            name="receiptMethod"
-            value="pickup"
-            checked
-          >
-
-          <span>
-            <strong>매장 픽업</strong>
-            <small>
-              배송비 0원 · 픽업할 때 결제 또는 미리 결제 가능
-            </small>
-          </span>
-        </label>
-
-        <label class="choice">
-          <input
-            type="radio"
-            name="receiptMethod"
-            value="home"
-          >
-
-          <span>
-            <strong>집 앞 배송</strong>
-            <small>
-              휴대폰 번호·주소 입력 및 선결제 필수 ·
-              선택 상품 합계 4만원 미만 500원 · 4만원 이상 무료
-            </small>
-          </span>
-        </label>
-      </div>
+    <span>
+      <strong>문고리 배송</strong>
+      <small>
+        문고리 배송을 원하는 경우만 결제 바랍니다.
+      </small>
+    </span>
+  </label>
+</div>
 
       <div
         id="deliveryFields"
@@ -1069,25 +1047,7 @@
       </h3>
 
       <div class="choice-grid">
-        <label
-          id="pickupPayChoice"
-          class="choice"
-        >
-          <input
-            type="radio"
-            name="paymentMethod"
-            value="pickup_pay"
-            checked
-          >
-
-          <span>
-            <strong>픽업할 때 결제</strong>
-            <small>
-              선택한 상품을 받을 때 현금 또는 매장 카드단말기로 결제합니다.
-            </small>
-          </span>
-        </label>
-
+        
         <label class="choice">
           <input
             type="radio"
@@ -1096,9 +1056,9 @@
           >
 
           <span>
-            <strong>계좌이체로 미리 결제</strong>
+            <strong>계좌이체</strong>
             <small>
-              관리자가 입금을 확인한 뒤 픽업 또는 배송을 준비합니다.
+                문고리 배송을 원하는 경우만 결제 바랍니다.
             </small>
           </span>
         </label>
@@ -1111,10 +1071,9 @@
           >
 
           <span>
-            <strong>카드로 미리 결제</strong>
+            <strong>카드 결제</strong>
             <small>
-              토스페이먼츠 카드·간편결제 창에서 바로 결제합니다.
-              승인되면 관리자 화면에 자동으로 결제 완료가 표시됩니다.
+             문고리 배송을 원하는 경우만 결제 바랍니다.
             </small>
           </span>
         </label>
@@ -1885,36 +1844,17 @@
       const isHome =
         receiptMethod === "home";
 
-      const pickupPayInput =
-        document.querySelector(
-          'input[name="paymentMethod"][value="pickup_pay"]'
-        );
+     if (
+  paymentMethod ===
+    "pickup_pay"
+) {
+  document.querySelector(
+    'input[name="paymentMethod"][value="bank_transfer"]'
+  ).checked = true;
 
-      pickupPayInput.disabled =
-        isHome;
-
-      document
-        .getElementById(
-          "pickupPayChoice"
-        )
-        .style.opacity =
-          isHome
-            ? ".45"
-            : "1";
-
-      if (
-        isHome &&
-        paymentMethod ===
-          "pickup_pay"
-      ) {
-        document.querySelector(
-          'input[name="paymentMethod"][value="bank_transfer"]'
-        ).checked = true;
-
-        paymentMethod =
-          "bank_transfer";
-      }
-
+  paymentMethod =
+    "bank_transfer";
+}
       document
         .getElementById(
           "deliveryFields"
@@ -1993,7 +1933,7 @@
           "이번에 결제할 상품을 한 개 이상 체크해주세요.";
       } else if (!isHome) {
         guide.textContent =
-          "체크한 상품만 결제방법이 변경됩니다. 체크하지 않은 상품은 자동으로 매장 픽업·픽업할 때 결제입니다.";
+          "문고리 배송을 원하는 경우만 결제 바랍니다.";
       } else if (
         productAmount >=
           FREE_DELIVERY_THRESHOLD
