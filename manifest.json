@@ -1,23 +1,23 @@
 {
-  "name": "담픽 관리자",
-  "short_name": "담픽 관리자",
-  "description": "담픽 공동구매 회원, 상품, 주문 및 픽업 매출 관리 시스템",
+  "name": "담픽 주문 상품 확인",
+  "short_name": "담픽",
+  "description": "담픽 공동구매 주문 조회 및 문고리 배송 신청",
   "lang": "ko-KR",
-  "start_url": "./admin.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#fff7fa",
-  "theme_color": "#ef3f7f",
+  "theme_color": "#f25b94",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "./dampick-icon-192.png.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./icon-512.png",
+      "src": "./dampick-icon-512.png.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
