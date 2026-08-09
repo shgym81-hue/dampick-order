@@ -1677,30 +1677,28 @@
                       ${formatDate(group.pickupDate)}
                     </span>
 
-                    ${
-                      assigned
-                        ? `
-                          <span class="status-badge">
-                            ${escapeHtml(statusText)}
-                          </span>
-                        `
-                        : `
-                          <span class="status-badge">
-                            기본: 매장 픽업 · 픽업할 때 결제
-                          </span>
-                        `
-                    }
+                  ${
+  assigned
+    ? `
+      <span class="status-badge">
+        ${escapeHtml(statusText)}
+      </span>
+    `
+    : ""
+}
                   </div>
                 </div>
 
                 <div class="product-bottom">
-                  <span class="product-meta">
-                    ${
-                      assigned
-                        ? "이미 결제·수령 방법을 신청한 상품입니다."
-                        : "변경하지 않으면 매장 픽업·픽업할 때 결제입니다."
-                    }
-                  </span>
+                  ${
+  assigned
+    ? `
+      <span class="product-meta">
+        이미 결제·수령 방법을 신청한 상품입니다.
+      </span>
+    `
+    : `<span></span>`
+}
 
                   <span class="product-price">
                     ${formatWon(group.lineTotal)}
@@ -2434,35 +2432,52 @@
       );
     }
 
-    function formatDate(value) {
-      if (!value) {
-        return "날짜 미정";
-      }
+   function formatDate(value) {
+  if (!value) {
+    return "날짜 미정";
+  }
 
-      const date =
-        new Date(
-          String(value)
-            .slice(0, 10) +
-          "T00:00:00"
-        );
+  const date =
+    new Date(
+      String(value)
+        .slice(0, 10) +
+      "T00:00:00"
+    );
 
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return String(value);
-      }
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return String(value);
+  }
 
-      return new Intl.DateTimeFormat(
-        "ko-KR",
-        {
-          year: "numeric",
-          month: "long",
-          day: "numeric"
-        }
-      ).format(date);
-    }
+  const weekdays = [
+    "일",
+    "월",
+    "화",
+    "수",
+    "목",
+    "금",
+    "토"
+  ];
+
+  const year =
+    date.getFullYear();
+
+  const month =
+    date.getMonth() + 1;
+
+  const day =
+    date.getDate();
+
+  const weekday =
+    weekdays[
+      date.getDay()
+    ];
+
+  return `${year}년 ${month}월 ${day}일(${weekday})`;
+}
 
     function formatWon(value) {
       return (
