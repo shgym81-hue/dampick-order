@@ -765,6 +765,7 @@
         font-size: 13px;
         line-height: 1.55;
       }
+      
 
       .description {
         font-size: 14px;
@@ -804,6 +805,41 @@
       .product-price {
         text-align: right;
       }
+    }
+
+    .product-price {
+        text-align: right;
+      }
+    }
+
+    .door-delivery-guide {
+      display: block !important;
+      max-width: 430px;
+      margin: 14px auto 0 !important;
+      padding: 14px 16px !important;
+      border: 1px solid rgba(244, 20, 104, .18) !important;
+      border-radius: 14px !important;
+      background: #fff5f8 !important;
+      text-align: left !important;
+      color: #252a38 !important;
+    }
+
+    .door-delivery-guide strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #d80656 !important;
+      font-size: 15px;
+      font-weight: 950;
+      text-align: center;
+    }
+
+    .door-delivery-guide span {
+      display: block;
+      margin-top: 5px;
+      color: #333;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.45;
     }
   </style>
 </head>
@@ -856,10 +892,11 @@
           닉네임으로 주문 상품과 픽업 날짜를 확인하세요.
         </p>
 
-        <p class="default-order-guide">
-          별도 신청이 없으면
-          <strong>매장 픽업 · 픽업 시 결제</strong>로 진행됩니다.
-        </p>
+       <div class="default-order-guide door-delivery-guide">
+  <strong>문고리 배송 안내</strong>
+  <span>- 월·화 픽업 상품 → 수요일 새벽 배송</span>
+  <span>- 수·목·금 픽업 상품 → 금요일 오후 배송</span>
+</div>
       </div>
 
       <label
