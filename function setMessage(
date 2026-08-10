@@ -4102,7 +4102,7 @@
       );
     }
 
-        function formatDate(value) {
+      function formatDate(value) {
       if (!value) {
         return "날짜 미정";
       }
@@ -4144,30 +4144,6 @@
         weekday +
         ")"
       );
-    }
-
-      const date =
-        new Date(
-          String(value).slice(0, 10) +
-          "T00:00:00"
-        );
-
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return String(value);
-      }
-
-      return new Intl.DateTimeFormat(
-        "ko-KR",
-        {
-          year: "numeric",
-          month: "long",
-          day: "numeric"
-        }
-      ).format(date);
     }
 
     function setMessage(
