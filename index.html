@@ -73,13 +73,13 @@
       width: min(880px, 100%);
       margin: 0 auto;
       padding:
-        calc(38px + env(safe-area-inset-top))
-        18px
-        calc(50px + env(safe-area-inset-bottom));
+        calc(26px + env(safe-area-inset-top))
+        16px
+        calc(22px + env(safe-area-inset-bottom));
     }
 
     .brand {
-      margin-bottom: 28px;
+      margin-bottom: 18px;
       text-align: center;
     }
 
@@ -121,12 +121,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 13px;
-      margin-top: 21px;
+      gap: 12px;
+      margin-top: 16px;
       color: #242832;
-      font-size: clamp(20px, 3vw, 28px);
-      font-weight: 850;
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 900;
       letter-spacing: -1px;
+      text-align: center;
     }
 
     .brand-subtitle::before,
@@ -142,15 +143,15 @@
     }
 
     .card {
-      margin-top: 18px;
-      padding: 28px;
+      margin-top: 14px;
+      padding: 24px;
       border: 1px solid rgba(238,226,231,.9);
       border-radius: 25px;
       background: rgba(255,255,255,.98);
       box-shadow: var(--shadow);
     }
 
-    .lookup-card { padding: 36px 40px 38px; }
+    .lookup-card { padding: 28px 32px 30px; }
 
     h2, h3 {
       margin-top: 0;
@@ -159,8 +160,8 @@
     }
 
     h2 {
-      margin-bottom: 16px;
-      font-size: clamp(27px, 4vw, 37px);
+      margin-bottom: 12px;
+      font-size: clamp(28px, 4vw, 38px);
       line-height: 1.2;
     }
 
@@ -179,8 +180,9 @@
     .lookup-description > p {
       margin: 0;
       color: var(--sub);
-      font-size: 16px;
-      line-height: 1.65;
+      font-size: 17px;
+      line-height: 1.6;
+      text-align: center;
       word-break: keep-all;
     }
 
@@ -224,9 +226,10 @@
     .default-guide {
       margin: 12px auto 0;
       color: #67616a;
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 750;
       line-height: 1.55;
+      text-align: center;
       word-break: keep-all;
     }
 
@@ -561,12 +564,13 @@
       justify-content: center;
       align-items: center;
       gap: 6px;
-      margin: 24px auto 0;
+      max-width: 420px;
+      margin: 14px auto 0;
       color: #333;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 800;
       text-align: center;
-      line-height: 1.5;
+      line-height: 1.45;
       word-break: keep-all;
     }
 
@@ -586,8 +590,8 @@
     .admin-page-link {
       display: block;
       width: max-content;
-      margin: 22px auto 0;
-      padding: 5px 7px;
+      margin: 14px auto 0;
+      padding: 4px 6px;
       color: #a0a0a7;
       font-size: 11px;
       text-decoration: underline;
@@ -597,47 +601,75 @@
     @media (max-width: 640px) {
       .page {
         padding:
-          calc(27px + env(safe-area-inset-top))
-          13px
-          calc(40px + env(safe-area-inset-bottom));
+          calc(18px + env(safe-area-inset-top))
+          14px
+          calc(18px + env(safe-area-inset-bottom));
       }
 
-      .brand { margin-bottom: 23px; }
+      .brand { margin-bottom: 14px; }
 
       .brand-mark {
-        width: 54px;
-        height: 54px;
-        border-radius: 17px;
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+        border-radius: 16px;
+      }
+
+      .brand h1 {
+        font-size: clamp(40px, 11vw, 56px);
+      }
+
+      .brand-subtitle {
+        margin-top: 12px;
+        font-size: 22px;
       }
 
       .lookup-card,
-      .card { padding: 21px 16px 24px; }
+      .card { padding: 18px 16px 20px; }
 
       .lookup-card > h2 {
-        font-size: 27px;
+        margin-bottom: 10px;
+        font-size: 30px;
         text-align: center;
       }
 
       .lookup-description > p {
-        font-size: 14px;
+        font-size: 15px;
       }
 
       .door-delivery-guide {
-        padding: 13px 14px;
+        margin-top: 12px;
+        padding: 12px 12px 13px;
+      }
+
+      .door-delivery-guide strong {
+        font-size: 15px;
       }
 
       .door-delivery-guide span {
+        font-size: 12.8px;
+      }
+
+      .default-guide {
+        margin-top: 10px;
         font-size: 13px;
       }
 
+      label.field-label {
+        margin: 18px 0 8px;
+        font-size: 15px;
+      }
+
       .lookup-card #nickname {
-        min-height: 58px;
-        font-size: 16px;
+        min-height: 54px;
+        padding: 14px 16px;
+        font-size: 17px;
       }
 
       .lookup-card #lookupButton {
-        min-height: 62px;
-        font-size: 20px;
+        min-height: 58px;
+        margin-top: 16px;
+        font-size: 19px;
       }
 
       .product-bottom {
@@ -648,7 +680,12 @@
       .product-price { text-align: right; }
 
       .privacy-note {
-        font-size: 10.5px;
+        margin-top: 12px;
+        font-size: 10px;
+      }
+
+      .admin-page-link {
+        display: none;
       }
     }
   </style>
@@ -668,11 +705,11 @@
       </div>
 
       <h1>DAMPICK <span>담픽</span></h1>
-      <div class="brand-subtitle">주문 상품 확인</div>
+      <div class="brand-subtitle">내 주문 조회</div>
     </header>
 
     <section class="card lookup-card">
-      <h2>내 주문 조회</h2>
+      <h2>주문 상품 확인</h2>
 
       <div class="lookup-description">
         <p>닉네임으로 주문 상품과 픽업 날짜를 확인하세요.</p>
