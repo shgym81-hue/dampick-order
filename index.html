@@ -185,33 +185,40 @@
     }
 
     .door-delivery-guide {
-      display: block;
-      max-width: 470px;
-      margin: 14px auto 0;
-      padding: 14px 16px;
-      border: 1px solid rgba(244,20,104,.18);
-      border-radius: 14px;
+      display: flex;
+      width: min(100%, 500px);
+      margin: 16px auto 0;
+      padding: 17px 20px 18px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(244,20,104,.20);
+      border-radius: 15px;
       color: #333;
       background: #fff5f8;
-      text-align: left;
+      text-align: center;
     }
 
     .door-delivery-guide strong {
       display: block;
-      margin-bottom: 8px;
+      margin: 0 0 2px;
       color: var(--main-dark);
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 950;
+      line-height: 1.4;
       text-align: center;
     }
 
     .door-delivery-guide span {
       display: block;
-      margin-top: 5px;
-      color: #333;
+      margin: 0;
+      color: #222;
       font-size: 14px;
-      font-weight: 800;
-      line-height: 1.5;
+      font-weight: 850;
+      line-height: 1.55;
+      text-align: center;
+      word-break: keep-all;
     }
 
     .default-guide {
@@ -672,10 +679,8 @@
 
         <div class="door-delivery-guide">
           <strong>문고리 배송 안내</strong>
-          <span>• 월·화 픽업 상품 → 수요일 새벽 배송</span>
-          <span>• 수·목·금 픽업 상품 → 금요일 오후 배송</span>
-          <span>• 주문금액 40,000원 초과 → 무료배송</span>
-          <span>• 주문금액 40,000원 이하 → 배송비 500원</span>
+          <span>월·화 픽업 상품 → 수요일 새벽 배송</span>
+          <span>수·목·금 픽업 상품 → 금요일 오후 배송</span>
         </div>
 
         <div class="default-guide">
