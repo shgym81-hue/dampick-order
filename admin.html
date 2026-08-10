@@ -4102,10 +4102,49 @@
       );
     }
 
-    function formatDate(value) {
+        function formatDate(value) {
       if (!value) {
         return "날짜 미정";
       }
+
+      const date =
+        new Date(
+          String(value).slice(0, 10) +
+          "T00:00:00"
+        );
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return String(value);
+      }
+
+      const weekdays = [
+        "일",
+        "월",
+        "화",
+        "수",
+        "목",
+        "금",
+        "토"
+      ];
+
+      const weekday =
+        weekdays[date.getDay()];
+
+      return (
+        date.getFullYear() +
+        "년 " +
+        (date.getMonth() + 1) +
+        "월 " +
+        date.getDate() +
+        "일 (" +
+        weekday +
+        ")"
+      );
+    }
 
       const date =
         new Date(
