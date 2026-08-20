@@ -1,1254 +1,1814 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#180824" />
-  <title>모아넥트 타임벨</title>
-  <meta name="timebell-build" content="2026-08-12-soundpack-v2" />
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png" />
-  <meta name="application-name" content="모아넥트 타임벨" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="타임벨" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <title>담픽 내 주문 조회·문고리 배송</title>
+  <meta name="description" content="담픽 내 주문 조회 및 문고리 배송 신청">
+  <meta name="theme-color" content="#f25b94">
+
+  <!-- 담픽 아이콘 / 홈화면 설치 -->
+  <link rel="icon" type="image/png" sizes="192x192" href="./dampick-icon-192.png.png?v=3">
+  <link rel="apple-touch-icon" sizes="180x180" href="./dampick-icon-512.png.png?v=3">
+  <link rel="manifest" href="./manifest.json?v=3">
+
+  <!-- 카카오톡 / SNS 미리보기 -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="담픽">
+  <meta property="og:title" content="담픽 내 주문 조회">
+  <meta property="og:description" content="닉네임으로 주문 상품을 조회하고 문고리 배송을 신청하세요.">
+  <meta property="og:image" content="https://shgym81-hue.github.io/dampick-order/dampick-og.png.png?v=3">
+  <meta property="og:url" content="https://shgym81-hue.github.io/dampick-order/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="담픽 내 주문 조회">
+  <meta name="twitter:description" content="닉네임으로 주문 상품을 조회하고 문고리 배송을 신청하세요.">
+  <meta name="twitter:image" content="https://shgym81-hue.github.io/dampick-order/dampick-og.png.png?v=3">
+
   <style>
-    :root {
-      --bg: #13051f;
-      --panel: rgba(35, 12, 55, 0.94);
-      --panel-2: rgba(49, 18, 74, 0.88);
-      --text: #fff8ff;
-      --muted: #c6a9d5;
-      --line: rgba(230, 199, 245, 0.18);
-      --accent: #be4ce5;
-      --accent-2: #f059a9;
-      --good: #2bd58c;
-      --prepare: #f59e0b;
-      --work: #ef4444;
-      --rest: #3b82f6;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
-    body.theme-orange {
-      --bg: #1a0d05;
-      --panel: rgba(55, 28, 11, 0.96);
-      --panel-2: rgba(78, 43, 18, 0.90);
-      --text: #fffaf3;
-      --muted: #ffd0a7;
-      --line: rgba(255, 186, 122, 0.28);
-      --accent: #ff6b1a;
-      --accent-2: #ff9f3f;
-    }
-    body.theme-yellow {
-      --bg: #211b04;
-      --panel: rgba(68, 55, 9, 0.96);
-      --panel-2: rgba(92, 75, 14, 0.90);
-      --text: #fffbe6;
-      --muted: #f7dc75;
-      --line: rgba(250, 204, 21, 0.32);
-      --accent: #facc15;
-      --accent-2: #f59e0b;
-    }
-    body.theme-red {
-      --bg: #23060a;
-      --panel: rgba(78, 13, 22, 0.96);
-      --panel-2: rgba(104, 18, 31, 0.90);
-      --text: #fff5f5;
-      --muted: #ffb4b4;
-      --line: rgba(248, 113, 113, 0.32);
-      --accent: #ff3b30;
-      --accent-2: #fb7185;
-    }
-    body.theme-blue {
-      --bg: #061c3a;
-      --panel: rgba(9, 42, 86, 0.96);
-      --panel-2: rgba(13, 59, 115, 0.90);
-      --text: #f3f9ff;
-      --muted: #a9d4ff;
-      --line: rgba(96, 165, 250, 0.34);
-      --accent: #2f80ff;
-      --accent-2: #38bdf8;
-    }
-    body.theme-green {
-      --bg: #062715;
-      --panel: rgba(8, 68, 37, 0.96);
-      --panel-2: rgba(13, 92, 52, 0.90);
-      --text: #f3fff7;
-      --muted: #a6f4c5;
-      --line: rgba(74, 222, 128, 0.32);
-      --accent: #22c55e;
-      --accent-2: #4ade80;
-    }
-    body.theme-purple {
-      --bg: #13051f;
-      --panel: rgba(35, 12, 55, 0.94);
-      --panel-2: rgba(49, 18, 74, 0.88);
-      --text: #fff8ff;
-      --muted: #c6a9d5;
-      --line: rgba(230, 199, 245, 0.18);
-      --accent: #be4ce5;
-      --accent-2: #f059a9;
-    }
-
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
+
+    :root {
+      --main: #f41468;
+      --main-light: #ff4d8d;
+      --main-dark: #d80656;
+      --navy: #101a38;
+      --text: #252a38;
+      --sub: #686e7a;
+      --border: #f0dce4;
+      --soft: #fff5f8;
+      --success: #176a3e;
+      --danger: #a62840;
+      --warning: #6b4b00;
+      --shadow: 0 18px 50px rgba(128,37,75,.12);
+    }
+
+    html {
+      background: #fff9fb;
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100svh;
+      margin: 0;
       color: var(--text);
       background:
-        radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--accent) 25%, transparent), transparent 30%),
-        radial-gradient(circle at 88% 82%, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 34%),
-        var(--bg);
-      overflow-x: hidden;
-      transition: background 0.25s ease;
+        radial-gradient(circle at 50% -5%, rgba(255,75,139,.12), transparent 32%),
+        linear-gradient(180deg, #fff9fb 0%, #ffffff 50%, #fff9fb 100%);
+      font-family:
+        "Pretendard",
+        "Noto Sans KR",
+        "Apple SD Gothic Neo",
+        Arial,
+        sans-serif;
     }
-    body.phase-prepare { background: radial-gradient(circle at 50% 25%, rgba(245,158,11,.28), transparent 38%), var(--bg); }
-    body.phase-work { background: radial-gradient(circle at 50% 25%, rgba(239,68,68,.30), transparent 42%), var(--bg); }
-    body.phase-rest { background: radial-gradient(circle at 50% 25%, rgba(59,130,246,.30), transparent 42%), var(--bg); }
-    body.phase-finished { background: radial-gradient(circle at 50% 25%, rgba(43,213,140,.28), transparent 42%), var(--bg); }
 
-    button, input, select { font: inherit; }
+    button,
+    input,
+    textarea { font: inherit; }
+
     button { cursor: pointer; }
-    button:disabled { cursor: not-allowed; opacity: .45; }
 
-    .app { width: min(1500px, 100%); min-height: 100vh; margin: 0 auto; padding: 14px; }
-    .topbar {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      margin-bottom: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 22px;
-      background: linear-gradient(135deg, color-mix(in srgb, var(--panel) 96%, transparent), color-mix(in srgb, var(--panel-2) 88%, transparent));
+    .page {
+      width: min(880px, 100%);
+      margin: 0 auto;
+      padding:
+        calc(26px + env(safe-area-inset-top))
+        16px
+        calc(22px + env(safe-area-inset-bottom));
+    }
+
+    .brand {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 12px;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 20px;
+      color: #fff;
+      background: linear-gradient(145deg, #ff5a92, #e30a5d);
+      box-shadow: 0 14px 30px rgba(216,6,86,.22);
+    }
+
+    .brand-mark svg {
+      width: 37px;
+      height: 37px;
+      display: block;
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: var(--main);
+      font-size: clamp(44px, 8vw, 66px);
+      font-weight: 950;
+      letter-spacing: -3px;
+      line-height: 1;
+    }
+
+    .brand h1 span {
+      margin-left: 7px;
+      font-size: .39em;
+      letter-spacing: -1px;
+    }
+
+    .card {
+      margin-top: 14px;
+      padding: 24px;
+      border: 1px solid rgba(238,226,231,.9);
+      border-radius: 25px;
+      background: rgba(255,255,255,.98);
       box-shadow: var(--shadow);
     }
-    .app-brand { min-width: 0; display: flex; align-items: center; gap: 11px; }
-    .app-icon {
-      width: 48px; height: 48px; flex: 0 0 auto; display: grid; place-items: center;
-      border-radius: 14px; overflow: hidden; background: transparent;
-      box-shadow: 0 10px 28px color-mix(in srgb, var(--accent) 28%, transparent);
-    }
-    .app-icon img {
-      width: 100%; height: 100%; display: block; object-fit: contain;
-    }
-    .brand-text { min-width: 0; }
-    .brand-title { font-size: clamp(17px, 2.5vw, 24px); font-weight: 950; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .brand-subtitle { margin-top: 2px; color: var(--muted); font-size: clamp(11px, 1.6vw, 14px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .brand-edit-btn {
-      flex: 0 0 auto; margin-left: 3px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 999px;
-      color: var(--text); background: rgba(0,0,0,.18); font-size: 12px; font-weight: 850;
-    }
-    .top-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 
-    .btn {
-      min-height: 48px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 14px;
-      color: var(--text); background: color-mix(in srgb, var(--panel-2) 86%, transparent); font-weight: 900;
-      transition: transform .15s ease, filter .15s ease, opacity .15s ease;
-    }
-    .btn:active:not(:disabled) { transform: scale(.98); }
-    .btn.primary { border-color: transparent; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
-    .btn.good { border-color: transparent; background: linear-gradient(135deg, #16a66d, var(--good)); color: #fff; }
-    .btn.ghost { min-height: 44px; background: rgba(0,0,0,.18); }
-    .settings-toggle { display: none; }
+    .lookup-card { padding: 28px 32px 30px; }
 
-    .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(360px, .72fr); gap: 12px; }
-    .layout.settings-hidden { grid-template-columns: 1fr; }
-    .display-card, .settings-card {
-      border: 1px solid var(--line); border-radius: 24px;
-      background: linear-gradient(160deg, color-mix(in srgb, var(--panel) 97%, transparent), color-mix(in srgb, var(--panel-2) 82%, transparent));
-      box-shadow: var(--shadow);
+    h2, h3 {
+      margin-top: 0;
+      color: var(--navy);
+      letter-spacing: -1px;
     }
-    .display-card {
-      min-height: calc(100vh - 105px); padding: clamp(18px, 3vw, 38px);
-      display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
-    }
-    .settings-card { max-height: calc(100vh - 105px); padding: 16px; overflow-y: auto; }
-    .settings-card.collapsed { display: none; }
 
-    .status-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .round-label { color: var(--muted); font-size: clamp(20px, 2.2vw, 32px); font-weight: 950; letter-spacing: .03em; }
-    .phase-badge {
-      padding: 10px 15px; border: 1px solid var(--line); border-radius: 999px;
-      color: var(--text); background: rgba(255,255,255,.06); font-weight: 950;
+    h2 {
+      margin-bottom: 12px;
+      font-size: clamp(30px, 4.2vw, 40px);
+      line-height: 1.2;
+      text-align: center;
     }
-    .timer-wrap { flex: 1; display: grid; place-items: center; min-height: 240px; }
-    .timer {
-      font-variant-numeric: tabular-nums; font-size: clamp(96px, 15vw, 260px); line-height: .88;
-      font-weight: 1000; letter-spacing: -.075em; text-shadow: 0 15px 55px rgba(0,0,0,.38);
-    }
-    .sub-status { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
-    .sub-status strong { font-size: clamp(22px, 3vw, 42px); }
-    .sub-status span { max-width: 52%; color: var(--muted); text-align: right; font-size: clamp(13px, 1.5vw, 17px); }
-    .progress-track { height: 12px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.09); }
-    .progress-bar { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .12s linear; }
-    .control-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
 
-    .section { padding: 15px; border: 1px solid var(--line); border-radius: 18px; background: rgba(0,0,0,.14); }
-    .section + .section { margin-top: 12px; }
-    .section-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 12px; font-size: 18px; }
-    .section-title small { color: var(--muted); font-size: 11px; font-weight: 650; }
-    .preset-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
-    .preset-btn {
-      min-height: 67px; padding: 10px; border: 1px solid var(--line); border-radius: 13px;
-      color: var(--text); background: rgba(255,255,255,.04); text-align: left; font-weight: 950;
-    }
-    .preset-btn small { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; font-weight: 700; }
-    .preset-btn.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent); }
-    .preset-btn.time-change-btn {
-      border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
-      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent-2) 13%, transparent));
-    }
-    .preset-btn.time-change-btn span::before { content: "⏱ "; }
+    h3 { font-size: 20px; }
 
-    .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
-    .field { display: flex; flex-direction: column; gap: 6px; }
-    .field.full { grid-column: 1 / -1; }
-    .field label { color: var(--muted); font-size: 12px; font-weight: 850; }
-    input, select {
-      width: 100%; min-height: 43px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 11px;
-      color: var(--text); background: color-mix(in srgb, var(--bg) 70%, #000 10%); outline: none;
+    .lookup-card > h2 { text-align: center; }
+
+    .lookup-description {
+      max-width: 640px;
+      margin: 0 auto;
+      padding-bottom: 23px;
+      border-bottom: 1px solid #ececef;
+      text-align: center;
     }
-    select option { color: #111; background: #fff; }
-    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
-    .inline-time { display: grid; grid-template-columns: 1fr auto 1fr auto; align-items: center; gap: 6px; }
-    .sound-select-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; gap: 7px; }
-    .sound-preview-btn {
-      min-width: 86px; min-height: 43px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 11px;
-      color: var(--text); background: color-mix(in srgb, var(--accent) 15%, rgba(255,255,255,.04)); font-size: 12px; font-weight: 900;
+
+    .lookup-description > p {
+      margin: 0;
+      color: var(--sub);
+      font-size: 17px;
+      line-height: 1.6;
+      text-align: center;
+      font-weight: 600;
+      word-break: keep-all;
     }
-    .sound-preview-btn:active:not(:disabled) { transform: scale(.98); }
-    .switch-list { display: grid; gap: 8px; }
-    .switch-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
-    .switch-line:last-child { border-bottom: 0; }
-    .switch { position: relative; width: 46px; height: 26px; flex: 0 0 auto; }
-    .switch input { position: absolute; opacity: 0; pointer-events: none; }
-    .slider { position: absolute; inset: 0; border-radius: 999px; background: rgba(255,255,255,.16); transition: .2s; }
-    .slider::before { content: ""; position: absolute; width: 20px; height: 20px; top: 3px; left: 3px; border-radius: 50%; background: #fff; transition: .2s; }
-    .switch input:checked + .slider { background: var(--accent); }
-    .switch input:checked + .slider::before { transform: translateX(20px); }
-    .volume-row { display: grid; grid-template-columns: 1fr 48px; align-items: center; gap: 10px; }
-    .small-note { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+
+    .door-delivery-guide {
+      display: flex;
+      width: min(100%, 500px);
+      margin: 16px auto 0;
+      padding: 17px 20px 18px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(244,20,104,.20);
+      border-radius: 15px;
+      color: #333;
+      background: #fff5f8;
+      text-align: center;
+    }
+
+    .door-delivery-guide strong {
+      display: block;
+      margin: 0 0 2px;
+      color: var(--main-dark);
+      font-size: 16px;
+      font-weight: 950;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .door-delivery-guide span {
+      display: block;
+      margin: 0;
+      color: #222;
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.55;
+      text-align: center;
+      word-break: keep-all;
+    }
+
+    .default-guide {
+      margin: 12px auto 0;
+      color: #67616a;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.55;
+      text-align: center;
+      word-break: keep-all;
+    }
+
+    label.field-label {
+      display: block;
+      margin: 22px 0 10px;
+      color: var(--navy);
+      font-size: 17px;
+      font-weight: 950;
+      letter-spacing: -.3px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    textarea {
+      width: 100%;
+      padding: 16px 18px;
+      border: 1px solid #dddfe5;
+      border-radius: 15px;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .lookup-card #nickname {
+      min-height: 66px;
+      padding: 18px 20px;
+      border: 2px solid rgba(244,20,104,.78);
+      border-radius: 18px;
+      background: #fffafc;
+      box-shadow: 0 8px 22px rgba(244,20,104,.10);
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    input::placeholder,
+    textarea::placeholder { color: #a7abb5; }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--main);
+      box-shadow: 0 0 0 4px rgba(244,20,104,.09);
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .primary-button {
+      width: 100%;
+      min-height: 58px;
+      margin-top: 15px;
+      border: 0;
+      border-radius: 16px;
+      color: #fff;
+      background: linear-gradient(105deg, var(--main-light), var(--main-dark));
+      box-shadow: 0 14px 28px rgba(216,6,86,.24);
+      font-size: 18px;
+      font-weight: 950;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+
+    .primary-button:hover:not(:disabled) { transform: translateY(-1px); }
+
+    .primary-button:disabled {
+      opacity: .5;
+      cursor: default;
+      transform: none;
+    }
+
+    .lookup-card #lookupButton {
+      position: relative;
+      min-height: 70px;
+      margin-top: 18px;
+      font-size: 24px;
+    }
+
+    .message {
+      display: none;
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 13px;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: center;
+      word-break: keep-all;
+    }
+
+    .message.show { display: block; }
+    .message.error { color: var(--danger); background: #fff0f4; }
+    .message.success { color: var(--success); background: #eaf8ef; }
+
+    .results { margin-top: 20px; }
+
+    .select-all-box {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 11px;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 15px;
+      border: 2px solid #f2a3c0;
+      border-radius: 16px;
+      background: #fff4f8;
+    }
+
+    .select-all-box input,
+    .product-head input,
+    .choice input {
+      accent-color: var(--main);
+    }
+
+    .select-all-box input {
+      width: 24px;
+      height: 24px;
+    }
+
+    .select-all-box strong {
+      color: var(--navy);
+      font-size: 16px;
+    }
+
+    .select-all-box small {
+      display: block;
+      margin-top: 4px;
+      color: var(--sub);
+      line-height: 1.5;
+    }
+
+    .product-card {
+      margin-top: 10px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: #fffafd;
+    }
+
+    .product-card.selected {
+      border-color: #f27fa9;
+      background: #fff3f8;
+    }
+
+    .product-card.assigned {
+      border-color: #d5d5d5;
+      background: #f7f7f7;
+    }
+
+    .product-head {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 11px;
+      align-items: start;
+    }
+
+    .product-head input {
+      width: 23px;
+      height: 23px;
+      margin-top: 2px;
+    }
+
+    .product-name {
+      color: var(--navy);
+      font-size: 17px;
+      font-weight: 950;
+      line-height: 1.45;
+    }
+
+    .product-meta {
+      margin-top: 6px;
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .quantity-badge,
+    .pickup-badge,
+    .status-badge,
+    .delivery-badge {
+      display: inline-flex;
+      margin: 6px 5px 0 0;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .quantity-badge { color: #214e87; background: #e8f2ff; }
+    .pickup-badge { color: #6c4d00; background: #fff3c9; }
+    .delivery-badge { color: #8a3c00; background: #fff0c2; }
+    .status-badge { color: #176a3e; background: #e6f7ed; }
+
+    .product-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-end;
+      margin-top: 13px;
+      padding-top: 12px;
+      border-top: 1px dashed #eadce2;
+    }
+
+    .product-price {
+      flex: 0 0 auto;
+      color: var(--main-dark);
+      font-size: 18px;
+      font-weight: 950;
+    }
+
+    .checkout-card { display: none; }
+    .checkout-card.show { display: block; }
+
+    .description {
+      margin: 0;
+      color: var(--sub);
+      font-size: 15px;
+      line-height: 1.75;
+      word-break: keep-all;
+    }
+
+    .summary-box {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      color: #fff;
+      background: #20232b;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+    }
+
+    .summary-row.final {
+      margin-top: 5px;
+      padding-top: 13px;
+      border-top: 1px solid rgba(255,255,255,.18);
+      font-size: 18px;
+    }
+
+    .summary-row.final strong {
+      color: #ff8db4;
+      font-size: 22px;
+    }
+
+    .choice-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .choice {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 15px;
+      border: 1px solid #eadde3;
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .choice:has(input:checked) {
+      border-color: #f27fa9;
+      background: #fff4f8;
+    }
+
+    .choice input {
+      width: 20px;
+      height: 20px;
+    }
+
+    .choice strong {
+      display: block;
+      color: var(--navy);
+    }
+
+    .choice small {
+      display: block;
+      margin-top: 4px;
+      color: var(--sub);
+      line-height: 1.55;
+    }
+
+    .delivery-fields,
+    .bank-box,
+    .card-box {
+      margin-top: 14px;
+      padding: 16px;
+      border: 1px solid #f1c9d8;
+      border-radius: 14px;
+      background: #fff7fa;
+    }
+
+    .delivery-fields[hidden],
+    .bank-box[hidden],
+    .card-box[hidden] { display: none; }
+
+    .bank-account {
+      margin: 7px 0;
+      color: var(--main-dark);
+      font-size: 18px;
+      font-weight: 950;
+    }
+
     .notice {
-      margin-top: 10px; padding: 10px 11px; border: 1px solid var(--line); border-radius: 12px;
-      color: var(--muted); background: rgba(255,255,255,.035); font-size: 11px; line-height: 1.55;
-    }
-    .name-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
-    .theme-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 7px; }
-    .theme-btn { min-height: 40px; padding: 6px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); background: rgba(255,255,255,.04); font-weight: 850; }
-    .theme-btn.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent); }
-    .footer-status { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
-    .mini-chip { padding: 7px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: rgba(255,255,255,.04); font-size: 11px; }
-
-    .modal-backdrop {
-      position: fixed; inset: 0; z-index: 1000; display: none; align-items: center; justify-content: center;
-      padding: 18px; background: rgba(0,0,0,.72); backdrop-filter: blur(8px);
-    }
-    .modal-backdrop.open { display: flex; }
-    .modal { width: min(520px, 100%); padding: 20px; border: 1px solid var(--line); border-radius: 22px; background: var(--panel); box-shadow: var(--shadow); }
-    .modal h2 { margin: 0 0 14px; }
-    .modal-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
-    .modal-actions.two { grid-template-columns: repeat(2, 1fr); }
-    .time-editor-summary { margin: -5px 0 13px; color: var(--muted); font-size: 12px; line-height: 1.55; }
-
-    .toast {
-      position: fixed; left: 50%; bottom: calc(22px + var(--safe-bottom)); z-index: 2000;
-      max-width: calc(100vw - 28px); transform: translate(-50%, 25px); opacity: 0; pointer-events: none;
-      padding: 11px 15px; border: 1px solid var(--line); border-radius: 999px; color: #fff;
-      background: rgba(17, 17, 20, .92); box-shadow: 0 14px 35px rgba(0,0,0,.42); font-size: 13px; font-weight: 850;
-      transition: opacity .2s, transform .2s;
-    }
-    .toast.show { opacity: 1; transform: translate(-50%, 0); }
-
-    /* 전체화면에서만 보이는 작은 프로그램 선택 바 */
-    .fullscreen-program-bar { display: none; }
-    body.fullscreen-mode .topbar, body.fullscreen-mode .settings-card { display: none !important; }
-    body.fullscreen-mode .app { width: 100%; padding: 0; }
-    body.fullscreen-mode .layout { display: block; }
-    body.fullscreen-mode .display-card {
-      min-height: 100vh; border: 0; border-radius: 0;
-      padding: clamp(16px, 3vh, 34px) clamp(16px, 3vw, 42px) calc(118px + var(--safe-bottom));
-    }
-    /* 전체화면에서는 타이머 숫자를 화면 폭에 가깝게 크게 표시 */
-    body.fullscreen-mode .timer-wrap {
-      width: 100%; min-height: 0; overflow: visible;
-    }
-    body.fullscreen-mode .timer {
-      width: 100%; white-space: nowrap; text-align: center;
-      font-size: clamp(160px, min(38vw, 42vh), 430px);
-      line-height: .82; letter-spacing: -.085em;
-    }
-    body.fullscreen-mode .control-row { margin-bottom: 0; opacity: .76; }
-    body.fullscreen-mode .fullscreen-program-bar {
-      position: fixed; left: 50%; bottom: calc(12px + var(--safe-bottom)); z-index: 500;
-      width: min(820px, calc(100vw - 24px)); transform: translateX(-50%);
-      display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 9px;
-      padding: 8px; border: 1px solid var(--line); border-radius: 16px;
-      background: color-mix(in srgb, var(--panel) 88%, transparent); box-shadow: 0 14px 38px rgba(0,0,0,.42); backdrop-filter: blur(14px);
-    }
-    .fs-program-label { padding: 0 8px; color: var(--muted); font-size: 11px; font-weight: 900; white-space: nowrap; }
-    .fs-program-list { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; }
-    .fs-program-btn {
-      min-width: 0; min-height: 43px; padding: 6px 7px; border: 1px solid var(--line); border-radius: 10px;
-      color: var(--text); background: rgba(255,255,255,.055); overflow: hidden; font-weight: 900;
-    }
-    .fs-program-btn span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
-    .fs-program-btn small { display: block; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 9px; }
-    .fs-program-btn.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 22%, transparent); }
-    .fs-program-btn.time-change-btn {
-      border-color: color-mix(in srgb, var(--accent) 70%, var(--line));
-      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 24%, transparent), color-mix(in srgb, var(--accent-2) 14%, transparent));
+      margin-top: 13px;
+      padding: 13px;
+      border-radius: 12px;
+      color: var(--warning);
+      background: #fff8da;
+      font-size: 13px;
+      line-height: 1.65;
+      word-break: keep-all;
     }
 
-    @media (max-width: 1050px) {
-      .layout { grid-template-columns: 1fr; }
-      .display-card { min-height: 68vh; }
-      .settings-card { max-height: none; }
-      .settings-toggle { display: inline-flex; }
+    .complete-box {
+      display: none;
+      margin-top: 16px;
+      padding: 18px;
+      border: 1px solid #afe0c5;
+      border-radius: 17px;
+      color: #155e39;
+      background: #effbf4;
+      line-height: 1.75;
     }
-    @media (max-width: 650px) {
-      .app { padding: 8px; }
-      .topbar { align-items: flex-start; padding: 10px; border-radius: 18px; }
-      .app-icon { width: 42px; height: 42px; border-radius: 12px; }
-      .app-icon img { width: 100%; height: 100%; }
-      .brand-edit-btn { padding: 7px 8px; font-size: 10px; }
-      .top-actions { gap: 6px; }
-      .top-actions .btn { min-height: 42px; padding: 8px 10px; font-size: 12px; }
-      .display-card { min-height: 63vh; padding: 16px; border-radius: 18px; }
-      .settings-card { padding: 10px; border-radius: 18px; }
-      .timer { font-size: clamp(82px, 28vw, 170px); }
-      .timer-wrap { min-height: 200px; }
-      .sub-status { align-items: flex-start; flex-direction: column; }
-      .sub-status span { max-width: none; text-align: left; }
-      .control-row { grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .field-grid, .name-grid { grid-template-columns: 1fr; }
-      .field.full { grid-column: auto; }
-      .sound-select-row { grid-template-columns: minmax(0, 1fr) 78px; }
-      .sound-preview-btn { min-width: 78px; padding: 7px 6px; font-size: 11px; }
-      body.fullscreen-mode .display-card { padding: 16px 14px calc(132px + var(--safe-bottom)); }
-      body.fullscreen-mode .timer {
-        font-size: clamp(128px, min(42vw, 40vh), 250px);
-        line-height: .82; letter-spacing: -.09em;
+
+    .complete-box.show { display: block; }
+
+    .privacy-note {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      max-width: 420px;
+      margin: 14px auto 0;
+      color: #333;
+      font-size: 11.5px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+
+    .privacy-note::before {
+      display: inline-grid;
+      flex: 0 0 18px;
+      width: 18px;
+      height: 18px;
+      place-items: center;
+      border: 2px solid #333;
+      border-radius: 50%;
+      content: "i";
+      font-size: 10px;
+      font-weight: 950;
+    }
+
+    .admin-page-link {
+      display: block;
+      width: max-content;
+      margin: 12px auto 0;
+      padding: 4px 6px;
+      color: #9c9ca4;
+      font-size: 11.5px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding:
+          calc(18px + env(safe-area-inset-top))
+          14px
+          calc(18px + env(safe-area-inset-bottom));
       }
-      body.fullscreen-mode .fullscreen-program-bar { grid-template-columns: 1fr; gap: 5px; }
-      body.fullscreen-mode .fs-program-label { display: none; }
-      .fs-program-list { grid-template-columns: repeat(4, minmax(0,1fr)); }
-      .fs-program-btn { min-height: 40px; padding: 5px 4px; }
-      .fs-program-btn small { display: none; }
-    }
-    @media (max-width: 390px) {
-      .brand-subtitle { display: none; }
-      .brand-edit-btn { display: none; }
-      .theme-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+
+      .brand { margin-bottom: 14px; }
+
+      .brand-mark {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+        border-radius: 16px;
+      }
+
+      .brand h1 {
+        font-size: clamp(42px, 11vw, 58px);
+      }
+
+      .lookup-card,
+      .card { padding: 18px 16px 20px; }
+
+      .lookup-card > h2 {
+        margin-bottom: 10px;
+        font-size: 30px;
+        text-align: center;
+      }
+
+      .lookup-description > p {
+        font-size: 15px;
+      }
+
+      .door-delivery-guide {
+        margin-top: 12px;
+        padding: 12px 12px 13px;
+      }
+
+      .door-delivery-guide strong {
+        font-size: 15px;
+      }
+
+      .door-delivery-guide span {
+        font-size: 12.8px;
+      }
+
+      .default-guide {
+        margin-top: 10px;
+        font-size: 13px;
+      }
+
+      label.field-label {
+        margin: 18px 0 8px;
+        font-size: 16px;
+      }
+
+      .lookup-card #nickname {
+        min-height: 56px;
+        padding: 15px 16px;
+        border-width: 2px;
+        font-size: 18px;
+      }
+
+      .lookup-card #lookupButton {
+        min-height: 58px;
+        margin-top: 16px;
+        font-size: 19px;
+      }
+
+      .product-bottom {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .product-price { text-align: right; }
+
+      .privacy-note {
+        margin-top: 12px;
+        font-size: 10px;
+      }
+
+      .admin-page-link {
+        display: block;
+        margin-top: 10px;
+        font-size: 11px;
+      }
     }
   </style>
 </head>
-<body class="theme-purple phase-idle">
-  <main class="app">
-    <header class="topbar">
-      <div class="app-brand">
-        <div class="app-icon">
-          <img src="./header-logo.png" alt="원타임벨 종 로고" />
-        </div>
-        <div class="brand-text">
-          <div id="brandTitle" class="brand-title">모아넥트 타임벨</div>
-          <div id="brandSubtitle" class="brand-subtitle">격투기 · 크로스핏 · 인터벌 트레이닝</div>
-        </div>
-        <button class="brand-edit-btn" type="button" id="brandEditBtn">상호 수정</button>
+
+<body>
+  <main class="page">
+    <header class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
+          <path d="M18 25h28l-2.5 27h-23z" fill="#ffffff"/>
+          <path d="M24 26v-5a8 8 0 0 1 16 0v5"
+                fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+          <path d="M32 44s-7-4.2-7-9a4 4 0 0 1 7-2.5A4 4 0 0 1 39 35c0 4.8-7 9-7 9z"
+                fill="#f41468"/>
+        </svg>
       </div>
-      <div class="top-actions">
-        <button class="btn ghost settings-toggle" id="settingsToggle" type="button">⚙️ 설정 열기</button>
-        <button class="btn ghost" id="fullscreenBtn" type="button">⛶ 전체화면</button>
-      </div>
+
+      <h1>DAMPICK <span>담픽</span></h1>
+      
     </header>
 
-    <section class="layout" id="layout">
-      <article class="display-card" id="displayCard">
-        <div class="status-row">
-          <div class="round-label" id="roundLabel">ROUND 1 / 10</div>
-          <div class="phase-badge" id="phaseBadge">준비</div>
+    <section class="card lookup-card">
+      <h2>내 주문 조회</h2>
+
+      <div class="lookup-description">
+        <p>닉네임으로 주문 상품과 픽업 날짜를 확인하세요.</p>
+
+        <div class="door-delivery-guide">
+          <strong>문고리 배송 안내</strong>
+          <span>월·화 픽업 상품 → 수요일 새벽 배송</span>
+          <span>수·목·금 픽업 상품 → 금요일 오후 배송</span>
         </div>
 
-        <div class="timer-wrap">
-          <div class="timer" id="timerDisplay">03:00</div>
+        <div class="default-guide">
+          문고리 배송을 원하는 경우만 상품을 선택해 선결제해 주세요.<br>
+          별도 신청이 없으면 매장 픽업 · 픽업 시 결제로 진행됩니다.
         </div>
+      </div>
 
-        <div class="sub-status">
-          <strong id="mainStatus">운동 준비</strong>
-          <span id="nextStatus">시작 버튼을 눌러주세요</span>
-        </div>
+      <label class="field-label" for="nickname">닉네임</label>
 
-        <div class="progress-track" aria-label="진행률">
-          <div class="progress-bar" id="progressBar"></div>
-        </div>
+      <input
+        id="nickname"
+        type="text"
+        lang="ko"
+        inputmode="text"
+        placeholder="예: 담픽1234"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+      >
 
-        <div class="control-row">
-          <button class="btn primary" id="startBtn" type="button">▶ 시작</button>
-          <button class="btn" id="pauseBtn" type="button" disabled>⏸ 일시정지</button>
-          <button class="btn" id="resetBtn" type="button">↺ 초기화</button>
-          <button class="btn" id="addTenBtn" type="button" disabled>＋10초</button>
-        </div>
+      <button id="lookupButton" class="primary-button" type="button">
+        주문 조회하기
+      </button>
 
-        <div class="fullscreen-program-bar" id="fullscreenProgramBar" aria-label="전체화면 프로그램 선택">
-          <span class="fs-program-label">프로그램 선택</span>
-          <div class="fs-program-list" id="fullscreenProgramList"></div>
-        </div>
-      </article>
-
-      <aside class="settings-card" id="settingsCard">
-        <section class="section">
-          <h2 class="section-title">① 화면 디자인 <small>배경색 / 전체 색감</small></h2>
-          <div class="theme-grid" id="themeGrid">
-            <button class="theme-btn" type="button" data-theme="orange">주황</button>
-            <button class="theme-btn" type="button" data-theme="yellow">노랑</button>
-            <button class="theme-btn" type="button" data-theme="red">빨강</button>
-            <button class="theme-btn" type="button" data-theme="blue">파랑</button>
-            <button class="theme-btn" type="button" data-theme="green">초록</button>
-            <button class="theme-btn active" type="button" data-theme="purple">보라</button>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title">② 빠른 프로그램 <small>3개 프로그램 + 타임 변경</small></h2>
-          <div class="preset-grid" id="presetGrid">
-            <button class="preset-btn active" type="button" data-preset="boxing"><span>복싱 3분</span><small>3분 / 1분 · 10R</small></button>
-            <button class="preset-btn" type="button" data-preset="kickboxing"><span>킥복싱</span><small>3분 / 1분 · 5R</small></button>
-            <button class="preset-btn" type="button" data-preset="tabata"><span>타바타</span><small>20초 / 10초 · 8R</small></button>
-            <button class="preset-btn time-change-btn" id="quickTimeChangeBtn" type="button"><span>타임 변경</span><small>준비·운동·휴식·라운드 바로 설정</small></button>
-          </div>
-          <div class="name-grid" style="margin-top:10px;">
-            <div class="field"><label for="presetNameBoxing">1번 프로그램 이름</label><input id="presetNameBoxing" value="복싱 3분" /></div>
-            <div class="field"><label for="presetNameKickboxing">2번 프로그램 이름</label><input id="presetNameKickboxing" value="킥복싱" /></div>
-            <div class="field full"><label for="presetNameTabata">3번 프로그램 이름</label><input id="presetNameTabata" value="타바타" /></div>
-          </div>
-          <div class="notice">1번·2번·3번 프로그램은 서로 독립적으로 저장됩니다. <b>타임 변경</b>을 누르면 현재 선택한 프로그램의 준비·운동·휴식 시간과 라운드 수를 바로 바꿀 수 있으며, 변경 내용은 자동 저장됩니다.</div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title">③ 시간 설정 <small>변경 즉시 자동 저장</small></h2>
-          <div class="field-grid">
-            <div class="field"><label for="prepareSeconds">준비 시간(초)</label><input id="prepareSeconds" type="number" min="0" max="600" value="10" /></div>
-            <div class="field"><label for="rounds">라운드 수</label><input id="rounds" type="number" min="1" max="99" value="10" /></div>
-            <div class="field full"><label>운동 시간</label><div class="inline-time"><input id="workMinutes" type="number" min="0" max="99" value="3" aria-label="운동 분" /><span>분</span><input id="workSeconds" type="number" min="0" max="59" value="0" aria-label="운동 초" /><span>초</span></div></div>
-            <div class="field full"><label>휴식 시간</label><div class="inline-time"><input id="restMinutes" type="number" min="0" max="99" value="1" aria-label="휴식 분" /><span>분</span><input id="restSeconds" type="number" min="0" max="59" value="0" aria-label="휴식 초" /><span>초</span></div></div>
-          </div>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title">④ 구간별 소리 <small>선택 즉시 재생 · 자동 저장</small></h2>
-          <div class="field-grid">
-            <div class="field full">
-              <label for="prepareSound">준비 시작 소리</label>
-              <div class="sound-select-row">
-              <select id="prepareSound">
-                <option value="file:sounds/prepare.mp3">기존 MP3 · 준비음</option>
-                <option value="file:sounds/start.mp3">기존 MP3 · 시작음</option>
-                <option value="file:sounds/rest.mp3">기존 MP3 · 휴식음</option>
-                <option value="file:sounds/finish.mp3">기존 MP3 · 완료음</option>
-                <option value="file:sounds/01_short_beep.mp3?v=20260812-2">추가 · 짧은 삐 1회</option>
-                <option value="file:sounds/02_triple_beep.mp3?v=20260812-2">추가 · 삐삐삐 3회</option>
-                <option value="file:sounds/03_loud_double_beep.mp3?v=20260812-2">추가 · 강한 삐삐 2회</option>
-                <option value="file:sounds/04_gym_buzzer.mp3?v=20260812-2">추가 · 체육관 버저</option>
-                <option value="file:sounds/05_round_bell.mp3?v=20260812-2">추가 · 라운드 벨</option>
-                <option value="file:sounds/06_fast_5beep.mp3?v=20260812-2">추가 · 빠른 삐 5회</option>
-                <option value="none">소리 없음</option>
-              </select>
-                <button class="sound-preview-btn" id="prepareSoundPreviewBtn" type="button">▶ 다시 듣기</button>
-              </div>
-            </div>
-            <div class="field full">
-              <label for="startSound">운동 시작 소리</label>
-              <div class="sound-select-row">
-              <select id="startSound">
-                <option value="file:sounds/prepare.mp3">기존 MP3 · 준비음</option>
-                <option value="file:sounds/start.mp3">기존 MP3 · 시작음</option>
-                <option value="file:sounds/rest.mp3">기존 MP3 · 휴식음</option>
-                <option value="file:sounds/finish.mp3">기존 MP3 · 완료음</option>
-                <option value="file:sounds/01_short_beep.mp3?v=20260812-2">추가 · 짧은 삐 1회</option>
-                <option value="file:sounds/02_triple_beep.mp3?v=20260812-2">추가 · 삐삐삐 3회</option>
-                <option value="file:sounds/03_loud_double_beep.mp3?v=20260812-2">추가 · 강한 삐삐 2회</option>
-                <option value="file:sounds/04_gym_buzzer.mp3?v=20260812-2">추가 · 체육관 버저</option>
-                <option value="file:sounds/05_round_bell.mp3?v=20260812-2">추가 · 라운드 벨</option>
-                <option value="file:sounds/06_fast_5beep.mp3?v=20260812-2">추가 · 빠른 삐 5회</option>
-                <option value="none">소리 없음</option>
-              </select>
-                <button class="sound-preview-btn" id="startSoundPreviewBtn" type="button">▶ 다시 듣기</button>
-              </div>
-            </div>
-            <div class="field full">
-              <label for="restSound">휴식 시작 소리</label>
-              <div class="sound-select-row">
-              <select id="restSound">
-                <option value="file:sounds/prepare.mp3">기존 MP3 · 준비음</option>
-                <option value="file:sounds/start.mp3">기존 MP3 · 시작음</option>
-                <option value="file:sounds/rest.mp3">기존 MP3 · 휴식음</option>
-                <option value="file:sounds/finish.mp3">기존 MP3 · 완료음</option>
-                <option value="file:sounds/01_short_beep.mp3?v=20260812-2">추가 · 짧은 삐 1회</option>
-                <option value="file:sounds/02_triple_beep.mp3?v=20260812-2">추가 · 삐삐삐 3회</option>
-                <option value="file:sounds/03_loud_double_beep.mp3?v=20260812-2">추가 · 강한 삐삐 2회</option>
-                <option value="file:sounds/04_gym_buzzer.mp3?v=20260812-2">추가 · 체육관 버저</option>
-                <option value="file:sounds/05_round_bell.mp3?v=20260812-2">추가 · 라운드 벨</option>
-                <option value="file:sounds/06_fast_5beep.mp3?v=20260812-2">추가 · 빠른 삐 5회</option>
-                <option value="none">소리 없음</option>
-              </select>
-                <button class="sound-preview-btn" id="restSoundPreviewBtn" type="button">▶ 다시 듣기</button>
-              </div>
-            </div>
-            <div class="field full">
-              <label for="finishSound">운동 완료 소리</label>
-              <div class="sound-select-row">
-              <select id="finishSound">
-                <option value="file:sounds/prepare.mp3">기존 MP3 · 준비음</option>
-                <option value="file:sounds/start.mp3">기존 MP3 · 시작음</option>
-                <option value="file:sounds/rest.mp3">기존 MP3 · 휴식음</option>
-                <option value="file:sounds/finish.mp3">기존 MP3 · 완료음</option>
-                <option value="file:sounds/01_short_beep.mp3?v=20260812-2">추가 · 짧은 삐 1회</option>
-                <option value="file:sounds/02_triple_beep.mp3?v=20260812-2">추가 · 삐삐삐 3회</option>
-                <option value="file:sounds/03_loud_double_beep.mp3?v=20260812-2">추가 · 강한 삐삐 2회</option>
-                <option value="file:sounds/04_gym_buzzer.mp3?v=20260812-2">추가 · 체육관 버저</option>
-                <option value="file:sounds/05_round_bell.mp3?v=20260812-2">추가 · 라운드 벨</option>
-                <option value="file:sounds/06_fast_5beep.mp3?v=20260812-2">추가 · 빠른 삐 5회</option>
-                <option value="none">소리 없음</option>
-              </select>
-                <button class="sound-preview-btn" id="finishSoundPreviewBtn" type="button">▶ 다시 듣기</button>
-              </div>
-            </div>
-            <div class="field full">
-              <label for="alertSound">30초·10초 알림 소리</label>
-              <div class="sound-select-row">
-              <select id="alertSound">
-                <option value="file:sounds/prepare.mp3">기존 MP3 · 준비음</option>
-                <option value="file:sounds/start.mp3">기존 MP3 · 시작음</option>
-                <option value="file:sounds/rest.mp3">기존 MP3 · 휴식음</option>
-                <option value="file:sounds/finish.mp3">기존 MP3 · 완료음</option>
-                <option value="file:sounds/01_short_beep.mp3?v=20260812-2">추가 · 짧은 삐 1회</option>
-                <option value="file:sounds/02_triple_beep.mp3?v=20260812-2">추가 · 삐삐삐 3회</option>
-                <option value="file:sounds/03_loud_double_beep.mp3?v=20260812-2">추가 · 강한 삐삐 2회</option>
-                <option value="file:sounds/04_gym_buzzer.mp3?v=20260812-2">추가 · 체육관 버저</option>
-                <option value="file:sounds/05_round_bell.mp3?v=20260812-2">추가 · 라운드 벨</option>
-                <option value="file:sounds/06_fast_5beep.mp3?v=20260812-2">추가 · 빠른 삐 5회</option>
-                <option value="doubleBeep">기본 전자음 · 삐삐 2번</option>
-                <option value="fastBeep">기본 전자음 · 빠른 삐</option>
-                <option value="none">소리 없음</option>
-              </select>
-                <button class="sound-preview-btn" id="alertSoundPreviewBtn" type="button">▶ 다시 듣기</button>
-              </div>
-            </div>
-          </div>
-          <div class="notice" id="activePresetSoundNotice">현재 선택한 프로그램의 시간·소리·음성 설정을 편집 중입니다.</div>
-          <p class="small-note">소리를 선택하면 즉시 한 번 재생되며 동시에 현재 프로그램에 자동 저장됩니다. 준비·운동 시작·휴식·완료에는 <b>기존 MP3 4개 + 추가 효과음 MP3 6개 + 소리 없음</b>이 표시됩니다. 30초·10초 알림에도 동일한 MP3 10개와 <b>기본 전자음(삐삐 2번·빠른 삐)</b>을 선택할 수 있습니다.</p>
-        </section>
-
-        <section class="section">
-          <h2 class="section-title">⑤ 음성·알림</h2>
-          <div class="switch-list">
-            <div class="switch-line"><span>한국어 음성 안내</span><label class="switch"><input id="voiceEnabled" type="checkbox" checked /><span class="slider"></span></label></div>
-            <div class="switch-line"><span>30초 남음 알림</span><label class="switch"><input id="alert30" type="checkbox" checked /><span class="slider"></span></label></div>
-            <div class="switch-line"><span>10초 남음 알림</span><label class="switch"><input id="alert10" type="checkbox" checked /><span class="slider"></span></label></div>
-            <div class="switch-line"><span>마지막 5초 삐 소리</span><label class="switch"><input id="countdown5" type="checkbox" checked /><span class="slider"></span></label></div>
-          </div>
-          <div class="field-grid" style="margin-top:12px;">
-            <div class="field full"><label for="voiceTone">음성 톤</label><select id="voiceTone"><option value="normal">기본 음성</option><option value="low">낮은 음성</option><option value="high">높은 음성</option></select></div>
-            <div class="field full"><label for="volumeRange">전체 음량</label><div class="volume-row"><input id="volumeRange" type="range" min="0" max="150" value="110" /><strong id="volumeValue">110%</strong></div></div>
-          </div>
-        </section>
-
-        <section class="section">
-          <button class="btn good" id="saveBtn" type="button" style="width:100%;">💾 현재 설정 저장</button>
-          <div class="footer-status"><span class="mini-chip" id="wakeChip">화면 유지: 대기</span><span class="mini-chip" id="audioChip">소리: 확인 필요</span><span class="mini-chip" id="autoSaveChip">자동 저장: 켜짐</span></div>
-          <p class="small-note">단축키: 스페이스바 시작/일시정지 · R 초기화 · F 전체화면</p>
-        </section>
-      </aside>
+      <div id="message" class="message"></div>
+      <section id="results" class="results"></section>
     </section>
+
+    <section id="checkoutCard" class="card checkout-card">
+      <h2>선택 상품 결제</h2>
+
+      <p class="description">
+        체크된 상품만 이번 문고리 배송에 포함됩니다.
+        배송 일정이 같은 상품끼리만 한 번에 신청할 수 있습니다.
+      </p>
+
+      <div class="summary-box">
+        <div class="summary-row">
+          <span>선택 상품 합계</span>
+          <strong id="productAmountText">0원</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>배송비</span>
+          <strong id="deliveryFeeText">0원</strong>
+        </div>
+
+        <div class="summary-row final">
+          <span>이번 결제금액</span>
+          <strong id="finalAmountText">0원</strong>
+        </div>
+      </div>
+
+      <div class="choice-grid" style="margin-top:22px;">
+        <label class="choice">
+          <input type="radio" name="receiptMethod" value="home" checked>
+          <span>
+            <strong>문고리 배송</strong>
+            <small>문고리 배송을 원하는 경우만 결제 바랍니다.</small>
+          </span>
+        </label>
+      </div>
+
+      <div id="deliveryFields" class="delivery-fields">
+        <label class="field-label" for="deliveryPhone">휴대폰 번호</label>
+        <input
+          id="deliveryPhone"
+          type="tel"
+          inputmode="tel"
+          placeholder="예: 010-1234-5678"
+          autocomplete="tel"
+        >
+
+        <label class="field-label" for="deliveryAddress">주소</label>
+        <input
+          id="deliveryAddress"
+          type="text"
+          placeholder="예: ○○아파트 101동 1203호"
+          autocomplete="street-address"
+        >
+
+        <label class="field-label" for="entranceInfo">공동현관 비밀번호 또는 출입방법</label>
+        <input
+          id="entranceInfo"
+          type="text"
+          placeholder="예: 종 모양 버튼 후 1234"
+          autocomplete="off"
+        >
+
+        <label class="field-label" for="deliveryRequest">배송 요청사항</label>
+        <textarea
+          id="deliveryRequest"
+          placeholder="예: 문 앞에 두고 문자 주세요."
+        ></textarea>
+      </div>
+
+      <h3 style="margin-top:22px;">결제 방법</h3>
+
+      <div class="choice-grid">
+        <label class="choice">
+          <input type="radio" name="paymentMethod" value="bank_transfer" checked>
+          <span>
+            <strong>계좌이체</strong>
+            <small>문고리 배송을 원하는 경우만 결제 바랍니다.</small>
+          </span>
+        </label>
+
+        <label class="choice">
+          <input type="radio" name="paymentMethod" value="card_online">
+          <span>
+            <strong>카드 결제</strong>
+            <small>토스페이먼츠 카드·간편결제로 결제합니다.</small>
+          </span>
+        </label>
+      </div>
+
+      <div id="bankBox" class="bank-box">
+        <strong>입금 계좌</strong>
+        <p class="bank-account">하나은행 412-910821-25107</p>
+        <p style="margin:0;">예금주: 담픽</p>
+        <p style="margin-bottom:0;color:#777;font-size:12px;">
+          입금자명은 주문 닉네임과 같게 입력해 주세요.
+        </p>
+      </div>
+
+      <div id="cardBox" class="card-box" hidden>
+        <strong>카드결제 안내</strong>
+        <p style="margin-bottom:0;line-height:1.65;">
+          카드·간편결제 승인이 끝나면 관리자 결제·배송 화면에
+          ‘카드 자동 결제 완료’가 표시됩니다.
+        </p>
+      </div>
+
+      <p id="deliveryGuide" class="notice"></p>
+
+      <button
+        id="submitCheckoutButton"
+        class="primary-button"
+        type="button"
+        disabled
+      >
+        선택 상품 결제·문고리 배송 신청하기
+      </button>
+
+      <div id="checkoutComplete" class="complete-box"></div>
+    </section>
+
+    <p class="privacy-note">
+      문고리 배송은 선결제(카드/계좌이체) 완료 후 이용할 수 있습니다.
+    </p>
+
+    <a class="admin-page-link" href="./admin.html">관리자 페이지</a>
   </main>
 
-  <div class="modal-backdrop" id="timeModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="timeModalTitle">
-    <div class="modal">
-      <h2 id="timeModalTitle">시간 변경</h2>
-      <p class="time-editor-summary" id="timeModalSummary">현재 선택한 프로그램의 시간을 바로 변경합니다.</p>
-      <div class="field-grid">
-        <div class="field full"><label for="timeEditPrepareSeconds">준비 시간(초)</label><input id="timeEditPrepareSeconds" type="number" min="0" max="600" value="10" inputmode="numeric" /></div>
-        <div class="field full">
-          <label>운동 시간</label>
-          <div class="inline-time">
-            <input id="timeEditWorkMinutes" type="number" min="0" max="99" value="3" inputmode="numeric" /><span>분</span>
-            <input id="timeEditWorkSeconds" type="number" min="0" max="59" value="0" inputmode="numeric" /><span>초</span>
-          </div>
-        </div>
-        <div class="field full">
-          <label>휴식 시간</label>
-          <div class="inline-time">
-            <input id="timeEditRestMinutes" type="number" min="0" max="99" value="1" inputmode="numeric" /><span>분</span>
-            <input id="timeEditRestSeconds" type="number" min="0" max="59" value="0" inputmode="numeric" /><span>초</span>
-          </div>
-        </div>
-        <div class="field full"><label for="timeEditRounds">라운드 수</label><input id="timeEditRounds" type="number" min="1" max="99" value="10" inputmode="numeric" /></div>
-      </div>
-      <div class="modal-actions two">
-        <button class="btn" id="timeEditCloseBtn" type="button">취소</button>
-        <button class="btn primary" id="timeEditApplyBtn" type="button">시간 적용</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-backdrop" id="brandModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="brandModalTitle">
-    <div class="modal">
-      <h2 id="brandModalTitle">상호 및 설명 수정</h2>
-      <div class="field-grid">
-        <div class="field full"><label for="brandTitleInput">상호·타이머 이름</label><input id="brandTitleInput" maxlength="40" /></div>
-        <div class="field full"><label for="brandSubtitleInput">하단 설명</label><input id="brandSubtitleInput" maxlength="80" /></div>
-      </div>
-      <div class="modal-actions">
-        <button class="btn" id="brandResetBtn" type="button">기본값</button>
-        <button class="btn" id="brandCloseBtn" type="button">닫기</button>
-        <button class="btn primary" id="brandSaveBtn" type="button">저장</button>
-      </div>
-    </div>
-  </div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://js.tosspayments.com/v2/standard"></script>
+  <script src="./config.js"></script>
+  <script src="./payment-config.js"></script>
 
   <script>
     "use strict";
 
-    const $ = (id) => document.getElementById(id);
-    const els = {
-      layout: $("layout"), settingsCard: $("settingsCard"), settingsToggle: $("settingsToggle"),
-      timerDisplay: $("timerDisplay"), roundLabel: $("roundLabel"), phaseBadge: $("phaseBadge"),
-      mainStatus: $("mainStatus"), nextStatus: $("nextStatus"), progressBar: $("progressBar"),
-      startBtn: $("startBtn"), pauseBtn: $("pauseBtn"), resetBtn: $("resetBtn"), addTenBtn: $("addTenBtn"),
-      fullscreenBtn: $("fullscreenBtn"), saveBtn: $("saveBtn"), quickTimeChangeBtn: $("quickTimeChangeBtn"),
-      prepareSeconds: $("prepareSeconds"), workMinutes: $("workMinutes"), workSeconds: $("workSeconds"),
-      restMinutes: $("restMinutes"), restSeconds: $("restSeconds"), rounds: $("rounds"),
-      voiceEnabled: $("voiceEnabled"), alert30: $("alert30"), alert10: $("alert10"), countdown5: $("countdown5"),
-      voiceTone: $("voiceTone"), prepareSound: $("prepareSound"), startSound: $("startSound"),
-      restSound: $("restSound"), finishSound: $("finishSound"), alertSound: $("alertSound"),
-      prepareSoundPreviewBtn: $("prepareSoundPreviewBtn"), startSoundPreviewBtn: $("startSoundPreviewBtn"),
-      restSoundPreviewBtn: $("restSoundPreviewBtn"), finishSoundPreviewBtn: $("finishSoundPreviewBtn"),
-      alertSoundPreviewBtn: $("alertSoundPreviewBtn"),
-      volumeRange: $("volumeRange"), volumeValue: $("volumeValue"), wakeChip: $("wakeChip"), audioChip: $("audioChip"), autoSaveChip: $("autoSaveChip"),
-      presetNameBoxing: $("presetNameBoxing"), presetNameKickboxing: $("presetNameKickboxing"),
-      presetNameTabata: $("presetNameTabata"),
-      activePresetSoundNotice: $("activePresetSoundNotice"), fullscreenProgramList: $("fullscreenProgramList"),
-      timeModalBackdrop: $("timeModalBackdrop"), timeModalTitle: $("timeModalTitle"), timeModalSummary: $("timeModalSummary"),
-      timeEditPrepareSeconds: $("timeEditPrepareSeconds"), timeEditWorkMinutes: $("timeEditWorkMinutes"),
-      timeEditWorkSeconds: $("timeEditWorkSeconds"), timeEditRestMinutes: $("timeEditRestMinutes"),
-      timeEditRestSeconds: $("timeEditRestSeconds"), timeEditRounds: $("timeEditRounds"),
-      timeEditCloseBtn: $("timeEditCloseBtn"), timeEditApplyBtn: $("timeEditApplyBtn"),
-      brandTitle: $("brandTitle"), brandSubtitle: $("brandSubtitle"), brandEditBtn: $("brandEditBtn"),
-      brandModalBackdrop: $("brandModalBackdrop"), brandTitleInput: $("brandTitleInput"),
-      brandSubtitleInput: $("brandSubtitleInput"), brandSaveBtn: $("brandSaveBtn"),
-      brandResetBtn: $("brandResetBtn"), brandCloseBtn: $("brandCloseBtn"), toast: $("toast")
-    };
+    const FREE_DELIVERY_THRESHOLD = 40000;
+    const HOME_DELIVERY_FEE = 500;
 
-    const DEFAULT_BRAND_TITLE = "모아넥트 타임벨";
-    const DEFAULT_BRAND_SUBTITLE = "격투기 · 크로스핏 · 인터벌 트레이닝";
-    const THEME_STORAGE_KEY = "theone-timebell-theme";
-    const SETTINGS_KEY = "theone-timebell-settings";
-    const PRESETS_KEY = "theone-timebell-presets";
-    const PRESET_AUDIO_KEY = "theone-timebell-preset-audio-settings";
-    const ACTIVE_PRESET_KEY = "theone-timebell-active-preset";
+    const sb = window.dampickSupabase;
+    const paymentConfig = window.DAMPICK_PAYMENT_CONFIG || {};
+    const TOSS_CLIENT_KEY = String(paymentConfig.tossClientKey || "").trim();
 
-    const PRESET_KEYS = ["boxing", "kickboxing", "tabata"];
-    const DEFAULT_PRESETS = {
-      boxing: { prepare: 10, work: 180, rest: 60, rounds: 10 },
-      kickboxing: { prepare: 10, work: 180, rest: 60, rounds: 5 },
-      tabata: { prepare: 10, work: 20, rest: 10, rounds: 8 }
-    };
-    const DEFAULT_NAMES = { boxing: "복싱 3분", kickboxing: "킥복싱", tabata: "타바타" };
-    const DEFAULT_PRESET_AUDIO = {
-      boxing: { voiceEnabled: true, alert30: true, alert10: true, countdown5: true, voiceTone: "normal", prepareSound: "file:sounds/prepare.mp3", startSound: "file:sounds/start.mp3", restSound: "file:sounds/rest.mp3", finishSound: "file:sounds/finish.mp3", alertSound: "doubleBeep" },
-      kickboxing: { voiceEnabled: true, alert30: true, alert10: true, countdown5: true, voiceTone: "normal", prepareSound: "file:sounds/prepare.mp3", startSound: "file:sounds/start.mp3", restSound: "file:sounds/rest.mp3", finishSound: "file:sounds/finish.mp3", alertSound: "doubleBeep" },
-      tabata: { voiceEnabled: true, alert30: false, alert10: true, countdown5: true, voiceTone: "high", prepareSound: "file:sounds/prepare.mp3", startSound: "file:sounds/start.mp3", restSound: "file:sounds/rest.mp3", finishSound: "file:sounds/finish.mp3", alertSound: "fastBeep" }
-    };
+    const nicknameInput = document.getElementById("nickname");
+    const lookupButton = document.getElementById("lookupButton");
+    const message = document.getElementById("message");
+    const results = document.getElementById("results");
+    const checkoutCard = document.getElementById("checkoutCard");
+    const submitCheckoutButton = document.getElementById("submitCheckoutButton");
 
-    const PHASE = { IDLE: "idle", PREPARE: "prepare", WORK: "work", REST: "rest", FINISHED: "finished" };
-    let presets = structuredClone(DEFAULT_PRESETS);
-    let presetAudioSettings = structuredClone(DEFAULT_PRESET_AUDIO);
-    let activePresetName = localStorage.getItem(ACTIVE_PRESET_KEY) || "boxing";
-    if (!PRESET_KEYS.includes(activePresetName)) activePresetName = "boxing";
+    let currentOrders = [];
+    let productGroups = [];
 
-    let state = {
-      phase: PHASE.IDLE, round: 1, totalRounds: presets[activePresetName].rounds,
-      isRunning: false, isPaused: false, remainingMs: presets[activePresetName].work * 1000,
-      phaseDurationMs: presets[activePresetName].work * 1000, endAt: 0, timerId: null, notified: new Set()
-    };
-    let audioContext = null;
-    let masterGain = null;
-    const customSoundBuffers = Object.create(null);
-    let customSoundErrorShown = false;
-    let wakeLock = null;
-    let toastTimer = null;
-    let autoSaveStatusTimer = null;
-    let volumeSaveTimer = null;
+    restoreNickname();
 
-    function showToast(message) {
-      els.toast.textContent = message;
-      els.toast.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 1800);
-    }
+    lookupButton.addEventListener("click", lookupOrder);
 
-    function markAutoSaved() {
-      if (!els.autoSaveChip) return;
-      els.autoSaveChip.textContent = "자동 저장: 완료";
-      clearTimeout(autoSaveStatusTimer);
-      autoSaveStatusTimer = setTimeout(() => { els.autoSaveChip.textContent = "자동 저장: 켜짐"; }, 1400);
-    }
+    nicknameInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        lookupOrder();
+      }
+    });
 
-    function clamp(value, min, max, fallback) {
-      const n = Number(value);
-      return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
-    }
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(function (input) {
+      input.addEventListener("change", updateCheckoutDisplay);
+    });
 
-    function getNameInput(key) {
-      return { boxing: els.presetNameBoxing, kickboxing: els.presetNameKickboxing, tabata: els.presetNameTabata }[key];
-    }
-    function getPresetName(key) { return getNameInput(key)?.value.trim() || DEFAULT_NAMES[key]; }
-    function formatSeconds(seconds) {
-      const s = Math.max(0, Math.round(seconds));
-      const m = Math.floor(s / 60);
-      const r = s % 60;
-      return m > 0 ? `${m}분${r ? ` ${r}초` : ""}` : `${r}초`;
-    }
-    function formatClock(ms) {
-      const total = Math.max(0, Math.ceil(ms / 1000));
-      return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
-    }
-    function presetMeta(p) { return `${formatSeconds(p.work)} / ${formatSeconds(p.rest)} · ${p.rounds}R`; }
+    results.addEventListener("change", handleProductSelection);
+    submitCheckoutButton.addEventListener("click", submitCheckout);
 
-    function applyTheme(theme, save = true) {
-      const safe = ["orange","yellow","red","blue","green","purple"].includes(theme) ? theme : "purple";
-      document.body.classList.remove("theme-orange","theme-yellow","theme-red","theme-blue","theme-green","theme-purple");
-      document.body.classList.add(`theme-${safe}`);
-      document.querySelectorAll(".theme-btn").forEach((btn) => btn.classList.toggle("active", btn.dataset.theme === safe));
-      const metaColors = { orange: "#1a0d05", yellow: "#211b04", red: "#23060a", blue: "#061c3a", green: "#062715", purple: "#13051f" };
-      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", metaColors[safe]);
-      if (save) localStorage.setItem(THEME_STORAGE_KEY, safe);
-    }
+    async function lookupOrder(options = {}) {
+      const nickname = nicknameInput.value.trim();
 
-    function loadBrand() {
-      const title = localStorage.getItem("timebell_brand_title") || DEFAULT_BRAND_TITLE;
-      const subtitle = localStorage.getItem("timebell_brand_subtitle") || DEFAULT_BRAND_SUBTITLE;
-      els.brandTitle.textContent = title;
-      els.brandSubtitle.textContent = subtitle;
-      document.title = title;
-    }
-    function openBrandModal() {
-      els.brandTitleInput.value = localStorage.getItem("timebell_brand_title") || DEFAULT_BRAND_TITLE;
-      els.brandSubtitleInput.value = localStorage.getItem("timebell_brand_subtitle") || DEFAULT_BRAND_SUBTITLE;
-      els.brandModalBackdrop.classList.add("open");
-      setTimeout(() => els.brandTitleInput.focus(), 30);
-    }
-    function closeBrandModal() { els.brandModalBackdrop.classList.remove("open"); }
-    function saveBrand() {
-      localStorage.setItem("timebell_brand_title", els.brandTitleInput.value.trim() || DEFAULT_BRAND_TITLE);
-      localStorage.setItem("timebell_brand_subtitle", els.brandSubtitleInput.value.trim() || DEFAULT_BRAND_SUBTITLE);
-      loadBrand(); closeBrandModal(); showToast("상호가 저장되었습니다.");
-    }
-    function resetBrand() {
-      localStorage.removeItem("timebell_brand_title"); localStorage.removeItem("timebell_brand_subtitle");
-      els.brandTitleInput.value = DEFAULT_BRAND_TITLE; els.brandSubtitleInput.value = DEFAULT_BRAND_SUBTITLE;
-      loadBrand(); showToast("기본 상호로 되돌렸습니다.");
-    }
+      if (!options.keepMessage) {
+        clearMessage();
+      }
 
-    function readTimingInputs() {
-      const prepare = Math.floor(clamp(els.prepareSeconds.value, 0, 600, 10));
-      const work = Math.floor(clamp(els.workMinutes.value, 0, 99, 3)) * 60 + Math.floor(clamp(els.workSeconds.value, 0, 59, 0));
-      const rest = Math.floor(clamp(els.restMinutes.value, 0, 99, 1)) * 60 + Math.floor(clamp(els.restSeconds.value, 0, 59, 0));
-      const rounds = Math.floor(clamp(els.rounds.value, 1, 99, 10));
-      if (work < 1) { showToast("운동 시간은 1초 이상이어야 합니다."); return null; }
-      return { prepare, work, rest, rounds };
-    }
-    function putTimingInputs(p) {
-      els.prepareSeconds.value = p.prepare;
-      els.workMinutes.value = Math.floor(p.work / 60); els.workSeconds.value = p.work % 60;
-      els.restMinutes.value = Math.floor(p.rest / 60); els.restSeconds.value = p.rest % 60;
-      els.rounds.value = p.rounds;
-    }
-    function readAudioInputs() {
-      return {
-        voiceEnabled: els.voiceEnabled.checked, alert30: els.alert30.checked, alert10: els.alert10.checked,
-        countdown5: els.countdown5.checked, voiceTone: els.voiceTone.value,
-        prepareSound: els.prepareSound.value, startSound: els.startSound.value, restSound: els.restSound.value,
-        finishSound: els.finishSound.value, alertSound: els.alertSound.value
-      };
-    }
-    function validSelectValue(select, value, fallback) {
-      const values = Array.from(select.options).map((o) => o.value);
-      if (values.includes(value)) return value;
-      if (values.includes(fallback)) return fallback;
-      if (values.includes("none")) return "none";
-      return values[0] || "none";
-    }
-    function normalizeAudio(key, item = {}) {
-      const d = DEFAULT_PRESET_AUDIO[key];
-      return {
-        voiceEnabled: item.voiceEnabled ?? d.voiceEnabled,
-        alert30: item.alert30 ?? d.alert30,
-        alert10: item.alert10 ?? d.alert10,
-        countdown5: item.countdown5 ?? d.countdown5,
-        voiceTone: ["normal","low","high"].includes(item.voiceTone) ? item.voiceTone : d.voiceTone,
-        prepareSound: validSelectValue(els.prepareSound, item.prepareSound, d.prepareSound),
-        startSound: validSelectValue(els.startSound, item.startSound, d.startSound),
-        restSound: validSelectValue(els.restSound, item.restSound, d.restSound),
-        finishSound: validSelectValue(els.finishSound, item.finishSound, d.finishSound),
-        alertSound: validSelectValue(els.alertSound, item.alertSound, d.alertSound)
-      };
-    }
-    function putAudioInputs(key) {
-      const a = normalizeAudio(key, presetAudioSettings[key]);
-      presetAudioSettings[key] = a;
-      els.voiceEnabled.checked = a.voiceEnabled; els.alert30.checked = a.alert30; els.alert10.checked = a.alert10;
-      els.countdown5.checked = a.countdown5; els.voiceTone.value = a.voiceTone;
-      els.prepareSound.value = a.prepareSound; els.startSound.value = a.startSound; els.restSound.value = a.restSound;
-      els.finishSound.value = a.finishSound; els.alertSound.value = a.alertSound;
-    }
-    function saveActivePresetData() {
-      if (state.isRunning) return;
-      const timing = readTimingInputs();
-      if (timing) presets[activePresetName] = timing;
-      presetAudioSettings[activePresetName] = normalizeAudio(activePresetName, readAudioInputs());
-      localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
-      localStorage.setItem(PRESET_AUDIO_KEY, JSON.stringify(presetAudioSettings));
-    }
+      results.innerHTML = "";
+      currentOrders = [];
+      productGroups = [];
+      checkoutCard.classList.remove("show");
 
-    function updatePresetUI() {
-      document.querySelectorAll(".preset-btn[data-preset]").forEach((btn) => {
-        const key = btn.dataset.preset;
-        btn.querySelector("span").textContent = getPresetName(key);
-        btn.querySelector("small").textContent = presetMeta(presets[key]);
-        btn.classList.toggle("active", key === activePresetName);
-      });
-      renderFullscreenPrograms();
-      els.activePresetSoundNotice.textContent = `현재 ‘${getPresetName(activePresetName)}’의 시간·소리·음성 설정을 편집 중입니다. 변경 내용은 이 프로그램에 자동 저장됩니다.`;
-    }
-    function renderFullscreenPrograms() {
-      els.fullscreenProgramList.innerHTML = PRESET_KEYS.map((key) => `
-        <button class="fs-program-btn${key === activePresetName ? " active" : ""}" type="button" data-fs-preset="${key}">
-          <span>${escapeHtml(getPresetName(key))}</span><small>${escapeHtml(presetMeta(presets[key]))}</small>
-        </button>`).join("") + `
-        <button class="fs-program-btn time-change-btn" type="button" data-open-time-editor="true">
-          <span>⏱ 타임 변경</span><small>바로 설정</small>
-        </button>`;
-    }
-    function escapeHtml(text) { return String(text).replace(/[&<>'"]/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch])); }
+      if (!options.keepComplete) {
+        document.getElementById("checkoutComplete").classList.remove("show");
+      }
 
-    function applyPreset(key) {
-      if (!PRESET_KEYS.includes(key)) return;
-      if (state.isRunning) { showToast("운동 중에는 프로그램을 바꿀 수 없습니다."); return; }
-      saveActivePresetData();
-      activePresetName = key;
-      localStorage.setItem(ACTIVE_PRESET_KEY, key);
-      putTimingInputs(presets[key]);
-      putAudioInputs(key);
-      updatePresetUI();
-      resetTimer(false);
-      markAutoSaved();
-    }
+      if (!nickname) {
+        showMessage("닉네임을 입력해주세요.", "error");
+        nicknameInput.focus();
+        return;
+      }
 
-    function loadSavedData() {
-      applyTheme(localStorage.getItem(THEME_STORAGE_KEY) || "purple", false);
-      loadBrand();
+      if (!sb) {
+        showMessage("담픽 데이터베이스 연결정보를 불러오지 못했습니다.", "error");
+        return;
+      }
+
+      lookupButton.disabled = true;
+      lookupButton.textContent = "주문을 확인하고 있습니다...";
+
       try {
-        const raw = JSON.parse(localStorage.getItem(PRESETS_KEY) || "null");
-        if (raw) PRESET_KEYS.forEach((key) => {
-          const x = raw[key]; if (!x) return;
-          presets[key] = {
-            prepare: Math.floor(clamp(x.prepare,0,600,DEFAULT_PRESETS[key].prepare)),
-            work: Math.floor(clamp(x.work,1,5999,DEFAULT_PRESETS[key].work)),
-            rest: Math.floor(clamp(x.rest,0,5999,DEFAULT_PRESETS[key].rest)),
-            rounds: Math.floor(clamp(x.rounds,1,99,DEFAULT_PRESETS[key].rounds))
-          };
+        const { data, error } = await sb.rpc(
+          "lookup_orders_by_nickname",
+          { p_nickname: nickname }
+        );
+
+        if (error) {
+          throw error;
+        }
+
+        currentOrders = normalizeOrders(data);
+        productGroups = buildProductGroups(currentOrders);
+
+        if (!productGroups.length) {
+          showMessage("해당 닉네임으로 등록된 주문상품이 없습니다.", "error");
+          return;
+        }
+
+        renderProductGroups();
+
+        const availableCount = productGroups.filter(function (group) {
+          return !group.checkout;
+        }).length;
+
+        if (availableCount) {
+          checkoutCard.classList.add("show");
+          showMessage(
+            "문고리 배송을 원하는 상품을 체크해주세요. 같은 배송 일정 상품끼리 선택할 수 있습니다.",
+            "success"
+          );
+        } else {
+          showMessage("모든 주문상품의 결제·배송 신청이 완료되어 있습니다.", "success");
+        }
+
+        updateCheckoutDisplay();
+
+      } catch (error) {
+        console.error(error);
+        showMessage(
+          error.message || "주문정보를 불러오지 못했습니다.",
+          "error"
+        );
+      } finally {
+        lookupButton.disabled = false;
+        lookupButton.textContent = "주문 조회하기";
+      }
+    }
+
+    function normalizeOrders(data) {
+      if (Array.isArray(data)) {
+        return data;
+      }
+
+      if (typeof data === "string") {
+        try {
+          const parsed = JSON.parse(data);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          return [];
+        }
+      }
+
+      return [];
+    }
+
+    function buildProductGroups(orders) {
+      const groupMap = new Map();
+
+      orders.forEach(function (order) {
+        const items = Array.isArray(order.items) ? order.items : [];
+
+        items.forEach(function (item) {
+          const checkout = item.checkout || null;
+
+          const productIdentity = String(
+            item.product_id ||
+            item.product_name ||
+            "상품"
+          );
+
+          const baseKey = [
+            productIdentity,
+            String(item.product_name || ""),
+            String(item.unit_price || 0),
+            String(item.unit_name || "개"),
+            String(item.pickup_date || "")
+          ].join("::");
+
+          const checkoutKey = checkout
+            ? "assigned:" + String(
+                checkout.request_id ||
+                checkout.request_code ||
+                ""
+              )
+            : "available";
+
+          const key = baseKey + "::" + checkoutKey;
+
+          if (!groupMap.has(key)) {
+            groupMap.set(key, {
+              key,
+              productName: item.product_name || "상품",
+              unitName: item.unit_name || "개",
+              unitPrice: Number(item.unit_price || 0),
+              pickupDate: item.pickup_date || "",
+              quantity: 0,
+              lineTotal: 0,
+              itemIds: [],
+              checkout
+            });
+          }
+
+          const group = groupMap.get(key);
+
+          group.quantity += Number(item.quantity || 0);
+
+          group.lineTotal += Number(
+            item.line_total ??
+            (
+              Number(item.unit_price || 0) *
+              Number(item.quantity || 0)
+            )
+          );
+
+          if (item.item_id) {
+            group.itemIds.push(String(item.item_id));
+          }
         });
-      } catch (_) {}
-      try {
-        const raw = JSON.parse(localStorage.getItem(PRESET_AUDIO_KEY) || "null");
-        PRESET_KEYS.forEach((key) => { presetAudioSettings[key] = normalizeAudio(key, raw?.[key] || DEFAULT_PRESET_AUDIO[key]); });
-      } catch (_) { presetAudioSettings = structuredClone(DEFAULT_PRESET_AUDIO); }
+      });
 
-      /* 선택창에 없는 예전 소리 값은 normalizeAudio에서 안전한 기본 소리로 자동 복원 */
-      try {
-        const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null");
-        if (saved) {
-          ["presetNameBoxing","presetNameKickboxing","presetNameTabata"].forEach((id) => {
-            if (typeof saved[id] === "string" && saved[id].trim()) els[id].value = saved[id].trim();
-          });
-          if (saved.volumeRange != null) els.volumeRange.value = clamp(saved.volumeRange,0,150,110);
-        }
-      } catch (_) {}
-      localStorage.setItem(PRESET_AUDIO_KEY, JSON.stringify(presetAudioSettings));
-      putTimingInputs(presets[activePresetName]);
-      putAudioInputs(activePresetName);
-      updateVolumeLabel(); updatePresetUI(); resetTimer(false);
+      return Array
+        .from(groupMap.values())
+        .sort(function (a, b) {
+          const dateCompare = String(a.pickupDate)
+            .localeCompare(String(b.pickupDate));
+
+          if (dateCompare !== 0) {
+            return dateCompare;
+          }
+
+          return a.productName.localeCompare(b.productName, "ko");
+        });
     }
 
-    function currentSettings() {
-      const timing = readTimingInputs(); if (!timing) return null;
-      return { ...timing, ...readAudioInputs(), volume: clamp(els.volumeRange.value, 0, 150, 110) / 100 };
+    function getPickupWeekday(value) {
+      if (!value) {
+        return "";
+      }
+
+      const date = new Date(
+        String(value).slice(0, 10) + "T00:00:00"
+      );
+
+      if (Number.isNaN(date.getTime())) {
+        return "";
+      }
+
+      return ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
     }
 
-    async function ensureAudio() {
-      try {
-        if (!audioContext) {
-          const Ctx = window.AudioContext || window.webkitAudioContext;
-          if (!Ctx) throw new Error("AudioContext unavailable");
-          audioContext = new Ctx();
-          masterGain = audioContext.createGain(); masterGain.connect(audioContext.destination);
-        }
-        if (audioContext.state === "suspended") await audioContext.resume();
-        updateMasterVolume();
-        els.audioChip.textContent = "소리: 사용 가능";
-        return true;
-      } catch (_) {
-        els.audioChip.textContent = "소리: 사용 불가";
-        showToast("브라우저에서 소리를 허용해주세요.");
+    function getDeliveryGroup(group) {
+      const weekday = getPickupWeekday(group?.pickupDate);
+
+      if (weekday === "월" || weekday === "화") {
+        return "MON_TUE";
+      }
+
+      if (
+        weekday === "수" ||
+        weekday === "목" ||
+        weekday === "금"
+      ) {
+        return "WED_THU_FRI";
+      }
+
+      return "OTHER";
+    }
+
+    function getDeliveryGroupLabel(groupName) {
+      if (groupName === "MON_TUE") {
+        return "월·화 픽업 → 수요일 새벽 배송";
+      }
+
+      if (groupName === "WED_THU_FRI") {
+        return "수·목·금 픽업 → 금요일 오후 배송";
+      }
+
+      return "배송 일정 확인 필요";
+    }
+
+    function getSelectedDeliveryGroups() {
+      return [
+        ...new Set(
+          getSelectedGroups()
+            .map(getDeliveryGroup)
+            .filter(function (groupName) {
+              return groupName && groupName !== "OTHER";
+            })
+        )
+      ];
+    }
+
+    function validateDeliveryGroupSelection() {
+      const selectedGroups = getSelectedDeliveryGroups();
+
+      if (selectedGroups.length > 1) {
+        showMessage(
+          "문고리 배송 일정이 다른 상품은 함께 결제할 수 없습니다. 월·화 픽업 상품끼리 또는 수·목·금 픽업 상품끼리만 선택해주세요.",
+          "error"
+        );
         return false;
       }
-    }
-    function updateMasterVolume() { if (masterGain) masterGain.gain.value = clamp(els.volumeRange.value,0,150,110) / 100; }
-    function updateVolumeLabel() { els.volumeValue.textContent = `${Math.round(clamp(els.volumeRange.value,0,150,110))}%`; updateMasterVolume(); }
 
-    function tone(freq, duration = .12, type = "sine", start = 0, gain = .45, endFreq = null) {
-      if (!audioContext || !masterGain) return;
-      const t = audioContext.currentTime + start;
-      const osc = audioContext.createOscillator(); const g = audioContext.createGain();
-      osc.type = type; osc.frequency.setValueAtTime(freq, t);
-      if (endFreq) osc.frequency.exponentialRampToValueAtTime(Math.max(20,endFreq), t + duration);
-      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.001,gain), t + .012);
-      g.gain.exponentialRampToValueAtTime(.0001, t + duration);
-      osc.connect(g); g.connect(masterGain); osc.start(t); osc.stop(t + duration + .025);
-    }
-    function metallicBell(start = 0, soft = false) {
-      const gain = soft ? .18 : .34;
-      [[620,1],[930,.6],[1280,.35],[1740,.18]].forEach(([f,m]) => tone(f, .75, "sine", start, gain*m, f*.72));
-    }
-    async function playCustomSound(src) {
-      try {
-        const ok = await ensureAudio();
-        if (!ok) return;
-        if (!customSoundBuffers[src]) {
-          const response = await fetch(src, { cache: "no-store" });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          const arrayBuffer = await response.arrayBuffer();
-          customSoundBuffers[src] = await audioContext.decodeAudioData(arrayBuffer);
-        }
-        const source = audioContext.createBufferSource();
-        source.buffer = customSoundBuffers[src];
-        source.connect(masterGain);
-        source.start();
-      } catch (error) {
-        console.warn("사용자 MP3 파일을 재생하지 못했습니다:", src, error);
-        if (!customSoundErrorShown) {
-          customSoundErrorShown = true;
-          alert(`사용자 소리 파일을 찾지 못했습니다.\nGitHub의 sounds 폴더와 파일 이름을 확인해주세요.\n예: ${src}`);
-          setTimeout(() => { customSoundErrorShown = false; }, 4000);
-        }
-      }
-    }
-    function playSound(name) {
-      if (!name || name === "none") return;
-      if (String(name).startsWith("file:")) {
-        playCustomSound(String(name).slice(5));
-        return;
-      }
-      if (!audioContext) return;
-      const seq = (freqs, gap, dur=.1, type="square", gain=.23) => freqs.forEach((f,i) => tone(f,dur,type,i*gap,gain));
-      switch (name) {
-        case "singleBeep": tone(900,.12,"square",0,.25); break;
-        case "doubleBeep": seq([880,880],.18,.11,"square",.25); break;
-        case "fastBeep": seq([1050,1050,1050],.11,.07,"square",.22); break;
-        case "longBeep": tone(850,.45,"square",0,.24); break;
-        case "lowBeep": tone(430,.16,"square",0,.26); break;
-        case "powerBeep": tone(1080,.24,"sawtooth",0,.30,740); break;
-        case "lowBuzzer": tone(170,.48,"sawtooth",0,.24,120); break;
-        case "longBuzzer": tone(150,1.05,"sawtooth",0,.27,90); break;
-        case "fightBellSoft": metallicBell(0,true); break;
-        case "fightBellStrong": metallicBell(0,false); metallicBell(.13,false); break;
-        case "boxingDing": metallicBell(0,false); break;
-        case "boxingDingDing": metallicBell(0,false); metallicBell(.42,false); break;
-        case "boxingDingDingDing": metallicBell(0,false); metallicBell(.36,false); metallicBell(.72,false); break;
-        case "tripleBell": metallicBell(0,false); metallicBell(.48,false); metallicBell(.96,false); break;
-        case "gong": tone(190,1.35,"sine",0,.42,70); tone(380,.9,"sine",0,.18,120); break;
-        case "gongTriple": [0,.55,1.10].forEach((s) => { tone(190,1.15,"sine",s,.35,70); tone(380,.8,"sine",s,.14,120); }); break;
-        case "softChime": seq([660,880,1100],.16,.42,"sine",.14); break;
-        case "victory": seq([523,659,784,1047],.18,.28,"sine",.22); break;
-        case "siren": tone(450,.8,"sawtooth",0,.18,1050); break;
-        case "sirenLong": tone(380,1.8,"sawtooth",0,.20,1200); break;
-        default: tone(900,.12,"square",0,.22);
-      }
-    }
-    function speak(text) {
-      const s = currentSettings();
-      if (!s?.voiceEnabled || !window.speechSynthesis) return;
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text); utter.lang = "ko-KR";
-      utter.rate = s.voiceTone === "low" ? .88 : s.voiceTone === "high" ? 1.12 : 1;
-      utter.pitch = s.voiceTone === "low" ? .72 : s.voiceTone === "high" ? 1.32 : 1;
-      utter.volume = Math.min(1, s.volume);
-      window.speechSynthesis.speak(utter);
+      return true;
     }
 
-    async function requestWakeLock() {
-      try { if ("wakeLock" in navigator) { wakeLock = await navigator.wakeLock.request("screen"); els.wakeChip.textContent = "화면 유지: 켜짐"; } }
-      catch (_) { els.wakeChip.textContent = "화면 유지: 제한됨"; }
-    }
-    async function releaseWakeLock() {
-      try { await wakeLock?.release(); } catch (_) {}
-      wakeLock = null; els.wakeChip.textContent = "화면 유지: 대기";
+    function getFirstSelectedDeliveryGroup() {
+      return getSelectedDeliveryGroups()[0] || "";
     }
 
-    function enterPhase(phase, seconds) {
-      const s = currentSettings(); if (!s) return;
-      state.phase = phase; state.isRunning = phase !== PHASE.FINISHED; state.isPaused = false;
-      state.remainingMs = Math.max(0, seconds * 1000); state.phaseDurationMs = Math.max(1, seconds * 1000);
-      state.endAt = performance.now() + state.remainingMs; state.notified = new Set();
-      if (phase === PHASE.PREPARE) { playSound(s.prepareSound); speak("준비 시작"); }
-      if (phase === PHASE.WORK) { playSound(s.startSound); speak(`${state.round} 라운드 시작`); }
-      if (phase === PHASE.REST) { playSound(s.restSound); speak("휴식"); }
-      if (phase === PHASE.FINISHED) { playSound(s.finishSound); speak("운동이 완료되었습니다"); releaseWakeLock(); }
-      if (state.isRunning) startTicker(); else clearInterval(state.timerId);
-      render();
-    }
-    function advancePhase() {
-      const s = currentSettings(); if (!s) return;
-      if (state.phase === PHASE.PREPARE) return enterPhase(PHASE.WORK, s.work);
-      if (state.phase === PHASE.WORK) {
-        if (state.round >= s.rounds) return enterPhase(PHASE.FINISHED, 0);
-        if (s.rest > 0) return enterPhase(PHASE.REST, s.rest);
-        state.round += 1; return enterPhase(PHASE.WORK, s.work);
-      }
-      if (state.phase === PHASE.REST) { state.round += 1; return enterPhase(PHASE.WORK, s.work); }
-    }
-    function notifyRemaining(seconds) {
-      const s = currentSettings(); if (!s || state.phase === PHASE.FINISHED || state.phase === PHASE.IDLE) return;
-      const whole = Math.ceil(seconds);
-      if (s.alert30 && whole === 30 && !state.notified.has("30")) { state.notified.add("30"); playSound(s.alertSound); speak("30초 남았습니다"); }
-      if (s.alert10 && whole === 10 && !state.notified.has("10")) { state.notified.add("10"); playSound(s.alertSound); speak("10초 남았습니다"); }
-      if (s.countdown5 && whole <= 5 && whole >= 1 && !state.notified.has(`c${whole}`)) { state.notified.add(`c${whole}`); playSound("singleBeep"); }
-    }
-    function tick() {
-      if (!state.isRunning || state.isPaused) return;
-      state.remainingMs = Math.max(0, state.endAt - performance.now());
-      notifyRemaining(state.remainingMs / 1000); render();
-      if (state.remainingMs <= 0) advancePhase();
-    }
-    function startTicker() { clearInterval(state.timerId); state.timerId = setInterval(tick, 100); }
-
-    async function startTimer() {
-      closeTimeEditor();
-      const s = currentSettings(); if (!s) return;
-      await ensureAudio(); await requestWakeLock(); saveActivePresetData();
-      if (state.isPaused) { state.isPaused = false; state.isRunning = true; state.endAt = performance.now() + state.remainingMs; startTicker(); return render(); }
-      if (state.phase === PHASE.FINISHED) resetTimer(false);
-      state.round = 1; state.totalRounds = s.rounds;
-      if (s.prepare > 0) enterPhase(PHASE.PREPARE, s.prepare); else enterPhase(PHASE.WORK, s.work);
-    }
-    function pauseTimer() {
-      if (!state.isRunning || state.isPaused) return;
-      state.remainingMs = Math.max(0, state.endAt - performance.now()); state.isPaused = true;
-      clearInterval(state.timerId); window.speechSynthesis?.cancel(); render();
-    }
-    function resetTimer(withSound = false) {
-      clearInterval(state.timerId); window.speechSynthesis?.cancel();
-      const s = currentSettings() || { work: presets[activePresetName].work, rounds: presets[activePresetName].rounds };
-      state = { phase: PHASE.IDLE, round: 1, totalRounds: s.rounds, isRunning: false, isPaused: false,
-        remainingMs: s.work * 1000, phaseDurationMs: s.work * 1000, endAt: 0, timerId: null, notified: new Set() };
-      if (withSound && audioContext) playSound("singleBeep"); releaseWakeLock(); render();
-    }
-    function addTenSeconds() {
-      if (!state.isRunning || state.phase === PHASE.FINISHED) return;
-      state.remainingMs += 10000; state.phaseDurationMs += 10000; if (!state.isPaused) state.endAt += 10000; render();
-    }
-
-    function render() {
-      const s = currentSettings() || { work: presets[activePresetName].work, rounds: presets[activePresetName].rounds };
-      document.body.classList.remove("phase-idle","phase-prepare","phase-work","phase-rest","phase-finished");
-      document.body.classList.add(`phase-${state.phase}`);
-      els.timerDisplay.textContent = formatClock(state.remainingMs);
-      els.roundLabel.textContent = `ROUND ${state.round} / ${state.totalRounds || s.rounds}`;
-      const labels = {
-        idle: ["준비", "운동 준비", "시작 버튼을 눌러주세요"],
-        prepare: ["준비", "곧 시작합니다", `다음: ${state.round} 라운드`],
-        work: ["운동", `${state.round} 라운드`, state.round < state.totalRounds ? "다음: 휴식" : "마지막 라운드"],
-        rest: ["휴식", "호흡을 정리하세요", `다음: ${state.round + 1} 라운드`],
-        finished: ["완료", "운동 완료", "수고하셨습니다"]
-      }[state.phase];
-      els.phaseBadge.textContent = state.isPaused ? "일시정지" : labels[0];
-      els.mainStatus.textContent = labels[1]; els.nextStatus.textContent = labels[2];
-      const progress = state.phaseDurationMs > 0 ? 100 * (1 - state.remainingMs / state.phaseDurationMs) : 0;
-      els.progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
-      els.startBtn.disabled = state.isRunning && !state.isPaused;
-      els.startBtn.textContent = state.isPaused ? "▶ 계속" : state.phase === PHASE.FINISHED ? "▶ 다시 시작" : "▶ 시작";
-      els.pauseBtn.disabled = !state.isRunning || state.isPaused;
-      els.addTenBtn.disabled = !state.isRunning;
-      document.querySelectorAll("input, select, .preset-btn, .theme-btn").forEach((el) => {
-        if ([els.volumeRange, els.voiceEnabled, els.alert30, els.alert10, els.countdown5].includes(el)) return;
-        el.disabled = state.isRunning;
+    function renderProductGroups() {
+      const availableGroups = productGroups.filter(function (group) {
+        return !group.checkout;
       });
-      document.querySelectorAll(".sound-preview-btn").forEach((el) => { el.disabled = state.isRunning; });
-    }
 
-    function saveSettings(showMessage = true) {
-      saveActivePresetData();
-      const payload = {
-        themeSelect: localStorage.getItem(THEME_STORAGE_KEY) || "purple",
-        prepareSeconds: els.prepareSeconds.value, workMinutes: els.workMinutes.value, workSeconds: els.workSeconds.value,
-        restMinutes: els.restMinutes.value, restSeconds: els.restSeconds.value, rounds: els.rounds.value,
-        voiceEnabled: els.voiceEnabled.checked, alert30: els.alert30.checked, alert10: els.alert10.checked,
-        countdown5: els.countdown5.checked, voiceTone: els.voiceTone.value,
-        prepareSound: els.prepareSound.value, startSound: els.startSound.value, restSound: els.restSound.value,
-        finishSound: els.finishSound.value, alertSound: els.alertSound.value, volumeRange: els.volumeRange.value,
-        presetNameBoxing: els.presetNameBoxing.value, presetNameKickboxing: els.presetNameKickboxing.value,
-        presetNameTabata: els.presetNameTabata.value
-      };
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload));
-      markAutoSaved();
-      if (showMessage) showToast(`‘${getPresetName(activePresetName)}’ 설정을 저장했습니다.`);
-      updatePresetUI();
-    }
+      const availableDeliveryGroups = [
+        ...new Set(
+          availableGroups
+            .map(getDeliveryGroup)
+            .filter(function (groupName) {
+              return groupName && groupName !== "OTHER";
+            })
+        )
+      ];
 
-    async function previewSoundSelection(select, label) {
-      if (state.isRunning) { showToast("운동 중에는 소리를 변경할 수 없습니다."); return; }
-      saveSettings(false);
-      const optionText = select.options[select.selectedIndex]?.textContent?.trim() || "선택한 소리";
-      if (select.value === "none") {
-        showToast(`${label}: 소리 없음으로 자동 저장되었습니다.`);
-        return;
-      }
-      if (!await ensureAudio()) return;
-      playSound(select.value);
-      showToast(`${label} 미리듣기: ${optionText}`);
-    }
+      const initialDeliveryGroup =
+        availableDeliveryGroups.length === 1
+          ? availableDeliveryGroups[0]
+          : "";
 
-    function saveTimeAndRefresh() {
-      if (state.isRunning) return;
-      saveSettings(false);
-      if (!state.isRunning) resetTimer(false);
-    }
+      const selectAllHtml = availableGroups.length
+        ? `
+          <label class="select-all-box">
+            <input
+              id="selectAllProducts"
+              type="checkbox"
+              ${initialDeliveryGroup ? "checked" : ""}
+            >
+            <span>
+              <strong>같은 배송 일정 상품 선택</strong>
+              <small>
+                월·화 픽업 상품끼리 또는 수·목·금 픽업 상품끼리만
+                함께 문고리 배송 결제가 가능합니다.
+              </small>
+            </span>
+          </label>
+        `
+        : "";
 
-    function scheduleVolumeSave() {
-      clearTimeout(volumeSaveTimer);
-      volumeSaveTimer = setTimeout(() => saveSettings(false), 220);
-    }
+      const groupHtml = productGroups.map(function (group, index) {
+        const assigned = Boolean(group.checkout);
+        const deliveryGroup = getDeliveryGroup(group);
 
-    function openTimeEditor() {
-      if (state.isRunning) { showToast("운동 중에는 시간을 변경할 수 없습니다."); return; }
-      const timing = readTimingInputs() || presets[activePresetName];
-      els.timeModalTitle.textContent = `‘${getPresetName(activePresetName)}’ 시간 변경`;
-      els.timeModalSummary.textContent = "아래 시간을 바꾸고 ‘시간 적용’을 누르면 현재 프로그램에 바로 저장됩니다.";
-      els.timeEditPrepareSeconds.value = timing.prepare;
-      els.timeEditWorkMinutes.value = Math.floor(timing.work / 60);
-      els.timeEditWorkSeconds.value = timing.work % 60;
-      els.timeEditRestMinutes.value = Math.floor(timing.rest / 60);
-      els.timeEditRestSeconds.value = timing.rest % 60;
-      els.timeEditRounds.value = timing.rounds;
-      els.timeModalBackdrop.classList.add("open");
-      setTimeout(() => els.timeEditWorkMinutes.focus(), 30);
-    }
-    function closeTimeEditor() { els.timeModalBackdrop.classList.remove("open"); }
-    function applyTimeEditor() {
-      if (state.isRunning) { showToast("운동 중에는 시간을 변경할 수 없습니다."); return; }
-      const prepare = Math.floor(clamp(els.timeEditPrepareSeconds.value, 0, 600, 10));
-      const work = Math.floor(clamp(els.timeEditWorkMinutes.value, 0, 99, 0)) * 60 + Math.floor(clamp(els.timeEditWorkSeconds.value, 0, 59, 0));
-      const rest = Math.floor(clamp(els.timeEditRestMinutes.value, 0, 99, 0)) * 60 + Math.floor(clamp(els.timeEditRestSeconds.value, 0, 59, 0));
-      const rounds = Math.floor(clamp(els.timeEditRounds.value, 1, 99, 1));
-      if (work < 1) { showToast("운동 시간은 1초 이상이어야 합니다."); return; }
-      putTimingInputs({ prepare, work, rest, rounds });
-      saveSettings(false);
-      resetTimer(false);
-      closeTimeEditor();
-      showToast(`‘${getPresetName(activePresetName)}’ 시간이 변경되었습니다.`);
-    }
-    async function toggleFullscreen() {
-      try {
-        if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
-        else await document.exitFullscreen();
-      } catch (_) { showToast("브라우저 메뉴에서 전체화면을 허용해주세요."); }
-    }
-    function syncFullscreen() {
-      const on = Boolean(document.fullscreenElement);
-      document.body.classList.toggle("fullscreen-mode", on);
-      els.fullscreenBtn.textContent = on ? "⤢ 전체화면 종료" : "⛶ 전체화면";
-      renderFullscreenPrograms();
-    }
-    function toggleSettings() {
-      els.settingsCard.classList.toggle("collapsed");
-      const hidden = els.settingsCard.classList.contains("collapsed");
-      els.layout.classList.toggle("settings-hidden", hidden);
-      els.settingsToggle.textContent = hidden ? "⚙️ 설정 열기" : "⚙️ 설정 닫기";
-    }
-    function initialSettingsVisibility() {
-      const small = matchMedia("(max-width: 1050px)").matches;
-      els.settingsCard.classList.toggle("collapsed", small);
-      els.layout.classList.toggle("settings-hidden", small);
-      els.settingsToggle.textContent = small ? "⚙️ 설정 열기" : "⚙️ 설정 닫기";
-    }
+        const shouldCheck =
+          !assigned &&
+          initialDeliveryGroup &&
+          deliveryGroup === initialDeliveryGroup;
 
-    document.querySelectorAll(".theme-btn").forEach((btn) => btn.addEventListener("click", () => { applyTheme(btn.dataset.theme); saveSettings(false); }));
-    document.querySelectorAll(".preset-btn[data-preset]").forEach((btn) => btn.addEventListener("click", () => applyPreset(btn.dataset.preset)));
-    els.quickTimeChangeBtn.addEventListener("click", openTimeEditor);
-    els.fullscreenProgramList.addEventListener("click", (event) => {
-      const presetBtn = event.target.closest("[data-fs-preset]");
-      if (presetBtn) { applyPreset(presetBtn.dataset.fsPreset); return; }
-      if (event.target.closest("[data-open-time-editor]")) openTimeEditor();
-    });
-    [els.presetNameBoxing,els.presetNameKickboxing,els.presetNameTabata].forEach((input) => input.addEventListener("input", () => { updatePresetUI(); saveSettings(false); }));
-    [els.prepareSeconds,els.workMinutes,els.workSeconds,els.restMinutes,els.restSeconds,els.rounds].forEach((input) => input.addEventListener("change", saveTimeAndRefresh));
-    [els.voiceEnabled,els.alert30,els.alert10,els.countdown5,els.voiceTone].forEach((input) => input.addEventListener("change", () => saveSettings(false)));
+        const statusText = assigned
+          ? [
+              getReceiptLabel(group.checkout.receipt_method),
+              getPaymentLabel(group.checkout.payment_method),
+              group.checkout.payment_status || "처리 중"
+            ].join(" · ")
+          : "";
 
-    const soundPreviewItems = [
-      [els.prepareSound, els.prepareSoundPreviewBtn, "준비 시작 소리"],
-      [els.startSound, els.startSoundPreviewBtn, "운동 시작 소리"],
-      [els.restSound, els.restSoundPreviewBtn, "휴식 시작 소리"],
-      [els.finishSound, els.finishSoundPreviewBtn, "운동 완료 소리"],
-      [els.alertSound, els.alertSoundPreviewBtn, "30초·10초 알림 소리"]
-    ];
-    soundPreviewItems.forEach(([select, button, label]) => {
-      select.addEventListener("change", () => previewSoundSelection(select, label));
-      button.addEventListener("click", () => previewSoundSelection(select, label));
-    });
+        return `
+          <article
+            class="product-card ${assigned ? "assigned" : shouldCheck ? "selected" : ""}"
+            data-group-index="${index}"
+            data-delivery-group="${deliveryGroup}"
+          >
+            <div class="product-head">
+              <input
+                class="product-check"
+                type="checkbox"
+                data-group-index="${index}"
+                data-delivery-group="${deliveryGroup}"
+                ${assigned ? "disabled" : ""}
+                ${shouldCheck ? "checked" : ""}
+                aria-label="${escapeHtml(group.productName)} 선택"
+              >
 
-    els.volumeRange.addEventListener("input", () => { updateVolumeLabel(); scheduleVolumeSave(); });
-    els.startBtn.addEventListener("click", startTimer); els.pauseBtn.addEventListener("click", pauseTimer);
-    els.resetBtn.addEventListener("click", () => resetTimer(true)); els.addTenBtn.addEventListener("click", addTenSeconds);
-    els.fullscreenBtn.addEventListener("click", toggleFullscreen);
-    els.timeEditApplyBtn.addEventListener("click", applyTimeEditor);
-    els.timeEditCloseBtn.addEventListener("click", closeTimeEditor);
-    els.timeModalBackdrop.addEventListener("click", (e) => { if (e.target === els.timeModalBackdrop) closeTimeEditor(); });
-    els.settingsToggle.addEventListener("click", toggleSettings); els.saveBtn.addEventListener("click", () => saveSettings(true));
-    els.brandEditBtn.addEventListener("click", openBrandModal); els.brandSaveBtn.addEventListener("click", saveBrand);
-    els.brandResetBtn.addEventListener("click", resetBrand); els.brandCloseBtn.addEventListener("click", closeBrandModal);
-    els.brandModalBackdrop.addEventListener("click", (e) => { if (e.target === els.brandModalBackdrop) closeBrandModal(); });
-    document.addEventListener("fullscreenchange", syncFullscreen);
-    document.addEventListener("visibilitychange", async () => { if (document.visibilityState === "visible" && state.isRunning) await requestWakeLock(); });
-    document.addEventListener("keydown", (e) => {
-      if (["INPUT","SELECT","TEXTAREA"].includes(document.activeElement?.tagName)) return;
-      if (e.code === "Space") { e.preventDefault(); state.isRunning && !state.isPaused ? pauseTimer() : startTimer(); }
-      if (e.key.toLowerCase() === "r") resetTimer(true);
-      if (e.key.toLowerCase() === "f") toggleFullscreen();
-      if (e.key === "Escape" && els.timeModalBackdrop.classList.contains("open")) closeTimeEditor();
-      else if (e.key === "Escape" && els.brandModalBackdrop.classList.contains("open")) closeBrandModal();
-    });
+              <div>
+                <div class="product-name">
+                  ${escapeHtml(group.productName)}
+                </div>
 
-    window.addEventListener("pagehide", () => {
-      if (!state.isRunning) saveSettings(false);
-    });
+                <div class="product-meta">
+                  개당 ${formatWon(group.unitPrice)}
+                </div>
 
-    initialSettingsVisibility();
-    loadSavedData();
-  </script>
+                <span class="quantity-badge">
+                  합산 수량:
+                  ${Number(group.quantity).toLocaleString("ko-KR")}
+                  ${escapeHtml(group.unitName)}
+                </span>
 
-  <script>
-    // PWA 서비스 워커 등록: 앱 설치 및 오프라인 실행에 사용합니다.
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=20260812-2").then((registration) => {
-          registration.update().catch(() => {});
-        }).catch((error) => {
-          console.warn("서비스 워커 등록 실패:", error);
+                <span class="pickup-badge">
+                  픽업: ${formatDate(group.pickupDate)}
+                </span>
+
+                <span class="delivery-badge">
+                  ${getDeliveryGroupLabel(deliveryGroup)}
+                </span>
+
+                ${
+                  assigned
+                    ? `<span class="status-badge">${escapeHtml(statusText)}</span>`
+                    : ""
+                }
+              </div>
+            </div>
+
+            <div class="product-bottom">
+              <span class="product-meta">
+                ${
+                  assigned
+                    ? "이미 결제·배송 신청이 완료된 상품입니다."
+                    : "문고리 배송을 원할 때만 체크하세요."
+                }
+              </span>
+
+              <span class="product-price">
+                ${formatWon(group.lineTotal)}
+              </span>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      results.innerHTML = selectAllHtml + groupHtml;
+
+      const selectAll = document.getElementById("selectAllProducts");
+
+      if (selectAll) {
+        selectAll.addEventListener("change", function () {
+          const checkboxes = Array.from(
+            document.querySelectorAll(".product-check:not(:disabled)")
+          );
+
+          if (!selectAll.checked) {
+            checkboxes.forEach(function (checkbox) {
+              checkbox.checked = false;
+              toggleProductCard(checkbox);
+            });
+
+            updateCheckoutDisplay();
+            return;
+          }
+
+          const deliveryGroups = [
+            ...new Set(
+              checkboxes
+                .map(function (checkbox) {
+                  return checkbox.dataset.deliveryGroup;
+                })
+                .filter(function (groupName) {
+                  return groupName && groupName !== "OTHER";
+                })
+            )
+          ];
+
+          let targetGroup = getFirstSelectedDeliveryGroup();
+
+          if (!targetGroup) {
+            targetGroup = deliveryGroups[0] || "";
+          }
+
+          if (deliveryGroups.length > 1) {
+            showMessage(
+              "전체 주문상품 중 배송 일정이 다른 상품이 섞여 있습니다. 같은 배송 일정 상품만 선택했습니다.",
+              "error"
+            );
+          }
+
+          checkboxes.forEach(function (checkbox) {
+            checkbox.checked =
+              checkbox.dataset.deliveryGroup === targetGroup;
+
+            toggleProductCard(checkbox);
+          });
+
+          updateCheckoutDisplay();
         });
+      }
+    }
+
+    function handleProductSelection(event) {
+      if (!event.target.matches(".product-check")) {
+        return;
+      }
+
+      if (event.target.checked) {
+        const selectedGroups = getSelectedDeliveryGroups();
+
+        if (selectedGroups.length > 1) {
+          event.target.checked = false;
+
+          showMessage(
+            "월·화 픽업 상품과 수·목·금 픽업 상품은 함께 선택할 수 없습니다. 같은 배송 일정 상품끼리만 선택해주세요.",
+            "error"
+          );
+        }
+      }
+
+      toggleProductCard(event.target);
+      syncSelectAll();
+      updateCheckoutDisplay();
+    }
+
+    function toggleProductCard(checkbox) {
+      const card = checkbox.closest(".product-card");
+
+      card?.classList.toggle(
+        "selected",
+        checkbox.checked
+      );
+    }
+
+    function syncSelectAll() {
+      const selectAll = document.getElementById("selectAllProducts");
+
+      if (!selectAll) {
+        return;
+      }
+
+      const available = Array.from(
+        document.querySelectorAll(".product-check:not(:disabled)")
+      );
+
+      const checked = available.filter(function (checkbox) {
+        return checkbox.checked;
       });
+
+      selectAll.checked =
+        available.length > 0 &&
+        checked.length === available.length;
+
+      selectAll.indeterminate =
+        checked.length > 0 &&
+        checked.length < available.length;
+    }
+
+    function getSelectedGroups() {
+      return Array.from(
+        document.querySelectorAll(".product-check:checked:not(:disabled)")
+      )
+        .map(function (checkbox) {
+          return productGroups[
+            Number(checkbox.dataset.groupIndex)
+          ];
+        })
+        .filter(Boolean);
+    }
+
+    function getSelectedItemIds() {
+      return getSelectedGroups()
+        .flatMap(function (group) {
+          return group.itemIds;
+        })
+        .filter(Boolean);
+    }
+
+    function getProductAmount() {
+      return getSelectedGroups().reduce(function (sum, group) {
+        return sum + Number(group.lineTotal || 0);
+      }, 0);
+    }
+
+    function getReceiptMethod() {
+      return "home";
+    }
+
+    function getPaymentMethod() {
+      return (
+        document.querySelector('input[name="paymentMethod"]:checked')?.value ||
+        "bank_transfer"
+      );
+    }
+
+    function updateCheckoutDisplay() {
+      const selectedGroups = getSelectedGroups();
+      const selectedCount = selectedGroups.length;
+      const productAmount = getProductAmount();
+      const paymentMethod = getPaymentMethod();
+
+      document.getElementById("deliveryFields").hidden = false;
+      document.getElementById("bankBox").hidden =
+        paymentMethod !== "bank_transfer";
+      document.getElementById("cardBox").hidden =
+        paymentMethod !== "card_online";
+
+      // 사용자 기준:
+      // 40,000원 초과 무료 / 40,000원 이하 500원
+      const deliveryFee =
+        selectedCount === 0
+          ? 0
+          : productAmount > FREE_DELIVERY_THRESHOLD
+            ? 0
+            : HOME_DELIVERY_FEE;
+
+      const finalAmount = productAmount + deliveryFee;
+
+      document.getElementById("productAmountText").textContent =
+        formatWon(productAmount);
+
+      document.getElementById("deliveryFeeText").textContent =
+        selectedCount === 0
+          ? "0원"
+          : deliveryFee === 0
+            ? "무료"
+            : formatWon(deliveryFee);
+
+      document.getElementById("finalAmountText").textContent =
+        formatWon(finalAmount);
+
+      submitCheckoutButton.disabled = selectedCount === 0;
+
+      const guide = document.getElementById("deliveryGuide");
+
+      if (!selectedCount) {
+        guide.textContent =
+          "이번 문고리 배송에 포함할 상품을 한 개 이상 체크해주세요.";
+        return;
+      }
+
+      const deliveryGroup = getFirstSelectedDeliveryGroup();
+
+      const scheduleText =
+        deliveryGroup === "MON_TUE"
+          ? "수요일 새벽 배송"
+          : deliveryGroup === "WED_THU_FRI"
+            ? "금요일 오후 배송"
+            : "배송 일정 확인 필요";
+
+      if (productAmount > FREE_DELIVERY_THRESHOLD) {
+        guide.textContent =
+          `배송 일정: ${scheduleText} · 선택 상품 합계가 40,000원을 초과하여 배송비가 무료입니다.`;
+      } else {
+        guide.textContent =
+          `배송 일정: ${scheduleText} · 선택 상품 합계가 40,000원 이하이므로 배송비 500원이 추가됩니다.`;
+      }
+    }
+
+    async function submitCheckout() {
+      clearMessage();
+
+      const nickname = nicknameInput.value.trim();
+      const itemIds = getSelectedItemIds();
+      const receiptMethod = getReceiptMethod();
+      const paymentMethod = getPaymentMethod();
+
+      const deliveryPhone =
+        document.getElementById("deliveryPhone").value.trim();
+
+      const address =
+        document.getElementById("deliveryAddress").value.trim();
+
+      const entranceInfo =
+        document.getElementById("entranceInfo").value.trim();
+
+      const deliveryRequest =
+        document.getElementById("deliveryRequest").value.trim();
+
+      if (!nickname) {
+        showMessage("닉네임을 입력해주세요.", "error");
+        return;
+      }
+
+      if (!itemIds.length) {
+        showMessage(
+          "이번 문고리 배송에 포함할 상품을 한 개 이상 체크해주세요.",
+          "error"
+        );
+        return;
+      }
+
+      if (!validateDeliveryGroupSelection()) {
+        return;
+      }
+
+      const phoneDigits = deliveryPhone.replace(/\D/g, "");
+
+      if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+        showMessage(
+          "문고리 배송을 위해 휴대폰 번호를 정확히 입력해주세요.",
+          "error"
+        );
+        return;
+      }
+
+      if (!address || !entranceInfo) {
+        showMessage(
+          "문고리 배송을 위해 주소와 공동현관 출입정보를 입력해주세요.",
+          "error"
+        );
+        return;
+      }
+
+      if (
+        paymentMethod === "card_online" &&
+        !isTossConfigured()
+      ) {
+        showMessage(
+          "카드결제 설정이 아직 완료되지 않았습니다. payment-config.js의 토스 클라이언트 키를 확인해주세요.",
+          "error"
+        );
+        return;
+      }
+
+      localStorage.setItem("dampickLastNickname", nickname);
+
+      submitCheckoutButton.disabled = true;
+      submitCheckoutButton.textContent =
+        "선택 상품 신청을 저장하고 있습니다...";
+
+      try {
+        const { data, error } = await sb.rpc(
+          "submit_checkout_item_request_v2",
+          {
+            p_nickname: nickname,
+            p_item_ids: itemIds,
+            p_receipt_method: receiptMethod,
+            p_payment_method: paymentMethod,
+            p_delivery_phone: deliveryPhone,
+            p_delivery_address: address,
+            p_entrance_info: entranceInfo,
+            p_delivery_request: deliveryRequest
+          }
+        );
+
+        if (error) {
+          throw error;
+        }
+
+        const result =
+          typeof data === "string"
+            ? JSON.parse(data)
+            : data;
+
+        if (paymentMethod === "card_online") {
+          await startTossCardPayment(result, nickname);
+          return;
+        }
+
+        const completeBox =
+          document.getElementById("checkoutComplete");
+
+        const nextGuide =
+          "하나은행 412-910821-25107, 예금주 담픽으로 " +
+          formatWon(result.final_amount) +
+          "을 입금해주세요.";
+
+        completeBox.innerHTML = `
+          <strong>문고리 배송 신청이 저장되었습니다.</strong><br>
+          신청번호:
+          ${escapeHtml(result.request_code || "")}<br>
+          선택 상품 합계:
+          ${formatWon(result.product_amount)}<br>
+          배송비:
+          ${
+            Number(result.delivery_fee || 0) === 0
+              ? "무료"
+              : formatWon(result.delivery_fee)
+          }<br>
+          이번 결제금액:
+          <strong>${formatWon(result.final_amount)}</strong><br>
+          ${escapeHtml(nextGuide)}
+        `;
+
+        completeBox.classList.add("show");
+
+        await lookupOrder({
+          keepComplete: true,
+          keepMessage: true
+        });
+
+        checkoutCard.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+
+      } catch (error) {
+        console.error(error);
+
+        showMessage(
+          error.message || "문고리 배송 신청을 저장하지 못했습니다.",
+          "error"
+        );
+
+      } finally {
+        submitCheckoutButton.disabled =
+          getSelectedGroups().length === 0;
+
+        submitCheckoutButton.textContent =
+          "선택 상품 결제·문고리 배송 신청하기";
+      }
+    }
+
+    function restoreNickname() {
+      const params = new URLSearchParams(window.location.search);
+
+      const saved =
+        params.get("nickname") ||
+        localStorage.getItem("dampickLastNickname") ||
+        "";
+
+      if (saved) {
+        nicknameInput.value = saved;
+      }
+    }
+
+    function isTossConfigured() {
+      return (
+        TOSS_CLIENT_KEY.startsWith("test_ck_") ||
+        TOSS_CLIENT_KEY.startsWith("live_ck_")
+      );
+    }
+
+    function makeTossOrderName() {
+      const groups = getSelectedGroups();
+
+      if (!groups.length) {
+        return "담픽 주문상품";
+      }
+
+      const firstName = String(
+        groups[0].productName || "담픽 상품"
+      );
+
+      return groups.length > 1
+        ? (
+            firstName +
+            " 외 " +
+            (groups.length - 1) +
+            "건"
+          ).slice(0, 100)
+        : firstName.slice(0, 100);
+    }
+
+    async function startTossCardPayment(result, nickname) {
+      if (typeof window.TossPayments !== "function") {
+        throw new Error("토스페이먼츠 결제 모듈을 불러오지 못했습니다.");
+      }
+
+      const amount = Number(result.final_amount || 0);
+
+      if (!Number.isInteger(amount) || amount < 100) {
+        throw new Error("카드결제 금액은 100원 이상이어야 합니다.");
+      }
+
+      const tossPayments = window.TossPayments(TOSS_CLIENT_KEY);
+
+      const payment = tossPayments.payment({
+        customerKey: window.TossPayments.ANONYMOUS
+      });
+
+      const successUrl = new URL(
+        "./payment-success.html",
+        window.location.href
+      ).href;
+
+      const failUrl = new URL(
+        "./payment-fail.html",
+        window.location.href
+      ).href;
+
+      try {
+        await payment.requestPayment({
+          method: "CARD",
+          amount: {
+            currency: "KRW",
+            value: amount
+          },
+          orderId: String(result.request_code),
+          orderName: makeTossOrderName(),
+          successUrl,
+          failUrl,
+          customerName: nickname.slice(0, 100),
+          card: {
+            flowMode: "DEFAULT"
+          }
+        });
+
+      } catch (error) {
+        try {
+          await sb.rpc(
+            "mark_card_payment_failed",
+            {
+              p_request_code: String(result.request_code),
+              p_error_code: String(error?.code || ""),
+              p_error_message: String(
+                error?.message ||
+                "카드결제 창을 열지 못했습니다."
+              )
+            }
+          );
+        } catch (ignore) {
+          console.warn(ignore);
+        }
+
+        throw error;
+      }
+    }
+
+    function getReceiptLabel(value) {
+      return value === "home"
+        ? "문고리 배송"
+        : "매장 픽업";
+    }
+
+    function getPaymentLabel(value) {
+      const labels = {
+        pickup_pay: "픽업 시 결제",
+        bank_transfer: "계좌이체",
+        card_online: "카드결제"
+      };
+
+      return labels[value] || "결제방법 확인";
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return "날짜 미정";
+      }
+
+      const date = new Date(
+        String(value).slice(0, 10) + "T00:00:00"
+      );
+
+      if (Number.isNaN(date.getTime())) {
+        return String(value);
+      }
+
+      const weekday =
+        ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
+
+      return (
+        date.getFullYear() +
+        "년 " +
+        (date.getMonth() + 1) +
+        "월 " +
+        date.getDate() +
+        "일 (" +
+        weekday +
+        ")"
+      );
+    }
+
+    function formatWon(value) {
+      return (
+        Number(value || 0).toLocaleString("ko-KR") +
+        "원"
+      );
+    }
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = "message show " + type;
+    }
+
+    function clearMessage() {
+      message.textContent = "";
+      message.className = "message";
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
   </script>
-
 </body>
 </html>
