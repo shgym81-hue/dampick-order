@@ -840,3 +840,31 @@
     #productEditDialog label { display: block; margin-top: 14px; margin-bottom: 6px; }
     #productEditMessage { color: #b42318; min-height: 22px; }
     #productEditDialog .product-action-buttons { justify-content: flex-end; margin-top: 20px; }
+
+    /* 상품 관리에만 적용: 다른 회원·주문 목록의 배치는 유지합니다. */
+    #productForm { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, .8fr) minmax(0, 1.5fr); align-items: end; }
+    #productForm > div { min-width: 0; }
+    #productForm label { font-size: 16px; }
+    #productForm input { min-height: 50px; font-size: 18px; }
+    #productList { gap: 12px; }
+    .product-summary-row {
+      display: grid;
+      grid-template-columns: minmax(160px, 2fr) minmax(110px, 1fr) minmax(70px, .6fr) minmax(190px, 1.5fr) auto;
+      align-items: center; gap: 18px; padding: 20px;
+      border: 1px solid var(--border); border-radius: 12px; background: #fff;
+    }
+    .product-summary-cell { display: grid; gap: 7px; min-width: 0; }
+    .product-summary-label { font-size: 14px; font-weight: 700; color: #626262; }
+    .product-summary-cell strong { font-size: 18px; line-height: 1.5; overflow-wrap: anywhere; }
+    .product-summary-name strong { font-size: 20px; }
+    .product-summary-date strong { color: #aa2455; }
+    .product-summary-row .button.small { min-height: 44px; font-size: 16px; white-space: nowrap; }
+    @media (max-width: 1050px) {
+      .product-summary-row { grid-template-columns: minmax(140px, 2fr) minmax(95px, 1fr) minmax(65px, .7fr) minmax(155px, 1.5fr); gap: 14px; }
+      .product-summary-row .product-action-buttons { grid-column: 1 / -1; justify-content: flex-end; }
+    }
+    @media (max-width: 720px) {
+      #productForm { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .product-summary-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 16px; gap: 16px; }
+      .product-summary-name, .product-summary-date { grid-column: 1 / -1; }
+    }

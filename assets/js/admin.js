@@ -1380,22 +1380,22 @@
         products.map(
           function (product) {
             return `
-              <div class="list-row">
-                <div class="list-row-main">
-                  <p class="list-row-title">
-                    ${escapeHtml(product.name)}
-                  </p>
-
-                  <p class="list-row-meta">
-                    ${formatWon(product.unit_price)}
-                    /
-                    ${escapeHtml(product.unit_name || "개")}
-                  </p>
-
-                  <span class="pickup-date-badge">
-                    픽업 날짜:
-                    ${formatDate(product.pickup_date)}
-                  </span>
+              <div class="product-summary-row">
+                <div class="product-summary-cell product-summary-name">
+                  <span class="product-summary-label">상품명</span>
+                  <strong>${escapeHtml(product.name)}</strong>
+                </div>
+                <div class="product-summary-cell">
+                  <span class="product-summary-label">금액</span>
+                  <strong>${formatWon(product.unit_price)}</strong>
+                </div>
+                <div class="product-summary-cell">
+                  <span class="product-summary-label">수량 단위</span>
+                  <strong>${escapeHtml(product.unit_name || "개")}</strong>
+                </div>
+                <div class="product-summary-cell product-summary-date">
+                  <span class="product-summary-label">픽업 날짜</span>
+                  <strong>${formatDate(product.pickup_date)}</strong>
                 </div>
 
                 <div class="product-action-buttons">
