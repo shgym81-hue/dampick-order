@@ -15,5 +15,11 @@
 */
 
 window.DAMPICK_PAYMENT_CONFIG = {
-  tossClientKey: "test_ck_본인에게_발급된_클라이언트키"
+  tossClientKey: ""
+};
+
+// 형식 검사만 수행합니다. 키의 유효성과 서버 설정은 별도 검증이 필요합니다.
+window.isDampickTossKeyConfigured = function (key) {
+  return /^(test|live)_ck_[A-Za-z0-9]+$/.test(String(key || "").trim()) &&
+    !/placeholder|example|your|replace/i.test(String(key));
 };

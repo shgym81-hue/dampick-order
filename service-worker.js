@@ -1,4 +1,4 @@
-const CACHE_NAME = "dampick-v4";
+const CACHE_NAME = "dampick-v5";
 
 self.addEventListener("install", function () {
   self.skipWaiting();
@@ -9,7 +9,7 @@ self.addEventListener("activate", function (event) {
     caches.keys().then(function (cacheNames) {
       return Promise.all(
         cacheNames.map(function (cacheName) {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheName.startsWith("dampick-") && cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })

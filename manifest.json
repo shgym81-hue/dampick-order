@@ -11,13 +11,13 @@
   "theme_color": "#f25b94",
   "icons": [
     {
-      "src": "./dampick-icon-192.png.png",
+      "src": "./assets/images/dampick-icon-192.png.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./dampick-icon-512.png.png",
+      "src": "./assets/images/dampick-icon-512.png.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

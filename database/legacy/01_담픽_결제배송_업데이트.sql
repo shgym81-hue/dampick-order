@@ -1,3 +1,4 @@
+-- 참고용 구버전: 현재 운영 DB에 그대로 실행하지 마세요. database/README.md 참고.
 -- =========================================================
 -- 담픽 결제·픽업·집 앞 배송 기능 추가
 -- 실행 위치: Supabase → SQL Editor → New query
@@ -211,7 +212,7 @@ begin
     and o.order_number = any(v_normalized_orders);
 
   if p_receipt_method = 'home'
-     and v_product_amount < 40000 then
+     and v_product_amount <= 40000 then
     v_delivery_fee := 500;
   else
     v_delivery_fee := 0;
