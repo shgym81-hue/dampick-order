@@ -639,10 +639,31 @@
     </section>
   </main>
 
+  <dialog id="productEditDialog" aria-labelledby="productEditTitle">
+    <form id="productEditForm">
+      <h2 id="productEditTitle">공동구매 상품 수정</h2>
+      <p>상품 목록과 이후 등록하는 주문에 적용됩니다. 이미 등록된 주문의 가격·픽업 날짜와 결제·배송 신청은 변경되지 않습니다.</p>
+      <label for="editProductName">상품명</label>
+      <input id="editProductName" type="text" required>
+      <label for="editProductPrice">가격(원)</label>
+      <input id="editProductPrice" type="number" min="0" step="1" required>
+      <label for="editProductUnit">단위</label>
+      <input id="editProductUnit" type="text" required>
+      <label for="editProductPickupDate">픽업 날짜</label>
+      <input id="editProductPickupDate" type="date" required>
+      <p id="productEditMessage" role="alert"></p>
+      <div class="product-action-buttons">
+        <button id="cancelProductEdit" class="button secondary" type="button">취소</button>
+        <button id="saveProductEdit" class="button" type="submit">변경 저장</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="./assets/js/config.js"></script>
 
+  <script src="./assets/js/admin-product-editor.js"></script>
   <script src="./assets/js/admin.js"></script>
 </body>
 </html>

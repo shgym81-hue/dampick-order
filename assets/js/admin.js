@@ -27,6 +27,11 @@
     let products = [];
     let orders = [];
 
+    const productEditor = window.createDampickProductEditor(sb, async product => {
+      await loadProducts();
+      setMessage(appMessage, product.name + " 상품을 수정했습니다. 기존 주문은 변경되지 않습니다.", "success");
+    });
+
     let memberListOpen = false;
     let orderListOpen = false;
     let selectedSalesDate = "";
@@ -1393,6 +1398,8 @@
                   </span>
                 </div>
 
+                <div class="product-action-buttons">
+                <button class="button secondary small" type="button" data-product-edit="${escapeHtml(product.id)}">수정</button>
                 <button
                   class="button danger small"
                   type="button"
@@ -1400,10 +1407,18 @@
                 >
                   상품 내리기
                 </button>
+                </div>
               </div>
             `;
           }
         ).join("");
+
+      target.querySelectorAll("[data-product-edit]").forEach(button => {
+        button.addEventListener("click", () => {
+          const product = products.find(item => item.id === button.dataset.productEdit);
+          if (product) productEditor.open(product);
+        });
+      });
 
       target
         .querySelectorAll(

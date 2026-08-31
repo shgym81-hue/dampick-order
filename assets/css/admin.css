@@ -833,3 +833,10 @@
         font-size: 10px;
       }
     }
+    .product-action-buttons { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    #productEditDialog { width: min(520px, calc(100% - 32px)); max-height: 90vh; overflow: auto; border: 0; border-radius: 16px; padding: 24px; color: #252525; }
+    #productEditDialog::backdrop { background: rgb(0 0 0 / 45%); }
+    #productEditDialog p { font-size: 14px; line-height: 1.6; }
+    #productEditDialog label { display: block; margin-top: 14px; margin-bottom: 6px; }
+    #productEditMessage { color: #b42318; min-height: 22px; }
+    #productEditDialog .product-action-buttons { justify-content: flex-end; margin-top: 20px; }
