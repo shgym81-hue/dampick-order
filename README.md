@@ -42,10 +42,14 @@ python -m http.server 8000 --bind 127.0.0.1
 Node.js가 있으면 자동 검증을 실행할 수 있습니다.
 
 ```sh
-node --test tests/project.test.cjs
+node --test
 ```
 
 ## 설정과 운영 주의사항
+
+배송 날짜별 선택·결제와 서버 적용 절차는 [배송 묶음별 결제 안내](docs/delivery-checkout.md)를 참고하세요.
+운영 데이터 없이 화면을 검증하려면 `node tests/preview-server.cjs`로 로컬 테스트 서버를 실행합니다.
+이 서버는 가상 상품과 가상 카드 요청만 사용하며 실제 카드 승인 기능은 없습니다.
 
 - `assets/js/config.js`: Supabase URL과 공개용 publishable/anon 키만 사용합니다. secret/service_role 키는 넣지 마세요.
 - `assets/js/payment-config.js`: 토스 클라이언트 키를 설정합니다. 기본값은 빈 문자열이며 카드 신청을 차단합니다. 형식 검사 통과가 유효한 키 또는 정상 결제를 보장하지는 않습니다.

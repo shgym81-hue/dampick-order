@@ -639,3 +639,9 @@
         font-size: 11px;
       }
     }
+    .delivery-bucket { border: 2px solid #f4c5d6; border-radius: 18px; padding: 16px; margin: 24px 0; background: #fffafb; }
+    .delivery-bucket-heading h3 { margin: 0 0 6px; font-size: 18px; color: #a6134a; }
+    .delivery-bucket-heading p { margin: 0 0 14px; font-size: 14px; color: #666; }
+    .delivery-bucket .product-card { margin: 12px 0; }
+    .delivery-bucket .bucket-checkout { margin-top: 14px; }
+    .checkout-schedule { padding: 12px; background: #fff0f5; color: #a6134a; font-weight: 700; border-radius: 10px; }

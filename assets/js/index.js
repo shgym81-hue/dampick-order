@@ -16,6 +16,7 @@
 
     let currentOrders = [];
     let productGroups = [];
+    let checkoutBusy = false;
 
     restoreNickname();
 
@@ -225,33 +226,12 @@
     }
 
     function getDeliveryGroup(group) {
-      const weekday = getPickupWeekday(group?.pickupDate);
-
-      if (weekday === "월" || weekday === "화") {
-        return "MON_TUE";
-      }
-
-      if (
-        weekday === "수" ||
-        weekday === "목" ||
-        weekday === "금"
-      ) {
-        return "WED_THU_FRI";
-      }
-
-      return "OTHER";
+      return window.DampickDelivery.schedule(group?.pickupDate)?.key || "OTHER";
     }
 
     function getDeliveryGroupLabel(groupName) {
-      if (groupName === "MON_TUE") {
-        return "월·화 픽업 → 수요일 새벽 배송";
-      }
-
-      if (groupName === "WED_THU_FRI") {
-        return "수·목·금 픽업 → 금요일 오후 배송";
-      }
-
-      return "배송 일정 확인 필요";
+      const group = productGroups.find(item => getDeliveryGroup(item) === groupName);
+      return window.DampickDelivery.schedule(group?.pickupDate)?.label || "배송 일정 확인 필요";
     }
 
     function getSelectedDeliveryGroups() {
@@ -267,16 +247,10 @@
     }
 
     function validateDeliveryGroupSelection() {
-      const selectedGroups = getSelectedDeliveryGroups();
-
-      if (selectedGroups.length > 1) {
-        showMessage(
-          "문고리 배송 일정이 다른 상품은 함께 결제할 수 없습니다. 월·화 픽업 상품끼리 또는 수·목·금 픽업 상품끼리만 선택해주세요.",
-          "error"
-        );
+      if (!window.DampickDelivery.validate(getSelectedGroups())) {
+        showMessage("같은 배송 날짜의 상품만 함께 결제할 수 있습니다. 배송 묶음을 하나 선택해주세요.", "error");
         return false;
       }
-
       return true;
     }
 
@@ -285,45 +259,8 @@
     }
 
     function renderProductGroups() {
-      const availableGroups = productGroups.filter(function (group) {
-        return !group.checkout;
-      });
-
-      const availableDeliveryGroups = [
-        ...new Set(
-          availableGroups
-            .map(getDeliveryGroup)
-            .filter(function (groupName) {
-              return groupName && groupName !== "OTHER";
-            })
-        )
-      ];
-
-      const initialDeliveryGroup =
-        availableDeliveryGroups.length === 1
-          ? availableDeliveryGroups[0]
-          : "";
-
-      const selectAllHtml = availableGroups.length
-        ? `
-          <label class="select-all-box">
-            <input
-              id="selectAllProducts"
-              type="checkbox"
-              ${initialDeliveryGroup ? "checked" : ""}
-            >
-            <span>
-              <strong>같은 배송 일정 상품 선택</strong>
-              <small>
-                월·화 픽업 상품끼리 또는 수·목·금 픽업 상품끼리만
-                함께 문고리 배송 결제가 가능합니다.
-              </small>
-            </span>
-          </label>
-        `
-        : "";
-
-      const groupHtml = productGroups.map(function (group, index) {
+      const initialDeliveryGroup = "";
+      const cards = productGroups.map(function (group, index) {
         const assigned = Boolean(group.checkout);
         const deliveryGroup = getDeliveryGroup(group);
 
@@ -352,7 +289,7 @@
                 type="checkbox"
                 data-group-index="${index}"
                 data-delivery-group="${deliveryGroup}"
-                ${assigned ? "disabled" : ""}
+                ${assigned || deliveryGroup === "OTHER" || !group.itemIds.length ? "disabled" : ""}
                 ${shouldCheck ? "checked" : ""}
                 aria-label="${escapeHtml(group.productName)} 선택"
               >
@@ -393,7 +330,7 @@
                 ${
                   assigned
                     ? "이미 결제·배송 신청이 완료된 상품입니다."
-                    : "문고리 배송을 원할 때만 체크하세요."
+                    : deliveryGroup === "OTHER" || !group.itemIds.length ? "배송 일정을 확인하려면 관리자에게 문의해주세요." : "이 배송 묶음에 포함할 상품만 체크하세요."
                 }
               </span>
 
@@ -403,63 +340,45 @@
             </div>
           </article>
         `;
+      });
+      const buckets = new Map();
+      productGroups.forEach((group, index) => {
+        const key = getDeliveryGroup(group);
+        if (!buckets.has(key)) buckets.set(key, []);
+        buckets.get(key).push(index);
+      });
+      results.innerHTML = Array.from(buckets).map(([key, indexes]) => {
+        const available = indexes.filter(i => !productGroups[i].checkout && productGroups[i].itemIds.length && key !== "OTHER");
+        const info = window.DampickDelivery.schedule(productGroups[indexes[0]].pickupDate);
+        return `<section class="delivery-bucket" data-bucket="${key}">
+          <div class="delivery-bucket-heading"><h3>${escapeHtml(info?.label || "배송 일정 확인 필요")}</h3>
+          <p>${escapeHtml(info?.pickupLabel || "주말·미정 상품은 관리자에게 문의해주세요.")}</p></div>
+          ${available.length ? `<label class="select-all-box"><input type="checkbox" class="bucket-select-all" data-delivery-group="${key}"><span>이 배송 묶음 전체 선택</span></label>` : ""}
+          ${indexes.map(i => cards[i]).join("")}
+          ${available.length ? `<button type="button" class="bucket-checkout primary-button" data-delivery-group="${key}" disabled>선택 상품 결제하기</button>` : ""}
+        </section>`;
       }).join("");
-
-      results.innerHTML = selectAllHtml + groupHtml;
-
-      const selectAll = document.getElementById("selectAllProducts");
-
-      if (selectAll) {
-        selectAll.addEventListener("change", function () {
-          const checkboxes = Array.from(
-            document.querySelectorAll(".product-check:not(:disabled)")
-          );
-
-          if (!selectAll.checked) {
-            checkboxes.forEach(function (checkbox) {
-              checkbox.checked = false;
-              toggleProductCard(checkbox);
-            });
-
-            updateCheckoutDisplay();
-            return;
-          }
-
-          const deliveryGroups = [
-            ...new Set(
-              checkboxes
-                .map(function (checkbox) {
-                  return checkbox.dataset.deliveryGroup;
-                })
-                .filter(function (groupName) {
-                  return groupName && groupName !== "OTHER";
-                })
-            )
-          ];
-
-          let targetGroup = getFirstSelectedDeliveryGroup();
-
-          if (!targetGroup) {
-            targetGroup = deliveryGroups[0] || "";
-          }
-
-          if (deliveryGroups.length > 1) {
-            showMessage(
-              "전체 주문상품 중 배송 일정이 다른 상품이 섞여 있습니다. 같은 배송 일정 상품만 선택했습니다.",
-              "error"
-            );
-          }
-
-          checkboxes.forEach(function (checkbox) {
-            checkbox.checked =
-              checkbox.dataset.deliveryGroup === targetGroup;
-
+      results.querySelectorAll(".bucket-select-all").forEach(control => {
+        control.addEventListener("change", () => {
+          if (checkoutBusy) return;
+          document.querySelectorAll(".product-check:not(:disabled)").forEach(checkbox => {
+            checkbox.checked = control.checked && checkbox.dataset.deliveryGroup === control.dataset.deliveryGroup;
             toggleProductCard(checkbox);
           });
-
+          clearMessage();
+          syncSelectAll();
           updateCheckoutDisplay();
         });
-      }
+      });
+      results.querySelectorAll(".bucket-checkout").forEach(button => {
+        button.addEventListener("click", () => {
+          if (!checkoutBusy && validateDeliveryGroupSelection()) {
+            checkoutCard.scrollIntoView({ behavior: "smooth", block: "start" });
+            document.getElementById("deliveryPhone").focus({ preventScroll: true });
+          }
+        });
+      });
+      syncSelectAll();
     }
 
     function handleProductSelection(event) {
@@ -468,13 +387,11 @@
       }
 
       if (event.target.checked) {
-        const selectedGroups = getSelectedDeliveryGroups();
-
-        if (selectedGroups.length > 1) {
+        if (!window.DampickDelivery.validate(getSelectedGroups())) {
           event.target.checked = false;
 
           showMessage(
-            "월·화 픽업 상품과 수·목·금 픽업 상품은 함께 선택할 수 없습니다. 같은 배송 일정 상품끼리만 선택해주세요.",
+            "배송 날짜가 다른 상품은 함께 선택할 수 없습니다. 다른 묶음의 전체 선택을 누르면 해당 묶음으로 전환됩니다.",
             "error"
           );
         }
@@ -495,27 +412,18 @@
     }
 
     function syncSelectAll() {
-      const selectAll = document.getElementById("selectAllProducts");
-
-      if (!selectAll) {
-        return;
-      }
-
-      const available = Array.from(
-        document.querySelectorAll(".product-check:not(:disabled)")
-      );
-
-      const checked = available.filter(function (checkbox) {
-        return checkbox.checked;
+      const checkboxes = Array.from(document.querySelectorAll(".product-check:not(:disabled)"));
+      document.querySelectorAll(".bucket-select-all").forEach(control => {
+        const available = checkboxes.filter(item => item.dataset.deliveryGroup === control.dataset.deliveryGroup);
+        const checked = available.filter(item => item.checked);
+        control.checked = available.length > 0 && checked.length === available.length;
+        control.indeterminate = checked.length > 0 && checked.length < available.length;
       });
-
-      selectAll.checked =
-        available.length > 0 &&
-        checked.length === available.length;
-
-      selectAll.indeterminate =
-        checked.length > 0 &&
-        checked.length < available.length;
+      document.querySelectorAll(".bucket-checkout").forEach(button => {
+        const selected = checkboxes.filter(item => item.checked && item.dataset.deliveryGroup === button.dataset.deliveryGroup);
+        button.disabled = checkoutBusy || selected.length === 0;
+        button.textContent = selected.length ? `선택 ${selected.length}종 결제하기` : "상품을 선택해주세요";
+      });
     }
 
     function getSelectedGroups() {
@@ -591,7 +499,9 @@
       document.getElementById("finalAmountText").textContent =
         formatWon(finalAmount);
 
-      submitCheckoutButton.disabled = selectedCount === 0;
+      submitCheckoutButton.disabled = checkoutBusy || selectedCount === 0;
+      const scheduleTextBox = document.getElementById("checkoutSchedule");
+      if (scheduleTextBox) scheduleTextBox.textContent = selectedCount ? getDeliveryGroupLabel(getFirstSelectedDeliveryGroup()) : "결제할 배송 묶음을 선택해주세요.";
 
       const guide = document.getElementById("deliveryGuide");
 
@@ -603,12 +513,7 @@
 
       const deliveryGroup = getFirstSelectedDeliveryGroup();
 
-      const scheduleText =
-        deliveryGroup === "MON_TUE"
-          ? "수요일 새벽 배송"
-          : deliveryGroup === "WED_THU_FRI"
-            ? "금요일 오후 배송"
-            : "배송 일정 확인 필요";
+      const scheduleText = getDeliveryGroupLabel(deliveryGroup);
 
       if (productAmount > FREE_DELIVERY_THRESHOLD) {
         guide.textContent =
@@ -620,6 +525,7 @@
     }
 
     async function submitCheckout() {
+      if (checkoutBusy) return;
       clearMessage();
 
       const nickname = nicknameInput.value.trim();
@@ -685,7 +591,12 @@
         return;
       }
 
-      localStorage.setItem("dampickLastNickname", nickname);
+      const selectedSnapshot = getSelectedGroups().map(group => ({ ...group, itemIds: [...group.itemIds] }));
+      const orderName = (getDeliveryGroupLabel(getFirstSelectedDeliveryGroup()) + " / " + selectedSnapshot[0].productName + (selectedSnapshot.length > 1 ? " 외 " + (selectedSnapshot.length - 1) + "종" : "")).slice(0, 100);
+      try { localStorage.setItem("dampickLastNickname", nickname); } catch (_) { /* 저장 차단 시에도 결제는 진행합니다. */ }
+      checkoutBusy = true;
+      const lockedControls = Array.from(document.querySelectorAll("input, textarea, button")).filter(control => !control.disabled);
+      lockedControls.forEach(control => { control.disabled = true; });
 
       submitCheckoutButton.disabled = true;
       submitCheckoutButton.textContent =
@@ -693,7 +604,7 @@
 
       try {
         const { data, error } = await sb.rpc(
-          "submit_checkout_item_request_v2",
+          paymentConfig.scheduledCheckoutRpc || "submit_checkout_item_request_v2",
           {
             p_nickname: nickname,
             p_item_ids: itemIds,
@@ -716,7 +627,7 @@
             : data;
 
         if (paymentMethod === "card_online") {
-          await startTossCardPayment(result, nickname);
+          await startTossCardPayment(result, nickname, orderName);
           return;
         }
 
@@ -766,6 +677,9 @@
         );
 
       } finally {
+        checkoutBusy = false;
+        lockedControls.forEach(control => { control.disabled = false; });
+        syncSelectAll();
         submitCheckoutButton.disabled =
           getSelectedGroups().length === 0;
 
@@ -812,7 +726,7 @@
         : firstName.slice(0, 100);
     }
 
-    async function startTossCardPayment(result, nickname) {
+    async function startTossCardPayment(result, nickname, orderName) {
       if (typeof window.TossPayments !== "function") {
         throw new Error("토스페이먼츠 결제 모듈을 불러오지 못했습니다.");
       }
@@ -847,7 +761,7 @@
             value: amount
           },
           orderId: String(result.request_code),
-          orderName: makeTossOrderName(),
+          orderName,
           successUrl,
           failUrl,
           customerName: nickname.slice(0, 100),

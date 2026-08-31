@@ -15,7 +15,10 @@
 */
 
 window.DAMPICK_PAYMENT_CONFIG = {
-  tossClientKey: ""
+  tossClientKey: "",
+  // database/002_scheduled_checkout.sql을 검토·설치한 뒤
+  // "submit_scheduled_checkout_request"로 설정합니다. 빈 값은 기존 RPC 유지.
+  scheduledCheckoutRpc: ""
 };
 
 // 형식 검사만 수행합니다. 키의 유효성과 서버 설정은 별도 검증이 필요합니다.

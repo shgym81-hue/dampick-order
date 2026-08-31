@@ -24,6 +24,7 @@ test('HTML local references and manifest icons exist', () => {
 
 test('all browser JavaScript parses', () => {
   for (const file of fs.readdirSync(path.join(root, 'assets/js'))) {
+    assert.equal(/\?{3,}/.test(read('assets/js/' + file)), false, `${file}: broken text encoding`);
     new vm.Script(read('assets/js/' + file), { filename: file });
   }
   new vm.Script(read('service-worker.js'));
@@ -65,7 +66,8 @@ test('delivery display charges 500 won at exactly 40,000 won', () => {
     const context = {
       document: { getElementById: id => { if (!elements.has(id)) elements.set(id, {}); return elements.get(id); } },
       getSelectedGroups: () => Array(count).fill({}), getProductAmount: () => amount,
-      getPaymentMethod: () => 'bank_transfer', getFirstSelectedDeliveryGroup: () => 'MON_TUE',
+      getPaymentMethod: () => 'bank_transfer', getFirstSelectedDeliveryGroup: () => '2026-09-02:DAWN',
+      getDeliveryGroupLabel: () => '2026-09-02 수요일 새벽 배송', checkoutBusy: false,
       FREE_DELIVERY_THRESHOLD: 40000, HOME_DELIVERY_FEE: 500,
       formatWon: value => `${value}원`, submitCheckoutButton: {}
     };
