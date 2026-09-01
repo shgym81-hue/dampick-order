@@ -69,7 +69,8 @@ test('delivery display charges 500 won at exactly 40,000 won', () => {
       getPaymentMethod: () => 'bank_transfer', getFirstSelectedDeliveryGroup: () => '2026-09-02:DAWN',
       getDeliveryGroupLabel: () => '2026-09-02 수요일 새벽 배송', checkoutBusy: false,
       FREE_DELIVERY_THRESHOLD: 40000, HOME_DELIVERY_FEE: 500,
-      formatWon: value => `${value}원`, submitCheckoutButton: {}
+      formatWon: value => `${value}원`, submitCheckoutButton: {}, stickyCheckoutButton: {},
+      stickyCheckout: {classList:{toggle(){}}}, productGroups: [{}], setProgress() {}
     };
     vm.runInNewContext(displayFunction + '\nupdateCheckoutDisplay();', context);
     assert.equal(elements.get('deliveryFeeText').textContent, count && !expected ? '무료' : `${expected}원`);

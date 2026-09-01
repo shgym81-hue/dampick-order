@@ -25,7 +25,7 @@
   <meta name="twitter:description" content="닉네임으로 주문 상품을 조회하고 문고리 배송을 신청하세요.">
   <meta name="twitter:image" content="https://shgym81-hue.github.io/dampick-order/assets/images/dampick-og.png.png?v=3">
 
-  <link rel="stylesheet" href="./assets/css/index.css">
+  <link rel="stylesheet" href="./assets/css/index.css?v=20260901-customer-redesign">
 </head>
 
 <body>
@@ -42,19 +42,30 @@
       </div>
 
       <h1>DAMPICK <span>담픽</span></h1>
-      
+      <p class="brand-tagline">공동구매 상품 확인부터 문고리 배송 결제까지</p>
     </header>
 
+    <nav class="customer-progress" aria-label="주문 진행 단계">
+      <div class="progress-step active" data-progress-step="1"><b>1</b><span>주문 조회</span></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-progress-step="2"><b>2</b><span>상품 선택</span></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-progress-step="3"><b>3</b><span>배송·결제</span></div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-progress-step="4"><b>4</b><span>신청 완료</span></div>
+    </nav>
+
     <section class="card lookup-card">
-      <h2>내 주문 조회</h2>
+      <div class="section-kicker">STEP 1</div>
+      <h2>내 주문을 확인해 주세요</h2>
 
       <div class="lookup-description">
         <p>닉네임으로 주문 상품과 픽업 날짜를 확인하세요.</p>
 
         <div class="door-delivery-guide">
-          <strong>문고리 배송 안내</strong>
-          <span>월·화 픽업 상품 → 수요일 새벽 배송</span>
-          <span>수·목·금 픽업 상품 → 금요일 오후 배송</span>
+          <strong>🚪 문고리 배송 일정</strong>
+          <span><b>월·화 픽업</b> → 수요일 새벽 배송</span>
+          <span><b>수·목·금 픽업</b> → 금요일 오후 배송</span>
         </div>
 
         <div class="default-guide">
@@ -85,6 +96,7 @@
     </section>
 
     <section id="checkoutCard" class="card checkout-card">
+      <div class="section-kicker">STEP 3</div>
       <h2>선택 배송 묶음 결제</h2>
       <p id="checkoutSchedule" class="checkout-schedule" aria-live="polite">결제할 배송 묶음을 선택해주세요.</p>
 
@@ -211,12 +223,17 @@
     <a class="admin-page-link" href="./admin.html">관리자 페이지</a>
   </main>
 
+  <aside id="stickyCheckout" class="sticky-checkout" aria-live="polite">
+    <div><span id="stickySelectionText">상품을 선택해 주세요</span><strong id="stickyAmountText">0원</strong></div>
+    <button id="stickyCheckoutButton" type="button" disabled>배송정보 입력하기</button>
+  </aside>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://js.tosspayments.com/v2/standard"></script>
   <script src="./assets/js/config.js"></script>
   <script src="./assets/js/payment-config.js"></script>
 
   <script src="./assets/js/delivery-schedule.js"></script>
-  <script src="./assets/js/index.js"></script>
+  <script src="./assets/js/index.js?v=20260901-customer-redesign"></script>
 </body>
 </html>

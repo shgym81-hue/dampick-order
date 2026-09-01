@@ -13,6 +13,8 @@
     const results = document.getElementById("results");
     const checkoutCard = document.getElementById("checkoutCard");
     const submitCheckoutButton = document.getElementById("submitCheckoutButton");
+    const stickyCheckout = document.getElementById("stickyCheckout");
+    const stickyCheckoutButton = document.getElementById("stickyCheckoutButton");
 
     let currentOrders = [];
     let productGroups = [];
@@ -34,6 +36,18 @@
 
     results.addEventListener("change", handleProductSelection);
     submitCheckoutButton.addEventListener("click", submitCheckout);
+    stickyCheckoutButton.addEventListener("click", function () {
+      checkoutCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      document.getElementById("deliveryPhone").focus({ preventScroll: true });
+    });
+
+    function setProgress(step) {
+      document.querySelectorAll("[data-progress-step]").forEach(function (item) {
+        const value = Number(item.dataset.progressStep);
+        item.classList.toggle("active", value === step);
+        item.classList.toggle("done", value < step);
+      });
+    }
 
     async function lookupOrder(options = {}) {
       const nickname = nicknameInput.value.trim();
@@ -46,6 +60,8 @@
       currentOrders = [];
       productGroups = [];
       checkoutCard.classList.remove("show");
+      stickyCheckout.classList.remove("show");
+      setProgress(1);
 
       if (!options.keepComplete) {
         document.getElementById("checkoutComplete").classList.remove("show");
@@ -84,6 +100,7 @@
         }
 
         renderProductGroups();
+        setProgress(2);
 
         const availableCount = productGroups.filter(function (group) {
           return !group.checkout;
@@ -500,6 +517,13 @@
         formatWon(finalAmount);
 
       submitCheckoutButton.disabled = checkoutBusy || selectedCount === 0;
+      document.getElementById("stickySelectionText").textContent = selectedCount
+        ? `선택 ${selectedCount}종 · ${getDeliveryGroupLabel(getFirstSelectedDeliveryGroup())}`
+        : "배송받을 상품을 선택해 주세요";
+      document.getElementById("stickyAmountText").textContent = formatWon(finalAmount);
+      stickyCheckoutButton.disabled = checkoutBusy || selectedCount === 0;
+      stickyCheckout.classList.toggle("show", productGroups.some(group => !group.checkout));
+      setProgress(selectedCount ? 3 : productGroups.length ? 2 : 1);
       const scheduleTextBox = document.getElementById("checkoutSchedule");
       if (scheduleTextBox) scheduleTextBox.textContent = selectedCount ? getDeliveryGroupLabel(getFirstSelectedDeliveryGroup()) : "결제할 배송 묶음을 선택해주세요.";
 
@@ -657,11 +681,13 @@
         `;
 
         completeBox.classList.add("show");
-
         await lookupOrder({
           keepComplete: true,
           keepMessage: true
         });
+
+        setProgress(4);
+        stickyCheckout.classList.remove("show");
 
         checkoutCard.scrollIntoView({
           behavior: "smooth",
