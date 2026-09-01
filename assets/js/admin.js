@@ -1427,6 +1427,10 @@
           function (product) {
             return `
               <div class="product-summary-row">
+                <div class="product-summary-mobile">
+                  <div><strong>${escapeHtml(product.name)}</strong> <span>${formatWon(product.unit_price)} / ${escapeHtml(product.unit_name || "개")}</span></div>
+                  <b>픽업: ${formatDate(product.pickup_date)}</b>
+                </div>
                 <div class="product-summary-cell product-summary-name">
                   <span class="product-summary-label">상품명</span>
                   <strong>${escapeHtml(product.name)}</strong>
