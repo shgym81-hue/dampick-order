@@ -669,8 +669,26 @@
     }
 
     @media (max-width: 620px) {
-      .order-item-edit-row { grid-template-columns: auto 1fr 1fr; }
-      .order-item-name, .order-item-date { grid-column: 2 / -1; }
+      .order-item-edit-row {
+        grid-template-columns: 26px minmax(75px,1.15fr) minmax(58px,.75fr) minmax(90px,1.2fr);
+        align-items: start;
+        gap: 9px 8px;
+        padding: 13px 11px;
+      }
+      .order-item-edit-row > input[type="checkbox"] { grid-column: 1; grid-row: 1 / 3; margin-top: 18px; }
+      .order-item-name { grid-column: 2; grid-row: 1; }
+      .order-item-unit-price { grid-column: 3; grid-row: 1; }
+      .order-item-date { grid-column: 4; grid-row: 1; }
+      .order-item-line-total { display: none; }
+      .order-item-quantity-cell { grid-column: 2 / -1; grid-row: 2; margin-top: 3px; padding-top: 9px; border-top: 1px solid #ededed; }
+      .order-item-cell { gap: 3px; }
+      .order-item-cell small { font-size: 11px; white-space: nowrap; }
+      .order-item-cell strong,
+      .order-item-name strong { font-size: 14px; line-height: 1.35; word-break: keep-all; }
+      .order-item-date strong { font-size: 12px; }
+      .order-item-quantity-editor { grid-template-columns: minmax(64px,90px) auto minmax(58px,70px); justify-content: start; }
+      .order-item-quantity-editor input { height: 38px; font-size: 15px; }
+      .order-item-quantity-editor .button { min-height: 38px; font-size: 13px; }
       .order-workflow-actions { grid-template-columns: 1fr; }
     }
 

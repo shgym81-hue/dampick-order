@@ -1782,8 +1782,8 @@
                           <button class="button secondary small" type="button" data-order-item-save="${escapeHtml(item.id)}" data-order-id="${escapeHtml(order.id)}">저장</button>
                         </span>
                       </span>
-                      <span class="order-item-cell"><small>개당 금액</small><strong>${formatWon(item.unit_price)}</strong></span>
-                      <span class="order-item-cell"><small>상품 금액</small><strong>${formatWon(item.line_total)}</strong></span>
+                      <span class="order-item-cell order-item-unit-price"><small>개당 금액</small><strong>${formatWon(item.unit_price)}</strong></span>
+                      <span class="order-item-cell order-item-line-total"><small>상품 금액</small><strong>${formatWon(item.line_total)}</strong></span>
                       <span class="order-item-cell order-item-date"><small>픽업 날짜</small><strong>${formatDate(item.pickup_date)}</strong></span>
                     </div>
                   `;
