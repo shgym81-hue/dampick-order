@@ -362,7 +362,11 @@
       customers =
         Array.from(
           map.values()
-        ).sort(
+        )
+        // 관리자 주문 입력만으로는 결제·배송 관리에 노출하지 않습니다.
+        // 고객이 제출한 유효한 checkout_request가 있어야 합니다.
+        .filter(window.DampickPaymentsVisibility.hasActiveRequest)
+        .sort(
           function (a, b) {
             return String(a.nickname)
               .localeCompare(
@@ -377,18 +381,7 @@
       customer
     ) {
       return customer.requests.filter(
-        function (request) {
-          return ![
-            "취소",
-            "신청 취소",
-            "결제 실패"
-          ].includes(
-            String(
-              request.request_status ||
-              ""
-            )
-          );
-        }
+        window.DampickPaymentsVisibility.isActiveRequest
       );
     }
 
