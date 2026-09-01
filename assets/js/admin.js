@@ -69,6 +69,23 @@
           addOrder
         );
 
+      document.querySelectorAll("[data-category-toggle]").forEach(function (button) {
+        const section = document.getElementById(button.dataset.categoryToggle);
+        if (section && window.matchMedia("(max-width: 720px)").matches) {
+          section.classList.add("is-collapsed");
+          button.setAttribute("aria-expanded", "false");
+          button.textContent = "펼치기";
+        }
+
+        button.addEventListener("click", function () {
+          const section = document.getElementById(button.dataset.categoryToggle);
+          if (!section) return;
+          const collapsed = section.classList.toggle("is-collapsed");
+          button.setAttribute("aria-expanded", String(!collapsed));
+          button.textContent = collapsed ? "펼치기" : "접기";
+        });
+      });
+
       document
         .getElementById("customerSearch")
         .addEventListener(
@@ -889,6 +906,35 @@
         "success"
       );
 
+      await loadOrders();
+    }
+
+    async function updateOrderItemQuantity(itemId, orderId) {
+      const input = document.querySelector('[data-order-item-quantity="' + itemId + '"]');
+      const quantity = Number(input?.value || 0);
+      const order = orders.find(function (entry) { return entry.id === orderId; });
+      const item = order?.order_items?.find(function (entry) { return entry.id === itemId; });
+
+      if (!item || !Number.isInteger(quantity) || quantity < 1) {
+        alert("수량은 1개 이상의 정수로 입력해 주세요.");
+        return;
+      }
+
+      const accepted = confirm(item.product_name + " 수량을 " + quantity + (item.unit_name || "개") + "로 변경할까요?");
+      if (!accepted) return;
+
+      const { error } = await sb
+        .from("order_items")
+        .update({ quantity: quantity })
+        .eq("id", itemId)
+        .eq("order_id", orderId);
+
+      if (error) {
+        showAppError(error);
+        return;
+      }
+
+      setMessage(appMessage, item.product_name + " 주문 수량을 수정했습니다.", "success");
       await loadOrders();
     }
 
@@ -1716,7 +1762,7 @@
               items.map(
                 function (item) {
                   return `
-                    <label class="order-item-edit-row">
+                    <div class="order-item-edit-row">
                       <input
                         type="checkbox"
                         value="${escapeHtml(item.id)}"
@@ -1724,11 +1770,18 @@
                       >
 
                       <span class="order-item-cell order-item-name"><small>상품명</small><strong>${escapeHtml(item.product_name)}</strong></span>
-                      <span class="order-item-cell"><small>수량</small><strong>${Number(item.quantity || 0).toLocaleString("ko-KR")} ${escapeHtml(item.unit_name || "개")}</strong></span>
+                      <span class="order-item-cell order-item-quantity-cell">
+                        <small>수량 수정</small>
+                        <span class="order-item-quantity-editor">
+                          <input type="number" min="1" step="1" value="${Number(item.quantity || 1)}" data-order-item-quantity="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.product_name)} 수량">
+                          <span>${escapeHtml(item.unit_name || "개")}</span>
+                          <button class="button secondary small" type="button" data-order-item-save="${escapeHtml(item.id)}" data-order-id="${escapeHtml(order.id)}">저장</button>
+                        </span>
+                      </span>
                       <span class="order-item-cell"><small>개당 금액</small><strong>${formatWon(item.unit_price)}</strong></span>
                       <span class="order-item-cell"><small>상품 금액</small><strong>${formatWon(item.line_total)}</strong></span>
                       <span class="order-item-cell order-item-date"><small>픽업 날짜</small><strong>${formatDate(item.pickup_date)}</strong></span>
-                    </label>
+                    </div>
                   `;
                 }
               ).join("");
@@ -1844,6 +1897,12 @@
             );
           }
         );
+
+      document.querySelectorAll("[data-order-item-save]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          updateOrderItemQuantity(button.dataset.orderItemSave, button.dataset.orderId);
+        });
+      });
 
       document
         .querySelectorAll(

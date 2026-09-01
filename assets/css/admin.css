@@ -512,6 +512,21 @@
       font-weight: 700;
     }
 
+    .category-toggle {
+      min-width: 76px;
+      min-height: 40px;
+      padding: 8px 13px;
+      border: 2px solid rgba(255,255,255,.72);
+      border-radius: 11px;
+      color: #fff;
+      background: rgba(255,255,255,.16);
+      font-size: 14px;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .category-card.is-collapsed > :not(.category-heading) { display: none !important; }
+
     /* 상품/주문 */
     .product-checks {
       display: grid;
@@ -639,6 +654,9 @@
     .order-item-cell strong { font-size: 17px; line-height: 1.45; overflow-wrap: anywhere; }
     .order-item-name strong { font-size: 19px; }
     .order-item-date strong { color: #a61e50; }
+    .order-item-quantity-editor { display: grid; grid-template-columns: minmax(58px,80px) auto auto; align-items: center; gap: 7px; }
+    .order-item-quantity-editor input { width: 100%; height: 42px; margin: 0; padding: 7px 8px; font-size: 16px; }
+    .order-item-quantity-editor .button { min-height: 42px; padding: 7px 10px; }
     .order-workflow-guide { margin: 16px 0 0; padding: 11px 13px; border-radius: 9px; background: #fff7dc; font-size: 14px; font-weight: 700; }
     .order-workflow-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .order-workflow-actions .button { min-height: 50px; font-size: 15px; }
@@ -842,9 +860,17 @@
         font-size: 18px;
       }
 
+      .category-title-area .section-description { display: none; }
+      .category-toggle { min-width: 68px; min-height: 38px; padding: 7px 10px; }
+      #categoryProducts .category-heading,
+      #categoryOrderForm .category-heading { cursor: pointer; }
+
       .product-choice {
-        grid-template-columns: auto 1fr 72px;
+        grid-template-columns: auto minmax(0,1fr) 72px;
       }
+
+      #productList,
+      #productChecks { display: grid; visibility: visible; }
 
       .calendar-empty,
       .calendar-day {
