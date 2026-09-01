@@ -618,10 +618,10 @@
 
     .order-item-edit-row {
       display: grid;
-      grid-template-columns: auto 1fr;
-      align-items: start;
-      gap: 9px;
-      padding: 10px;
+      grid-template-columns: auto minmax(150px, 2fr) minmax(80px, .7fr) minmax(105px, 1fr) minmax(105px, 1fr) minmax(170px, 1.4fr);
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
       border: 1px solid #ededed;
       border-radius: 10px;
       background: #fff;
@@ -629,9 +629,31 @@
     }
 
     .order-item-edit-row input {
-      width: 19px;
-      height: 19px;
+      width: 23px;
+      height: 23px;
       margin-top: 1px;
+    }
+
+    .order-item-cell { display: grid; min-width: 0; gap: 5px; }
+    .order-item-cell small { color: #6b6b6b; font-size: 13px; font-weight: 800; }
+    .order-item-cell strong { font-size: 17px; line-height: 1.45; overflow-wrap: anywhere; }
+    .order-item-name strong { font-size: 19px; }
+    .order-item-date strong { color: #a61e50; }
+    .order-workflow-guide { margin: 16px 0 0; padding: 11px 13px; border-radius: 9px; background: #fff7dc; font-size: 14px; font-weight: 700; }
+    .order-workflow-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .order-workflow-actions .button { min-height: 50px; font-size: 15px; }
+    .order-workflow-actions .button:disabled { opacity: .45; cursor: not-allowed; }
+
+    @media (max-width: 980px) {
+      .order-item-edit-row { grid-template-columns: auto minmax(130px, 2fr) repeat(2, minmax(90px, 1fr)); }
+      .order-item-date { grid-column: 2 / -1; }
+      .order-workflow-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .order-item-edit-row { grid-template-columns: auto 1fr 1fr; }
+      .order-item-name, .order-item-date { grid-column: 2 / -1; }
+      .order-workflow-actions { grid-template-columns: 1fr; }
     }
 
     .order-total {

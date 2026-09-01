@@ -1707,6 +1707,8 @@
                 order.order_status || ""
               ).includes("배송 완료");
 
+            const workflow = window.DampickOrderWorkflow.state(order);
+
             const total =
               getOrderTotal(order);
 
@@ -1721,25 +1723,11 @@
                         data-order-item-check="${escapeHtml(order.id)}"
                       >
 
-                      <span>
-                        <strong>
-                          ${escapeHtml(item.product_name)}
-                        </strong><br>
-
-                        <span class="muted">
-                          ${Number(item.quantity || 0).toLocaleString("ko-KR")}
-                          ${escapeHtml(item.unit_name || "개")}
-                          ×
-                          ${formatWon(item.unit_price)}
-                          =
-                          ${formatWon(item.line_total)}
-                        </span><br>
-
-                        <span class="pickup-date-badge">
-                          픽업 날짜:
-                          ${formatDate(item.pickup_date)}
-                        </span>
-                      </span>
+                      <span class="order-item-cell order-item-name"><small>상품명</small><strong>${escapeHtml(item.product_name)}</strong></span>
+                      <span class="order-item-cell"><small>수량</small><strong>${Number(item.quantity || 0).toLocaleString("ko-KR")} ${escapeHtml(item.unit_name || "개")}</strong></span>
+                      <span class="order-item-cell"><small>개당 금액</small><strong>${formatWon(item.unit_price)}</strong></span>
+                      <span class="order-item-cell"><small>상품 금액</small><strong>${formatWon(item.line_total)}</strong></span>
+                      <span class="order-item-cell order-item-date"><small>픽업 날짜</small><strong>${formatDate(item.pickup_date)}</strong></span>
                     </label>
                   `;
                 }
@@ -1794,64 +1782,33 @@
                   ${formatWon(total)}
                 </div>
 
-                <div class="payment-edit">
-                  <select
-                    id="payment-edit-${escapeHtml(order.id)}"
-                    aria-label="결제상태 변경"
-                  >
-                    ${renderPaymentOptions(order.payment_status)}
-                  </select>
-
-                  <button
-                    class="button warning"
-                    type="button"
-                    data-payment-save="${escapeHtml(order.id)}"
-                  >
-                    결제상태 저장
-                  </button>
-                </div>
-
-                <div class="payment-edit">
-                  <select
-                    id="order-status-edit-${escapeHtml(order.id)}"
-                    aria-label="주문상태 변경"
-                  >
-                    ${renderOrderStatusOptions(order.order_status)}
-                  </select>
-
-                  <button
-                    class="button secondary"
-                    type="button"
-                    data-order-status-save="${escapeHtml(order.id)}"
-                  >
-                    주문상태 저장
-                  </button>
-                </div>
-
-                <div class="order-action-grid">
+                <p class="order-workflow-guide">상품 취소가 필요하면 먼저 상품을 체크하세요. 처리는 결제 완료 후 픽업 완료 순서입니다.</p>
+                <div class="order-action-grid order-workflow-actions">
                   <button
                     class="button light"
                     type="button"
                     data-items-delete="${escapeHtml(order.id)}"
                   >
-                    체크 상품 부분취소
+                    ① 체크 상품 취소
                   </button>
 
                   <button
                     class="button success"
                     type="button"
                     data-payment-complete="${escapeHtml(order.id)}"
+                    ${workflow.paymentDisabled ? "disabled" : ""}
                   >
-                    결제 완료
+                    ${workflow.paid ? "② 결제 완료됨" : "② 결제 완료"}
                   </button>
 
                   <button
-                    class="button ${completed ? "warning" : "success"}"
+                    class="button success"
                     type="button"
                     data-pickup-toggle="${escapeHtml(order.id)}"
-                    data-completed="${completed ? "true" : "false"}"
+                    data-completed="false"
+                    ${workflow.pickupDisabled ? "disabled" : ""}
                   >
-                    ${completed ? "픽업 완료 취소" : "픽업 완료"}
+                    ${workflow.pickedUp ? "③ 픽업 완료됨" : "③ 픽업 완료"}
                   </button>
 
                   <button
@@ -1859,7 +1816,7 @@
                     type="button"
                     data-order-delete="${escapeHtml(order.id)}"
                   >
-                    주문 전체 삭제
+                    ④ 주문 전체 삭제
                   </button>
                 </div>
               </article>
