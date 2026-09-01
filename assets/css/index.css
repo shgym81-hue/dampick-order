@@ -173,14 +173,45 @@
     }
 
     .default-guide {
-      margin: 12px auto 0;
-      color: #67616a;
-      font-size: 14px;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 13px;
+      align-items: start;
+      margin: 16px auto 0;
+      padding: 16px 18px;
+      color: #563b00;
+      background: linear-gradient(135deg, #fff9df, #fff1b9);
+      border: 2px solid #efc64f;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgb(119 80 0 / 10%);
+      font-size: 16px;
       font-weight: 750;
       line-height: 1.55;
-      text-align: center;
-      word-break: keep-all;
+      text-align: left;
     }
+
+    .default-guide-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      color: #fff;
+      background: #d96c00;
+      border-radius: 50%;
+      font-size: 24px;
+      font-weight: 950;
+    }
+
+    .default-guide strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #6d4100;
+      font-size: 18px;
+      font-weight: 950;
+    }
+
+    .default-guide p { margin: 2px 0; }
+    .default-guide b { color: #b13c00; font-weight: 950; }
 
     label.field-label {
       display: block;
@@ -347,6 +378,44 @@
       font-weight: 950;
       line-height: 1.45;
     }
+
+    .product-facts {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 13px;
+    }
+
+    .product-fact {
+      display: flex;
+      min-width: 0;
+      min-height: 72px;
+      padding: 10px 11px;
+      flex-direction: column;
+      justify-content: center;
+      background: #f7f8fc;
+      border: 1px solid #e1e4ed;
+      border-radius: 12px;
+    }
+
+    .product-fact span {
+      margin-bottom: 4px;
+      color: #656b78;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .product-fact strong {
+      color: #20283d;
+      font-size: 16px;
+      font-weight: 950;
+      line-height: 1.35;
+      word-break: keep-all;
+    }
+
+    .product-fact-pickup { background: #fff9df; border-color: #efd98b; }
+    .product-fact-delivery { background: #fff0e7; border-color: #efc2a8; }
+    .product-fact-delivery strong { color: #a33d06; }
 
     .product-meta {
       margin-top: 6px;
@@ -600,8 +669,14 @@
 
       .default-guide {
         margin-top: 10px;
-        font-size: 13px;
+        grid-template-columns: 36px minmax(0, 1fr);
+        gap: 10px;
+        padding: 14px;
+        font-size: 15px;
       }
+
+      .default-guide-icon { width: 36px; height: 36px; font-size: 21px; }
+      .default-guide strong { font-size: 17px; }
 
       label.field-label {
         margin: 18px 0 8px;
@@ -695,6 +770,9 @@
       .door-delivery-guide span { min-height: 48px; }
       .delivery-bucket { margin: 18px -4px; }
       .product-name { font-size: 18px; }
+      .product-facts { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+      .product-fact { min-height: 70px; padding: 9px 10px; }
+      .product-fact strong { font-size: 15px; }
       .sticky-checkout { gap: 10px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); }
       .sticky-checkout strong { font-size: 19px; }
       .sticky-checkout button { min-width: 135px; min-height: 48px; padding: 10px 12px; font-size: 14px; }

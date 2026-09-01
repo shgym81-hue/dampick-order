@@ -25,7 +25,7 @@
   <meta name="twitter:description" content="닉네임으로 주문 상품을 조회하고 문고리 배송을 신청하세요.">
   <meta name="twitter:image" content="https://shgym81-hue.github.io/dampick-order/assets/images/dampick-og.png.png?v=3">
 
-  <link rel="stylesheet" href="./assets/css/index.css?v=20260901-customer-redesign">
+  <link rel="stylesheet" href="./assets/css/index.css?v=20260901-order-details">
 </head>
 
 <body>
@@ -68,9 +68,13 @@
           <span><b>수·목·금 픽업</b> → 금요일 오후 배송</span>
         </div>
 
-        <div class="default-guide">
-          문고리 배송을 원하는 경우만 상품을 선택해 선결제해 주세요.<br>
-          별도 신청이 없으면 매장 픽업 · 픽업 시 결제로 진행됩니다.
+        <div class="default-guide" role="note" aria-label="결제 및 픽업 안내">
+          <div class="default-guide-icon" aria-hidden="true">!</div>
+          <div>
+            <strong>결제 전에 꼭 확인해 주세요</strong>
+            <p><b>문고리 배송을 원하는 경우에만</b> 상품을 선택하고 선결제해 주세요.</p>
+            <p>별도 신청이 없으면 <b>매장 픽업 · 픽업 시 결제</b>로 진행됩니다.</p>
+          </div>
         </div>
       </div>
 
@@ -234,6 +238,6 @@
   <script src="./assets/js/payment-config.js"></script>
 
   <script src="./assets/js/delivery-schedule.js"></script>
-  <script src="./assets/js/index.js?v=20260901-customer-redesign"></script>
+  <script src="./assets/js/index.js?v=20260901-order-details"></script>
 </body>
 </html>

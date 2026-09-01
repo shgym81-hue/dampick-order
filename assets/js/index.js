@@ -316,23 +316,24 @@
                   ${escapeHtml(group.productName)}
                 </div>
 
-                <div class="product-meta">
-                  개당 ${formatWon(group.unitPrice)}
+                <div class="product-facts">
+                  <div class="product-fact">
+                    <span>개당 금액</span>
+                    <strong>${formatWon(group.unitPrice)}</strong>
+                  </div>
+                  <div class="product-fact">
+                    <span>합산 수량</span>
+                    <strong>${Number(group.quantity).toLocaleString("ko-KR")} ${escapeHtml(group.unitName)}</strong>
+                  </div>
+                  <div class="product-fact product-fact-pickup">
+                    <span>픽업 날짜</span>
+                    <strong>${formatDate(group.pickupDate)}</strong>
+                  </div>
+                  <div class="product-fact product-fact-delivery">
+                    <span>배송 일정</span>
+                    <strong>${getDeliveryGroupLabel(deliveryGroup)}</strong>
+                  </div>
                 </div>
-
-                <span class="quantity-badge">
-                  합산 수량:
-                  ${Number(group.quantity).toLocaleString("ko-KR")}
-                  ${escapeHtml(group.unitName)}
-                </span>
-
-                <span class="pickup-badge">
-                  픽업: ${formatDate(group.pickupDate)}
-                </span>
-
-                <span class="delivery-badge">
-                  ${getDeliveryGroupLabel(deliveryGroup)}
-                </span>
 
                 ${
                   assigned
