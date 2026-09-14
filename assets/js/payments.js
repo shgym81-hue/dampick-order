@@ -60,6 +60,10 @@
       );
 
     document
+      .getElementById("downloadHomeDeliveryExcel")
+      .addEventListener("click", downloadHomeDeliveryExcel);
+
+    document
       .getElementById(
         "searchButton"
       )
@@ -215,7 +219,8 @@
             is_visible,
             customers(
               id,
-              nickname
+              nickname,
+              memo
             ),
             order_items(
               id,
@@ -299,6 +304,30 @@
 
       buildCustomers();
       render();
+    }
+
+    function downloadHomeDeliveryExcel() {
+      clearMessage();
+
+      try {
+        const rows = window.DampickPaymentsExport.buildRows(
+          requests,
+          orders,
+          window.DampickDelivery,
+          window.DampickPaymentsVisibility
+        );
+
+        if (!rows.length) {
+          showMessage("다운로드할 문고리 배송 신청 내역이 없습니다.", "error");
+          return;
+        }
+
+        const name = window.DampickPaymentsExport.download(rows, window.XLSX);
+        showMessage(`${rows.length}건을 ${name} 파일로 만들었습니다.`, "success");
+      } catch (error) {
+        console.error(error);
+        showMessage(error.message || "엑셀 파일을 만들지 못했습니다.", "error");
+      }
     }
 
     function buildCustomers() {

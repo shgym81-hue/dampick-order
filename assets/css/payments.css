@@ -209,6 +209,11 @@
       font-size: 20px;
     }
 
+    .export-panel { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; padding: 16px; border: 1px solid #b9e1cc; border-radius: 13px; background: #f0fbf5; }
+    .export-panel strong { display: block; color: var(--success); font-size: 17px; }
+    .export-panel p { margin: 4px 0 0; color: var(--sub); font-size: 13px; line-height: 1.5; }
+    .privacy-guide { margin: 8px 2px 0; color: #8a5165; font-size: 11px; line-height: 1.5; }
+
     .customer-list {
       display: grid;
       gap: 16px;
@@ -465,4 +470,7 @@
       .item-price {
         text-align: left;
       }
+
+      .export-panel { align-items: stretch; flex-direction: column; }
+      .export-panel .button { width: 100%; }
     }
