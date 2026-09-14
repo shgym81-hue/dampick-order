@@ -15,18 +15,19 @@ function setup(result = {data: {id:'p1', name:'새 상품'}}) {
   vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../assets/js/admin-product-editor.js'),'utf8'),context);
   let saved = null;
   const editor = context.window.createDampickProductEditor({from(table){assert.equal(table,'products');return query;}}, async data=>{saved=data;});
-  editor.open({id:'p1', name:'사과', unit_price:1000, unit_name:'개', pickup_date:'2026-09-01'});
+  editor.open({id:'p1', name:'사과', unit_price:1000, unit_name:'개', pickup_date:'2026-09-01', stock_quantity:10});
   return {get,calls,editor, saved:()=>saved, submit:()=>get('productEditForm').listeners.submit({preventDefault(){}})};
 }
-test('editor loads product and saves all four fields only to matching active product', async()=>{
+test('editor loads product and saves inventory with the product fields', async()=>{
   const s=setup();
   assert.equal(s.get('editProductName').value,'사과');
   s.get('editProductName').value='수정 사과';
   s.get('editProductPrice').value='2000';
   s.get('editProductUnit').value='봉';
   s.get('editProductPickupDate').value='2026-09-04';
+  s.get('editProductStock').value='8';
   await s.submit();
-  assert.deepEqual(JSON.parse(JSON.stringify(s.calls)),[{name:'수정 사과',unit_price:2000,unit_name:'봉',pickup_date:'2026-09-04'},['id','p1'],['is_active',true]]);
+  assert.deepEqual(JSON.parse(JSON.stringify(s.calls)),[{name:'수정 사과',unit_price:2000,unit_name:'봉',pickup_date:'2026-09-04',stock_quantity:8},['id','p1'],['is_active',true]]);
   assert.equal(s.get('productEditDialog').open,false);
   assert.equal(s.saved().id,'p1');
 });
@@ -35,6 +36,9 @@ test('invalid price or blank name never writes',async()=>{
     const s=setup(); s.get('editProductPrice').value=price; await s.submit(); assert.equal(s.calls.length,0);
   }
   const s=setup(); s.get('editProductPrice').value='1000';s.get('editProductName').value='  ';await s.submit();assert.equal(s.calls.length,0);
+  for(const stock of ['', '-1', '1.5', 'NaN']) {
+    const s=setup(); s.get('editProductStock').value=stock; await s.submit(); assert.equal(s.calls.length,0);
+  }
 });
 test('failed or denied update keeps dialog and input for retry',async()=>{
   const s=setup({data:null,error:{message:'Permission denied'}});
@@ -46,6 +50,7 @@ test('failed or denied update keeps dialog and input for retry',async()=>{
 });
 test('cancel does not write and another product can use the same dialog',()=>{
   const s=setup();s.get('cancelProductEdit').listeners.click();assert.equal(s.calls.length,0);
-  s.editor.open({id:'p2',name:'배',unit_price:0,unit_name:'개',pickup_date:'2026-09-02'});
+  s.editor.open({id:'p2',name:'배',unit_price:0,unit_name:'개',pickup_date:'2026-09-02',stock_quantity:3});
   assert.equal(s.get('editProductName').value,'배');assert.equal(s.get('editProductPrice').value,0);
+  assert.equal(s.get('editProductStock').value,3);
 });

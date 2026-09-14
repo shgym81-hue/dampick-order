@@ -478,16 +478,22 @@
           )
           .value;
 
+      const stockQuantity = Number(
+        document.getElementById("newProductStock").value
+      );
+
       if (
         !name ||
         !Number.isFinite(unitPrice) ||
         unitPrice < 0 ||
         !unitName ||
-        !pickupDate
+        !pickupDate ||
+        !Number.isSafeInteger(stockQuantity) ||
+        stockQuantity < 0
       ) {
         setMessage(
           appMessage,
-          "상품명·가격·단위·픽업 날짜를 모두 입력해주세요.",
+          "상품명·가격·단위·픽업 날짜와 0 이상의 재고 수량을 입력해주세요.",
           "error"
         );
 
@@ -501,7 +507,8 @@
             name,
             unit_price: unitPrice,
             unit_name: unitName,
-            pickup_date: pickupDate
+            pickup_date: pickupDate,
+            stock_quantity: stockQuantity
           });
 
       if (error) {
@@ -521,6 +528,8 @@
           "newProductUnit"
         )
         .value = "개";
+
+      document.getElementById("newProductStock").value = "0";
 
       setDefaultProductPickupDate();
 
@@ -596,91 +605,37 @@
         return;
       }
 
-      const orderNumber =
-        makeOrderNumber();
-
-      const orderValues = {
-        customer_id: customerId,
-        order_number: orderNumber,
-        order_date:
-          document
-            .getElementById(
-              "orderDate"
-            )
-            .value,
-        payment_status:
-          "현장 결제 예정",
-        order_status:
-          document
-            .getElementById(
-              "orderStatus"
-            )
-            .value,
-        notice:
-          document
-            .getElementById(
-              "orderNotice"
-            )
-            .value
-            .trim()
-      };
-
-      const {
-        data: order,
-        error: orderError
-      } =
-        await sb
-          .from("orders")
-          .insert(orderValues)
-          .select()
-          .single();
-
-      if (orderError) {
-        setMessage(
-          appMessage,
-          "주문 저장에 실패했습니다.",
-          "error"
-        );
+      if (selected.some(function (selection) {
+        return !Number.isSafeInteger(selection.quantity) ||
+          selection.quantity < 1 ||
+          selection.quantity > Number(selection.product.stock_quantity || 0);
+      })) {
+        setMessage(appMessage, "재고가 부족합니다. 남은 재고를 확인해주세요.", "error");
         return;
       }
 
-      const itemRows =
-        selected.map(
-          function (selection) {
-            return {
-              order_id: order.id,
-              product_id:
-                selection.product.id,
-              product_name:
-                selection.product.name,
-              quantity:
-                selection.quantity,
-              unit_name:
-                selection.product.unit_name,
-              unit_price:
-                Number(
-                  selection.product.unit_price
-                ),
-              pickup_date:
-                selection.product.pickup_date
-            };
-          }
-        );
+      const orderNumber =
+        makeOrderNumber();
 
-      const { error: itemError } =
-        await sb
-          .from("order_items")
-          .insert(itemRows);
+      const { error: orderError } = await sb.rpc("create_order_with_stock", {
+        p_customer_id: customerId,
+        p_order_number: orderNumber,
+        p_order_date: document.getElementById("orderDate").value,
+        p_payment_status: "현장 결제 예정",
+        p_order_status: document.getElementById("orderStatus").value,
+        p_notice: document.getElementById("orderNotice").value.trim(),
+        p_items: selected.map(function (selection) {
+          return { product_id: selection.product.id, quantity: selection.quantity };
+        })
+      });
 
-      if (itemError) {
-        await sb
-          .from("orders")
-          .delete()
-          .eq("id", order.id);
-
+      if (orderError) {
+        const stockError = String(orderError.message || "").includes("재고가 부족합니다");
         setMessage(
           appMessage,
-          "주문상품 저장에 실패했습니다. 상품별 픽업 날짜 SQL이 실행됐는지 확인해주세요.",
+          stockError
+            ? "재고가 부족합니다. 남은 재고를 확인해주세요."
+            : "주문 저장에 실패했습니다. 재고 관리 SQL 실행 여부를 확인해주세요.",
           "error"
         );
         return;
@@ -708,7 +663,7 @@
       );
 
       orderListOpen = true;
-      await loadOrders();
+      await Promise.all([loadProducts(), loadOrders()]);
     }
 
     async function editCustomer(
@@ -775,11 +730,9 @@
 
       if (!accepted) return;
 
-      const { error } =
-        await sb
-          .from("customers")
-          .delete()
-          .eq("id", id);
+      const { error } = await sb.rpc("delete_customer_with_stock", {
+        p_customer_id: id
+      });
 
       if (error) {
         showAppError(error);
@@ -864,40 +817,14 @@
 
       if (!accepted) return;
 
-      const { error } =
-        await sb
-          .from("order_items")
-          .delete()
-          .in("id", itemIds);
+      const { error } = await sb.rpc("cancel_order_items_with_stock", {
+        p_order_id: orderId,
+        p_item_ids: itemIds
+      });
 
       if (error) {
         showAppError(error);
         return;
-      }
-
-      const currentOrder =
-        orders.find(
-          function (order) {
-            return order.id === orderId;
-          }
-        );
-
-      const remainingCount =
-        (currentOrder?.order_items || [])
-          .filter(
-            function (item) {
-              return !itemIds.includes(
-                item.id
-              );
-            }
-          )
-          .length;
-
-      if (remainingCount === 0) {
-        await sb
-          .from("orders")
-          .delete()
-          .eq("id", orderId);
       }
 
       setMessage(
@@ -906,7 +833,7 @@
         "success"
       );
 
-      await loadOrders();
+      await Promise.all([loadProducts(), loadOrders()]);
     }
 
     async function updateOrderItemQuantity(itemId, orderId) {
@@ -923,19 +850,23 @@
       const accepted = confirm(item.product_name + " 수량을 " + quantity + (item.unit_name || "개") + "로 변경할까요?");
       if (!accepted) return;
 
-      const { error } = await sb
-        .from("order_items")
-        .update({ quantity: quantity })
-        .eq("id", itemId)
-        .eq("order_id", orderId);
+      const { error } = await sb.rpc("update_order_item_quantity_with_stock", {
+        p_order_id: orderId,
+        p_item_id: itemId,
+        p_quantity: quantity
+      });
 
       if (error) {
-        showAppError(error);
+        if (String(error.message || "").includes("재고가 부족합니다")) {
+          setMessage(appMessage, "재고가 부족합니다. 남은 재고를 확인해주세요.", "error");
+        } else {
+          showAppError(error);
+        }
         return;
       }
 
       setMessage(appMessage, item.product_name + " 주문 수량을 수정했습니다.", "success");
-      await loadOrders();
+      await Promise.all([loadProducts(), loadOrders()]);
     }
 
     async function updatePaymentStatus(
@@ -1128,11 +1059,9 @@
 
       if (!accepted) return;
 
-      const { error } =
-        await sb
-          .from("orders")
-          .delete()
-          .eq("id", id);
+      const { error } = await sb.rpc("delete_order_with_stock", {
+        p_order_id: id
+      });
 
       if (error) {
         showAppError(error);
@@ -1145,7 +1074,7 @@
         "success"
       );
 
-      await loadOrders();
+      await Promise.all([loadProducts(), loadOrders()]);
     }
 
     function renderCustomers() {
@@ -1430,6 +1359,7 @@
                 <div class="product-summary-mobile">
                   <div><strong>${escapeHtml(product.name)}</strong> <span>${formatWon(product.unit_price)} / ${escapeHtml(product.unit_name || "개")}</span></div>
                   <b>픽업: ${formatDate(product.pickup_date)}</b>
+                  <em class="${Number(product.stock_quantity || 0) === 0 ? "sold-out" : ""}">${Number(product.stock_quantity || 0) === 0 ? "품절" : "남은 재고: " + Number(product.stock_quantity).toLocaleString("ko-KR") + "개"}</em>
                 </div>
                 <div class="product-summary-cell product-summary-name">
                   <span class="product-summary-label">상품명</span>
@@ -1446,6 +1376,10 @@
                 <div class="product-summary-cell product-summary-date">
                   <span class="product-summary-label">픽업 날짜</span>
                   <strong>${formatDate(product.pickup_date)}</strong>
+                </div>
+                <div class="product-summary-cell product-stock ${Number(product.stock_quantity || 0) === 0 ? "sold-out" : ""}">
+                  <span class="product-summary-label">재고</span>
+                  <strong>${Number(product.stock_quantity || 0) === 0 ? "품절" : "남은 재고: " + Number(product.stock_quantity).toLocaleString("ko-KR") + "개"}</strong>
                 </div>
 
                 <div class="product-action-buttons">
@@ -1524,12 +1458,13 @@
             return `
               <label
                 id="choice-${escapeHtml(product.id)}"
-                class="product-choice"
+                class="product-choice ${Number(product.stock_quantity || 0) === 0 ? "sold-out" : ""}"
               >
                 <input
                   id="check-${escapeHtml(product.id)}"
                   type="checkbox"
                   data-product-check="${escapeHtml(product.id)}"
+                  ${Number(product.stock_quantity || 0) === 0 ? "disabled" : ""}
                 >
 
                 <span>
@@ -1547,6 +1482,10 @@
                     픽업:
                     ${formatDate(product.pickup_date)}
                   </span>
+
+                  <span class="stock-badge ${Number(product.stock_quantity || 0) === 0 ? "sold-out" : ""}">
+                    ${Number(product.stock_quantity || 0) === 0 ? "품절" : "남은 재고: " + Number(product.stock_quantity).toLocaleString("ko-KR") + "개"}
+                  </span>
                 </span>
 
                 <input
@@ -1557,6 +1496,8 @@
                   value="1"
                   aria-label="${escapeHtml(product.name)} 수량"
                   data-product-qty="${escapeHtml(product.id)}"
+                  max="${Number(product.stock_quantity || 0)}"
+                  ${Number(product.stock_quantity || 0) === 0 ? "disabled" : ""}
                 >
               </label>
             `;

@@ -23,6 +23,12 @@
 | `process_checkout_request` | 결제·배송 관리 | 없음 |
 | `confirm-toss-payment` (Edge Function) | 결제 성공 | 없음 |
 
+## 재고 관리
+
+`003_inventory_management.sql`은 `products.stock_quantity` 컬럼과 관리자용 재고 RPC를 추가합니다.
+주문 생성·수량 변경·부분 취소·전체 삭제·회원 삭제 시 재고 변경을 같은 DB 트랜잭션에서 처리합니다.
+기존 테이블이나 운영 데이터를 삭제하는 `DROP TABLE`은 포함하지 않습니다.
+
 `legacy/01_담픽_결제배송_업데이트.sql`은 주문 단위 신청을 위한 예전 코드입니다.
 현재 화면은 상품 단위 신청을 사용하므로 이 SQL만 실행해서는 현재 기능이 완성되지 않습니다.
 해당 SQL의 배송비 비교만 현재 화면과 동일하게 수정했습니다. 운영 DB에 반영한 것은 아닙니다.

@@ -30,6 +30,23 @@ test('all browser JavaScript parses', () => {
   new vm.Script(read('service-worker.js'));
 });
 
+test('inventory migration is transactional and non-destructive', () => {
+  const sql = read('database/003_inventory_management.sql');
+  const admin = read('assets/js/admin.js');
+  assert.match(sql, /add column if not exists stock_quantity integer not null default 0/i);
+  assert.match(sql, /add column if not exists stock_deducted boolean not null default false/i);
+  assert.match(sql, /create_order_with_stock/);
+  assert.match(sql, /cancel_order_items_with_stock/);
+  assert.match(sql, /delete_order_with_stock/);
+  assert.match(sql, /update_order_item_quantity_with_stock/);
+  assert.match(sql, /for update/i);
+  assert.doesNotMatch(sql, /drop\s+table/i);
+  for (const rpc of ['create_order_with_stock', 'cancel_order_items_with_stock', 'delete_order_with_stock', 'update_order_item_quantity_with_stock']) {
+    assert.match(admin, new RegExp(`rpc\\("${rpc}"`));
+  }
+  assert.doesNotMatch(admin, /from\("orders"\)\s*\.insert/);
+});
+
 test('payment configuration rejects empty, placeholder and secret keys', () => {
   const context = { window: {} };
   vm.runInNewContext(read('assets/js/payment-config.js'), context);
