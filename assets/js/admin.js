@@ -1720,7 +1720,7 @@
                         <span class="order-item-quantity-editor">
                           <input type="number" min="1" step="1" value="${Number(item.quantity || 1)}" data-order-item-quantity="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.product_name)} 수량">
                           <span>${escapeHtml(item.unit_name || "개")}</span>
-                          <button class="button secondary small" type="button" data-order-item-save="${escapeHtml(item.id)}" data-order-id="${escapeHtml(order.id)}">수량 저장</button>
+                          <button class="button secondary small quantity-save-button" type="button" data-order-item-save="${escapeHtml(item.id)}" data-order-id="${escapeHtml(order.id)}" aria-label="수량 저장"><span>수량</span><span>저장</span></button>
                         </span>
                       </span>
                       <span class="order-item-cell order-item-unit-price"><small>개당 금액</small><strong>${formatWon(item.unit_price)}</strong></span>
