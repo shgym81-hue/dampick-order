@@ -932,7 +932,7 @@
             item-row
             default-item
           ">
-            <div>
+            <div class="item-main">
               <div class="item-name">
                 ${escapeHtml(
                   item.product_name ||
@@ -953,8 +953,9 @@
                   item.pickup_date
                 )}
               </div>
+            </div>
 
-              <div>
+              <div class="item-statuses">
                 <span class="
                   badge
                   default
@@ -984,7 +985,6 @@
               >
                 현장 결제·픽업 완료
               </button>
-            </div>
 
             <div class="item-price">
               ${formatWon(total)}
