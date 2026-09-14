@@ -1720,7 +1720,7 @@
                         <span class="order-item-quantity-editor">
                           <input type="number" min="1" step="1" value="${Number(item.quantity || 1)}" data-order-item-quantity="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.product_name)} 수량">
                           <span>${escapeHtml(item.unit_name || "개")}</span>
-                          <button class="button secondary small" type="button" data-order-item-save="${escapeHtml(item.id)}" data-order-id="${escapeHtml(order.id)}">저장</button>
+                          <button class="button secondary small" type="button" data-order-item-save="${escapeHtml(item.id)}" data-order-id="${escapeHtml(order.id)}">수량 저장</button>
                         </span>
                       </span>
                       <span class="order-item-cell order-item-unit-price"><small>개당 금액</small><strong>${formatWon(item.unit_price)}</strong></span>
@@ -1780,7 +1780,7 @@
                   ${formatWon(total)}
                 </div>
 
-                <p class="order-workflow-guide">상품 취소가 필요하면 먼저 상품을 체크하세요. 처리는 결제 완료 후 픽업 완료 순서입니다.</p>
+                <p class="order-workflow-guide" data-pickup-guide="${escapeHtml(order.id)}" aria-live="polite">${escapeHtml(window.DampickOrderWorkflow.pickupControl(order, 0).message)}</p>
                 <div class="order-action-grid order-workflow-actions">
                   <button
                     class="button light"
@@ -1804,7 +1804,7 @@
                     type="button"
                     data-pickup-toggle="${escapeHtml(order.id)}"
                     data-completed="false"
-                    ${workflow.pickupDisabled ? "disabled" : ""}
+                    disabled
                   >
                     ${workflow.pickedUp ? "③ 픽업 완료됨" : "③ 픽업 완료"}
                   </button>
@@ -1826,6 +1826,12 @@
     }
 
     function bindOrderActionButtons() {
+      document.querySelectorAll("[data-order-item-check]").forEach(function (checkbox) {
+        checkbox.addEventListener("change", function () {
+          updatePickupControl(checkbox.dataset.orderItemCheck);
+        });
+      });
+
       document
         .querySelectorAll(
           "[data-items-delete]"
@@ -1909,6 +1915,7 @@
             button.addEventListener(
               "click",
               function () {
+                if (!updatePickupControl(button.dataset.pickupToggle)) return;
                 togglePickupComplete(
                   button.dataset.pickupToggle,
                   button.dataset.completed ===
@@ -1948,6 +1955,18 @@
             );
           }
         );
+    }
+
+    function updatePickupControl(orderId) {
+      const order = orders.find(function (entry) { return entry.id === orderId; });
+      const button = document.querySelector('[data-pickup-toggle="' + orderId + '"]');
+      const guide = document.querySelector('[data-pickup-guide="' + orderId + '"]');
+      if (!order || !button) return false;
+      const selectedCount = document.querySelectorAll('[data-order-item-check="' + orderId + '"]:checked').length;
+      const control = window.DampickOrderWorkflow.pickupControl(order, selectedCount);
+      button.disabled = !control.enabled;
+      if (guide) guide.textContent = control.message;
+      return control.enabled;
     }
 
     function renderPaymentOptions(
