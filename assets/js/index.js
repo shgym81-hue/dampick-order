@@ -551,9 +551,6 @@
       const entranceInfo =
         document.getElementById("entranceInfo").value.trim();
 
-      const deliveryRequest =
-        document.getElementById("deliveryRequest").value.trim();
-
       if (!nickname) {
         showMessage("닉네임을 입력해주세요.", "error");
         return;
@@ -622,7 +619,7 @@
             p_delivery_phone: deliveryPhone,
             p_delivery_address: address,
             p_entrance_info: entranceInfo,
-            p_delivery_request: deliveryRequest
+            p_delivery_request: ""
           }
         );
 
