@@ -246,9 +246,13 @@
       return window.DampickDelivery.schedule(group?.pickupDate)?.key || "OTHER";
     }
 
+    function formatCustomerDeliveryLabel(label) {
+      return (label || "배송 일정 확인 필요").replace("수요일 새벽 배송", "수요일 오전 8시 이전 배송");
+    }
+
     function getDeliveryGroupLabel(groupName) {
       const group = productGroups.find(item => getDeliveryGroup(item) === groupName);
-      return window.DampickDelivery.schedule(group?.pickupDate)?.label || "배송 일정 확인 필요";
+      return formatCustomerDeliveryLabel(window.DampickDelivery.schedule(group?.pickupDate)?.label);
     }
 
     function getSelectedDeliveryGroups() {
@@ -348,7 +352,7 @@
         const allAssigned = available.length === 0 && indexes.every(i => Boolean(productGroups[i].checkout));
         return `<section class="delivery-bucket" data-bucket="${key}">
           <div class="delivery-bucket-heading">
-            <div class="delivery-bucket-heading-top"><span class="delivery-date-pill">📅 ${escapeHtml(info?.label || "배송 일정 확인 필요")}</span><span class="delivery-state-pill">${key === "OTHER" ? "일정 확인 필요" : allAssigned ? "신청 완료" : "배송 선택 가능"}</span></div>
+            <div class="delivery-bucket-heading-top"><span class="delivery-date-pill">📅 ${escapeHtml(formatCustomerDeliveryLabel(info?.label))}</span><span class="delivery-state-pill">${key === "OTHER" ? "일정 확인 필요" : allAssigned ? "신청 완료" : "배송 선택 가능"}</span></div>
             <div class="delivery-customer">👤 ${escapeHtml(nicknameInput.value.trim())}님</div>
             <p>${escapeHtml(info?.pickupLabel || "주말·미정 상품은 관리자에게 문의해주세요.")}</p>
           </div>
