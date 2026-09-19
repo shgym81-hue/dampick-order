@@ -586,13 +586,13 @@
           0
         );
 
-      const completedCount =
+      const readyCount =
         filtered.reduce(
           function (sum, customer) {
             return (
               sum +
               getActiveRequests(customer).filter(request =>
-                isFulfillmentCompleted(request.fulfillment_status)).length
+                String(request.fulfillment_status || "").includes("배송 준비")).length
             );
           },
           0
@@ -624,7 +624,7 @@
           "completedOrderCount"
         )
         .textContent =
-          completedCount + "건";
+          readyCount + "건";
     }
 
     function renderCustomer(

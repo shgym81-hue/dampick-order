@@ -26,6 +26,7 @@
     let customers = [];
     let products = [];
     let orders = [];
+    let checkoutRequests = [];
 
     const productEditor = window.createDampickProductEditor(sb, async product => {
       await loadProducts();
@@ -334,20 +335,10 @@
     }
 
     async function loadOrders() {
-      const { data, error } =
-        await sb
+      const ordersResult = await sb
           .from("orders")
           .select(`
-            id,
-            customer_id,
-            order_number,
-            order_date,
-            payment_status,
-            order_status,
-            notice,
-            completed_at,
-            created_at,
-            is_visible,
+            *,
             customers(
               id,
               nickname
@@ -369,17 +360,31 @@
             { ascending: false }
           );
 
-      if (error) {
-        showAppError(error);
+      if (ordersResult.error) {
+        showAppError(ordersResult.error);
         return;
       }
 
       orders =
-        (data || []).filter(
+        (ordersResult.data || []).filter(
           function (order) {
             return order.is_visible !== false;
           }
         );
+
+      try {
+        const requestsResult = await sb.from("checkout_requests")
+          .select("*,checkout_request_items(order_item_id,quantity,unit_price,line_total)")
+          .eq("receipt_method", "home");
+        if (requestsResult.error) throw requestsResult.error;
+        checkoutRequests = requestsResult.data || [];
+      } catch (error) {
+        console.warn("문고리 배송 신청 조회 실패; 주문 목록만 표시합니다.", error);
+        checkoutRequests = [];
+        setMessage(appMessage,
+          "문고리 배송 신청 상태를 불러오지 못했습니다. 4번 주문 목록은 표시하지만 배송 상태와 5번 매출은 정확하지 않을 수 있습니다.",
+          "error");
+      }
 
       renderOrders();
       renderSalesCalendar();
@@ -940,13 +945,16 @@
 
       if (!select) return;
 
+      const currentOrder = orders.find(order => order.id === orderId);
+      const completed = /픽업 완료|배송 완료/.test(select.value);
+      const updateValues = { order_status: select.value };
+      if (completed && !currentOrder?.completed_at) updateValues.completed_at = new Date().toISOString();
+      if (!completed && currentOrder?.completed_at) updateValues.completed_at = null;
+
       const { error } =
         await sb
           .from("orders")
-          .update({
-            order_status:
-              select.value
-          })
+          .update(updateValues)
           .eq("id", orderId);
 
       if (error) {
@@ -1610,8 +1618,10 @@
             "ko-KR"
           );
 
+      const openOrders = orders.filter(order =>
+        window.DampickAdminCompletion.pendingItems(order, checkoutRequests).length > 0);
       const filtered =
-        orders.filter(
+        openOrders.filter(
           function (order) {
             const nickname =
               String(
@@ -1642,12 +1652,12 @@
           orderListOpen
             ? (
                 "주문 목록 접기 ▲ (" +
-                orders.length +
+                openOrders.length +
                 "건)"
               )
             : (
                 "주문 목록 펼치기 ▼ (" +
-                orders.length +
+                openOrders.length +
                 "건)"
               );
 
@@ -1664,7 +1674,7 @@
               )
             : (
                 "등록 주문 " +
-                orders.length +
+                openOrders.length +
                 "건"
               );
 
@@ -1680,28 +1690,14 @@
       target.innerHTML =
         filtered.map(
           function (order) {
-            const items =
-              Array.isArray(
-                order.order_items
-              )
-                ? order.order_items
-                : [];
+            const items = window.DampickAdminCompletion.pendingItems(order, checkoutRequests);
 
-            const completed =
-              Boolean(
-                order.completed_at
-              ) ||
-              String(
-                order.order_status || ""
-              ).includes("픽업 완료") ||
-              String(
-                order.order_status || ""
-              ).includes("배송 완료");
+            const completed = window.DampickAdminCompletion.pickupCompleted(order);
+            const displayStatus = completed ? "문고리 배송 진행 중" : order.order_status || "주문 접수";
 
             const workflow = window.DampickOrderWorkflow.state(order);
 
-            const total =
-              getOrderTotal(order);
+            const total = getOrderTotal({ order_items: items });
 
             const itemsHtml =
               items.map(
@@ -1712,6 +1708,7 @@
                         type="checkbox"
                         value="${escapeHtml(item.id)}"
                         data-order-item-check="${escapeHtml(order.id)}"
+                        ${window.DampickAdminCompletion.isHomeItem(item, checkoutRequests) ? "disabled" : ""}
                       >
 
                       <span class="order-item-cell order-item-name"><small>상품명</small><strong>${escapeHtml(item.product_name)}</strong></span>
@@ -1733,7 +1730,7 @@
 
             return `
               <article
-                class="order-card ${completed ? "completed" : ""}"
+                class="order-card"
               >
                 <div class="order-head">
                   <div>
@@ -1746,8 +1743,8 @@
                       ${formatDate(order.order_date)}
                     </div>
 
-                    <span class="order-status-badge ${completed ? "completed" : ""}">
-                      ${escapeHtml(order.order_status || "주문 접수")}
+                    <span class="order-status-badge">
+                      ${escapeHtml(displayStatus)}
                     </span>
 
                     <span class="order-status-badge">
@@ -2066,7 +2063,7 @@
       );
     }
 
-    function getCompletedOrdersForMonth() {
+    function getCompletedEntriesForMonth() {
       const monthValue =
         document
           .getElementById(
@@ -2074,20 +2071,8 @@
           )
           .value;
 
-      return orders.filter(
-        function (order) {
-          if (!order.completed_at) {
-            return false;
-          }
-
-          return (
-            String(
-              order.completed_at
-            ).slice(0, 7) ===
-            monthValue
-          );
-        }
-      );
+      return window.DampickAdminCompletion.salesEntries(orders, checkoutRequests)
+        .filter(entry => String(entry.date).slice(0, 7) === monthValue);
     }
 
     function renderSalesCalendar() {
@@ -2105,52 +2090,24 @@
           .split("-")
           .map(Number);
 
-      const completedOrders =
-        getCompletedOrdersForMonth();
+      const completedEntries = getCompletedEntriesForMonth();
 
-      const total =
-        completedOrders.reduce(
-          function (sum, order) {
-            return (
-              sum +
-              getOrderTotal(order)
-            );
-          },
-          0
-        );
+      const total = completedEntries.reduce((sum, entry) => sum + entry.total, 0);
+      const productTotal = completedEntries.reduce((sum, entry) => sum + entry.productAmount, 0);
+      const deliveryTotal = completedEntries.reduce((sum, entry) => sum + entry.deliveryFee, 0);
 
-      const itemCount =
-        completedOrders.reduce(
-          function (sum, order) {
-            return (
-              sum +
-              (order.order_items || [])
-                .reduce(
-                  function (
-                    itemSum,
-                    item
-                  ) {
-                    return (
-                      itemSum +
-                      Number(
-                        item.quantity || 0
-                      )
-                    );
-                  },
-                  0
-                )
-            );
-          },
-          0
-        );
+      const itemCount = completedEntries.reduce((sum, entry) => sum + entry.itemCount, 0);
 
       document
         .getElementById(
           "monthlyOrderCount"
         )
         .textContent =
-          completedOrders.length +
+          completedEntries.length +
           "건";
+
+      document.getElementById("monthlyProductTotal").textContent = formatWon(productTotal);
+      document.getElementById("monthlyDeliveryTotal").textContent = formatWon(deliveryTotal);
 
       document
         .getElementById(
@@ -2186,11 +2143,11 @@
       const dailyMap =
         new Map();
 
-      completedOrders.forEach(
-        function (order) {
+      completedEntries.forEach(
+        function (entry) {
           const date =
             String(
-              order.completed_at
+              entry.date
             ).slice(0, 10);
 
           if (!dailyMap.has(date)) {
@@ -2202,7 +2159,7 @@
 
           dailyMap
             .get(date)
-            .push(order);
+            .push(entry);
         }
       );
 
@@ -2235,25 +2192,16 @@
             String(day).padStart(2, "0")
           ].join("-");
 
-        const dayOrders =
+        const dayEntries =
           dailyMap.get(date) || [];
 
-        const dayTotal =
-          dayOrders.reduce(
-            function (sum, order) {
-              return (
-                sum +
-                getOrderTotal(order)
-              );
-            },
-            0
-          );
+        const dayTotal = dayEntries.reduce((sum, entry) => sum + entry.total, 0);
 
         cells.push(`
           <button
             class="
               calendar-day
-              ${dayOrders.length ? "has-sales" : ""}
+              ${dayEntries.length ? "has-sales" : ""}
               ${selectedSalesDate === date ? "selected" : ""}
             "
             type="button"
@@ -2264,7 +2212,7 @@
             </span>
 
             ${
-              dayOrders.length
+              dayEntries.length
                 ? `
                   <span class="calendar-sales-amount">
                     ${formatWon(dayTotal)}
@@ -2313,20 +2261,10 @@
         return;
       }
 
-      const dayOrders =
-        orders.filter(
-          function (order) {
-            return (
-              order.completed_at &&
-              String(
-                order.completed_at
-              ).slice(0, 10) ===
-              selectedSalesDate
-            );
-          }
-        );
+      const dayEntries = window.DampickAdminCompletion.salesEntries(orders, checkoutRequests)
+        .filter(entry => String(entry.date).slice(0, 10) === selectedSalesDate);
 
-      if (!dayOrders.length) {
+      if (!dayEntries.length) {
         target.innerHTML = `
           <strong>${formatDate(selectedSalesDate)}</strong><br>
           완료 매출이 없습니다.
@@ -2334,16 +2272,7 @@
         return;
       }
 
-      const total =
-        dayOrders.reduce(
-          function (sum, order) {
-            return (
-              sum +
-              getOrderTotal(order)
-            );
-          },
-          0
-        );
+      const total = dayEntries.reduce((sum, entry) => sum + entry.total, 0);
 
       target.innerHTML = `
         <strong>
@@ -2351,16 +2280,17 @@
           · ${formatWon(total)}
         </strong>
 
-        ${dayOrders.map(
-          function (order) {
+        ${dayEntries.map(
+          function (entry) {
             return `
               <div class="daily-sales-row">
                 <span>
-                  ${escapeHtml(order.customers?.nickname || "고객")}
+                  ${escapeHtml(entry.nickname)} · ${escapeHtml(entry.kind)}
+                  ${entry.dateIsFallback ? `<small> · 완료일 대체값 (${escapeHtml(entry.dateSource)})</small>` : ""}
                 </span>
 
                 <strong>
-                  ${formatWon(getOrderTotal(order))}
+                  ${formatWon(entry.total)}
                 </strong>
               </div>
             `;
@@ -2386,13 +2316,17 @@
           )
           .value;
 
-      const monthlyOrders =
-        getCompletedOrdersForMonth();
-
-      const rows =
-        makeExcelRows(
-          monthlyOrders
-        );
+      const rows = getCompletedEntriesForMonth().map(entry => ({
+        고객닉네임: entry.nickname,
+        주문또는신청번호: entry.code,
+        완료구분: entry.kind,
+        완료일: String(entry.date).slice(0, 10),
+        완료일근거: entry.dateIsFallback ? `완료일 대체값 (${entry.dateSource})` : "실제 완료일",
+        상품수량: entry.itemCount,
+        상품매출: entry.productAmount,
+        배송비: entry.deliveryFee,
+        총완료매출: entry.total
+      }));
 
       downloadExcel(
         rows,

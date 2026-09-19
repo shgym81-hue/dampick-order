@@ -29,6 +29,15 @@ test('completed payment and delivery request remains visible', () => {
   assert.equal(visibility.isActiveRequest({request_code:'DP-1', receipt_method:'home', request_status:'신청', payment_status:'결제 완료'}), true);
 });
 
+test('delivered home requests leave payment management', () => {
+  for (const fulfillment_status of ['배송 완료', '배송완료', 'completed', 'delivery_completed', 'delivered']) {
+    assert.equal(visibility.isActiveRequest({id:'r1', receipt_method:'home', fulfillment_status}), false);
+  }
+  for (const fulfillment_status of ['배송 대기', '입금 확인 대기', '배송 준비 중']) {
+    assert.equal(visibility.isActiveRequest({id:'r1', receipt_method:'home', fulfillment_status}), true);
+  }
+});
+
 test('pickup and other receipt methods never make a customer visible', () => {
   for (const receipt_method of ['pickup', 'store', undefined]) {
     assert.equal(visibility.hasActiveRequest({requests:[{id:'r1', receipt_method, request_status:'신청'}]}), false);

@@ -26,6 +26,7 @@ test('export includes unpaid and paid pending home requests only', () => {
     request({ id: 'r3', receipt_method: 'pickup' }),
     request({ id: 'r4', fulfillment_status: '배송 완료' }),
     request({ id: 'r5', fulfillment_status: 'delivered' }),
+    request({ id: 'r8', fulfillment_status: 'delivery_completed' }),
     request({ id: 'r6', request_status: '취소' }),
     request({ id: 'r7', payment_status: '결제 실패' })
   ];

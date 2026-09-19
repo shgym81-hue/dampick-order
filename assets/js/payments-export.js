@@ -15,7 +15,7 @@
 
   function isDeliveryCompleted(status) {
     const value = normalized(status);
-    return value.includes("배송완료") || ["delivered", "complete", "completed"].includes(value);
+    return value.includes("배송완료") || ["delivered", "complete", "completed", "deliverycompleted"].includes(value);
   }
 
   function isPaymentCompleted(status) {

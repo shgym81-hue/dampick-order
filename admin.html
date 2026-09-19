@@ -105,7 +105,7 @@
         <div class="brand">
           <h1>DAMPICK 담픽 관리자</h1>
           <p>
-            회원·상품·주문·결제상태·픽업완료 매출을 관리합니다.
+            회원·상품·주문·결제상태·픽업·배송 완료 매출을 관리합니다.
           </p>
         </div>
 
@@ -165,7 +165,7 @@
 
         <a class="nav-5" href="#categorySales">
           <span class="category-nav-number">5</span>
-          <span class="category-nav-label">월별 픽업 완료 매출</span>
+          <span class="category-nav-label">월별 픽업·배송 완료 매출</span>
         </a>
       </nav>
 
@@ -557,10 +557,10 @@
           <div class="category-icon" aria-hidden="true">📊</div>
 
           <div class="category-title-area">
-            <h2>월별 픽업 완료 매출</h2>
+            <h2>월별 픽업·배송 완료 매출</h2>
             <p class="section-description">
-              픽업 완료 또는 배송 완료된 주문만 완료 날짜 기준으로
-              매출 달력과 월 합계에 반영합니다.
+              픽업 완료 상품과 배송 완료 신청 상품을 완료 날짜 기준으로
+              중복 없이 매출 달력과 월 합계에 반영합니다.
             </p>
           </div>
         </div>
@@ -588,13 +588,23 @@
 
         <div class="sales-summary">
           <div class="summary-box">
-            <span class="muted">월 완료 주문</span>
+            <span class="muted">월 완료 건</span>
             <strong id="monthlyOrderCount">0건</strong>
           </div>
 
           <div class="summary-box">
             <span class="muted">월 판매 상품</span>
             <strong id="monthlyItemCount">0개</strong>
+          </div>
+
+          <div class="summary-box">
+            <span class="muted">상품 매출</span>
+            <strong id="monthlyProductTotal">0원</strong>
+          </div>
+
+          <div class="summary-box">
+            <span class="muted">배송비</span>
+            <strong id="monthlyDeliveryTotal">0원</strong>
           </div>
 
           <div class="summary-box">
@@ -674,6 +684,7 @@
 
   <script src="./assets/js/admin-product-editor.js?v=20260914-inventory"></script>
   <script src="./assets/js/admin-order-workflow.js?v=20260914-pickup-guide"></script>
-  <script src="./assets/js/admin.js?v=20260914-quantity-layout"></script>
+  <script src="./assets/js/admin-completion.js?v=20260919-completed-sales"></script>
+  <script src="./assets/js/admin.js?v=20260919-completed-sales"></script>
 </body>
 </html>

@@ -2,8 +2,13 @@
 (function (root) {
   "use strict";
   const hiddenStatuses = new Set(["취소", "신청 취소", "결제 실패", "카드 결제 실패"]);
+  function isDeliveryCompleted(status) {
+    const value = String(status || "").trim().toLowerCase().replace(/[\s_-]+/g, "");
+    return value.includes("배송완료") || ["delivered", "complete", "completed", "deliverycompleted"].includes(value);
+  }
   function isActiveRequest(request) {
     if (!request || request.receipt_method !== "home" || !String(request.id || request.request_code || "").trim()) return false;
+    if (isDeliveryCompleted(request.fulfillment_status)) return false;
     return ![request.request_status, request.payment_status]
       .some(value => hiddenStatuses.has(String(value || "").trim()));
   }
@@ -22,5 +27,5 @@
   function hasActiveRequest(customer) {
     return activeHomeRequests(customer).length > 0;
   }
-  root.DampickPaymentsVisibility = Object.freeze({isActiveRequest, activeHomeRequests, homeItems, homeProductAmount, hasActiveRequest});
+  root.DampickPaymentsVisibility = Object.freeze({isDeliveryCompleted, isActiveRequest, activeHomeRequests, homeItems, homeProductAmount, hasActiveRequest});
 })(typeof window === "undefined" ? module.exports : window);
