@@ -218,6 +218,7 @@
     }
 
     .default-guide p { margin: 2px 0; }
+    .default-guide-emphasis { color: var(--main-dark); }
     .default-guide b { color: #b13c00; font-weight: 950; }
 
     label.field-label {
