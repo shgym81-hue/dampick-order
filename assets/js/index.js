@@ -513,9 +513,6 @@
       stickyCheckoutButton.disabled = checkoutBusy || selectedCount === 0;
       stickyCheckout.classList.toggle("show", productGroups.some(group => !group.checkout));
       setProgress(selectedCount ? 3 : productGroups.length ? 2 : 1);
-      const scheduleTextBox = document.getElementById("checkoutSchedule");
-      if (scheduleTextBox) scheduleTextBox.textContent = selectedCount ? getDeliveryGroupLabel(getFirstSelectedDeliveryGroup()) : "결제할 배송 묶음을 선택해주세요.";
-
       const guide = document.getElementById("deliveryGuide");
 
       if (!selectedCount) {
