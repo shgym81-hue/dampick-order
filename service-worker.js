@@ -1,4 +1,4 @@
-const CACHE_NAME = "dampick-v5";
+const CACHE_NAME = "dampick-v6-mobile-orders";
 
 self.addEventListener("install", function () {
   self.skipWaiting();
@@ -17,7 +17,7 @@ self.addEventListener("activate", function (event) {
     })
   );
 
-  self.clients.claim();
+  event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener("fetch", function (event) {
@@ -32,7 +32,9 @@ self.addEventListener("fetch", function (event) {
   }
 
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, requestUrl.pathname.endsWith(".html") || requestUrl.pathname.endsWith("/")
+      ? { cache: "no-store" }
+      : undefined)
       .then(function (response) {
         if (
           response &&

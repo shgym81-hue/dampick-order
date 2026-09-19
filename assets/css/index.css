@@ -842,9 +842,15 @@
       .delivery-date-pill, .delivery-state-pill { padding: 5px 8px; font-size: 11px; }
       .delivery-customer { margin-top: 10px; font-size: 18px; }
       .delivery-items { padding: 1px 9px; }
-      .product-head { grid-template-columns: 19px minmax(0, 1fr); gap: 8px; }
+      .product-head { grid-template-columns: 19px minmax(0, 1fr) auto; gap: 8px; }
       .product-head input { width: 18px; height: 18px; }
       .product-name { font-size: 15px; }
-      .product-head .product-price { grid-column: 2; justify-self: end; margin-top: -2px; font-size: 16px; }
+      .product-head .product-price { grid-column: 3; align-self: start; margin-top: 1px; font-size: 15px; }
       .delivery-total strong { font-size: 18px; }
+    }
+    @media (max-width: 380px) {
+      .product-head { gap: 6px; }
+      .product-name { font-size: 14px; }
+      .product-head .product-price { font-size: 14px; }
+      .delivery-date-pill, .delivery-state-pill { font-size: 10px; }
     }
