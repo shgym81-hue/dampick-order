@@ -293,6 +293,11 @@
               group.checkout.payment_status || "처리 중"
             ].join(" · ")
           : "";
+        const statusLabel = assigned
+          ? group.checkout.payment_status || "신청 완료"
+          : deliveryGroup === "OTHER" || !group.itemIds.length
+            ? "일정 확인 필요"
+            : "미신청";
 
         return `
           <article
@@ -311,50 +316,21 @@
                 aria-label="${escapeHtml(group.productName)} 선택"
               >
 
-              <div>
+              <div class="product-content">
                 <div class="product-name">
                   ${escapeHtml(group.productName)}
                 </div>
-
-                <div class="product-facts">
-                  <div class="product-fact">
-                    <span>개당 금액</span>
-                    <strong>${formatWon(group.unitPrice)}</strong>
-                  </div>
-                  <div class="product-fact">
-                    <span>합산 수량</span>
-                    <strong>${Number(group.quantity).toLocaleString("ko-KR")} ${escapeHtml(group.unitName)}</strong>
-                  </div>
-                  <div class="product-fact product-fact-pickup">
-                    <span>픽업 날짜</span>
-                    <strong>${formatDate(group.pickupDate)}</strong>
-                  </div>
-                  <div class="product-fact product-fact-delivery">
-                    <span>배송 일정</span>
-                    <strong>${getDeliveryGroupLabel(deliveryGroup)}</strong>
-                  </div>
+                <div class="product-line">
+                  <span>${formatWon(group.unitPrice)} × ${Number(group.quantity).toLocaleString("ko-KR")}${escapeHtml(group.unitName)}</span>
+                  <span class="product-line-separator" aria-hidden="true">·</span>
+                  <span>픽업 ${formatDate(group.pickupDate)}</span>
                 </div>
-
-                ${
-                  assigned
-                    ? `<span class="status-badge">${escapeHtml(statusText)}</span>`
-                    : ""
-                }
+                <div class="product-status-row">
+                  <span class="status-badge ${assigned ? "is-assigned" : "is-pending"}">${escapeHtml(statusLabel)}</span>
+                  ${assigned ? `<span class="product-payment-detail">${escapeHtml(statusText)}</span>` : ""}
+                </div>
               </div>
-            </div>
-
-            <div class="product-bottom">
-              <span class="product-meta">
-                ${
-                  assigned
-                    ? "이미 결제·배송 신청이 완료된 상품입니다."
-                    : deliveryGroup === "OTHER" || !group.itemIds.length ? "배송 일정을 확인하려면 관리자에게 문의해주세요." : "이 배송 묶음에 포함할 상품만 체크하세요."
-                }
-              </span>
-
-              <span class="product-price">
-                ${formatWon(group.lineTotal)}
-              </span>
+              <strong class="product-price">${formatWon(group.lineTotal)}</strong>
             </div>
           </article>
         `;
@@ -368,11 +344,19 @@
       results.innerHTML = Array.from(buckets).map(([key, indexes]) => {
         const available = indexes.filter(i => !productGroups[i].checkout && productGroups[i].itemIds.length && key !== "OTHER");
         const info = window.DampickDelivery.schedule(productGroups[indexes[0]].pickupDate);
+        const bucketTotal = indexes.reduce((sum, i) => sum + Number(productGroups[i].lineTotal || 0), 0);
+        const allAssigned = available.length === 0 && indexes.every(i => Boolean(productGroups[i].checkout));
         return `<section class="delivery-bucket" data-bucket="${key}">
-          <div class="delivery-bucket-heading"><h3>${escapeHtml(info?.label || "배송 일정 확인 필요")}</h3>
-          <p>${escapeHtml(info?.pickupLabel || "주말·미정 상품은 관리자에게 문의해주세요.")}</p></div>
-          ${available.length ? `<label class="select-all-box"><input type="checkbox" class="bucket-select-all" data-delivery-group="${key}"><span>이 배송 묶음 전체 선택</span></label>` : ""}
-          ${indexes.map(i => cards[i]).join("")}
+          <div class="delivery-bucket-heading">
+            <div class="delivery-bucket-heading-top"><span class="delivery-date-pill">📅 ${escapeHtml(info?.label || "배송 일정 확인 필요")}</span><span class="delivery-state-pill">${key === "OTHER" ? "일정 확인 필요" : allAssigned ? "신청 완료" : "배송 선택 가능"}</span></div>
+            <div class="delivery-customer">👤 ${escapeHtml(nicknameInput.value.trim())}님</div>
+            <p>${escapeHtml(info?.pickupLabel || "주말·미정 상품은 관리자에게 문의해주세요.")}</p>
+          </div>
+          <div class="delivery-items">${indexes.map(i => cards[i]).join("")}</div>
+          <div class="delivery-bucket-footer">
+            ${available.length ? `<label class="select-all-box"><input type="checkbox" class="bucket-select-all" data-delivery-group="${key}"><span>이 묶음 전체 선택</span></label>` : ""}
+            <div class="delivery-total"><span>상품 합계</span><strong>${formatWon(bucketTotal)}</strong></div>
+          </div>
           ${available.length ? `<button type="button" class="bucket-checkout primary-button" data-delivery-group="${key}" disabled>선택 상품 결제하기</button>` : ""}
         </section>`;
       }).join("");
