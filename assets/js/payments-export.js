@@ -26,6 +26,7 @@
   function isPendingHomeRequest(request, visibility) {
     return request?.receipt_method === "home" &&
       (!visibility || visibility.isActiveRequest(request)) &&
+      Array.isArray(request.checkout_request_items) && request.checkout_request_items.length > 0 &&
       !isDeliveryCompleted(request.fulfillment_status);
   }
 
@@ -41,7 +42,6 @@
       .map(request => {
         const items = Array.isArray(request.checkout_request_items) ? request.checkout_request_items : [];
         const orderNumbers = Array.from(new Set([
-          ...(Array.isArray(request.order_numbers) ? request.order_numbers : []),
           ...items.map(item => item.order_number)
         ].map(text).filter(Boolean)));
         const pickupDates = Array.from(new Set(items.map(item => isoDate(item.pickup_date)).filter(Boolean))).sort();
@@ -50,10 +50,10 @@
           const order = orderMap.get(number);
           return [text(order?.customers?.memo), text(order?.notice)];
         }).filter(Boolean)));
-        const productAmount = request.product_amount ?? items.reduce((sum, item) =>
+        const productAmount = items.reduce((sum, item) =>
           sum + Number(item.line_total ?? Number(item.quantity || 0) * Number(item.unit_price || 0)), 0);
         const deliveryFee = Number(request.delivery_fee || 0);
-        const finalAmount = request.final_amount ?? Number(productAmount || 0) + deliveryFee;
+        const finalAmount = productAmount + deliveryFee;
 
         return {
           "주문번호": orderNumbers.join(" / ") || text(request.request_code),

@@ -25,11 +25,30 @@ test('export includes unpaid and paid pending home requests only', () => {
     request({ id: 'r2', request_code: 'DP-R2', payment_status: '결제 완료' }),
     request({ id: 'r3', receipt_method: 'pickup' }),
     request({ id: 'r4', fulfillment_status: '배송 완료' }),
-    request({ id: 'r5', fulfillment_status: 'delivered' })
+    request({ id: 'r5', fulfillment_status: 'delivered' }),
+    request({ id: 'r6', request_status: '취소' }),
+    request({ id: 'r7', payment_status: '결제 실패' })
   ];
   const rows = exporter.buildRows(requests, [{ order_number: 'DP-O1', notice: '냉장 보관' }], delivery, visibility);
   assert.equal(rows.length, 2);
   assert.deepEqual(rows.map(row => row['결제 상태']), ['미결제', '결제 완료']);
+});
+
+test('export excludes pickup and unlinked items even for a mixed customer', () => {
+  const rows = exporter.buildRows([
+    request({order_numbers:['DP-O1','DP-O2'], checkout_request_items:[
+      {order_number:'DP-O1', product_name:'사과', quantity:1, unit_price:5000, line_total:5000}
+    ]}),
+    request({id:'pickup', receipt_method:'pickup', checkout_request_items:[
+      {order_number:'DP-O2', product_name:'배', quantity:1, unit_price:7000, line_total:7000}
+    ]}),
+    request({id:'empty', checkout_request_items:[]})
+  ], [{order_number:'DP-O1'}, {order_number:'DP-O2'}], delivery, visibility);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0]['주문번호'], 'DP-O1');
+  assert.equal(rows[0]['주문 상품'], '사과');
+  assert.equal(rows[0]['총 상품 금액'], 5000);
+  assert.equal(rows[0]['총 결제 금액'], 5500);
 });
 
 test('export row contains delivery contact, items, amounts and schedule', () => {

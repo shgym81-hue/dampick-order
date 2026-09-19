@@ -3,12 +3,24 @@
   "use strict";
   const hiddenStatuses = new Set(["취소", "신청 취소", "결제 실패", "카드 결제 실패"]);
   function isActiveRequest(request) {
-    if (!request || !String(request.id || request.request_code || "").trim()) return false;
+    if (!request || request.receipt_method !== "home" || !String(request.id || request.request_code || "").trim()) return false;
     return ![request.request_status, request.payment_status]
       .some(value => hiddenStatuses.has(String(value || "").trim()));
   }
-  function hasActiveRequest(customer) {
-    return Array.isArray(customer?.requests) && customer.requests.some(isActiveRequest);
+  function activeHomeRequests(customer) {
+    return Array.isArray(customer?.requests) ? customer.requests.filter(isActiveRequest) : [];
   }
-  root.DampickPaymentsVisibility = Object.freeze({isActiveRequest, hasActiveRequest});
+  function homeItems(customer) {
+    return activeHomeRequests(customer).flatMap(request =>
+      (Array.isArray(request.checkout_request_items) ? request.checkout_request_items : [])
+        .map(item => ({ item, request })));
+  }
+  function homeProductAmount(customer) {
+    return homeItems(customer).reduce((total, { item }) =>
+      total + Number(item.line_total ?? Number(item.unit_price || 0) * Number(item.quantity || 0)), 0);
+  }
+  function hasActiveRequest(customer) {
+    return activeHomeRequests(customer).length > 0;
+  }
+  root.DampickPaymentsVisibility = Object.freeze({isActiveRequest, activeHomeRequests, homeItems, homeProductAmount, hasActiveRequest});
 })(typeof window === "undefined" ? module.exports : window);

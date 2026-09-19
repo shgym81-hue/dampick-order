@@ -262,6 +262,7 @@
               created_at
             )
           `)
+          .eq("receipt_method", "home")
           .order(
             "updated_at",
             {
@@ -334,33 +335,6 @@
       const map =
         new Map();
 
-      orders.forEach(
-        function (order) {
-          const customerId =
-            String(
-              order.customer_id || ""
-            );
-
-          if (!map.has(customerId)) {
-            map.set(
-              customerId,
-              {
-                id:
-                  customerId,
-                nickname:
-                  order.customers?.nickname ||
-                  "고객",
-                orders: [],
-                requests: []
-              }
-            );
-          }
-
-          map.get(customerId)
-            .orders.push(order);
-        }
-      );
-
       requests.forEach(
         function (request) {
           const customerId =
@@ -377,7 +351,6 @@
                 nickname:
                   request.nickname_snapshot ||
                   "고객",
-                orders: [],
                 requests: []
               }
             );
@@ -392,8 +365,7 @@
         Array.from(
           map.values()
         )
-        // 관리자 주문 입력만으로는 결제·배송 관리에 노출하지 않습니다.
-        // 고객이 제출한 유효한 checkout_request가 있어야 합니다.
+        // 문고리 배송 신청이 없는 고객은 표시하지 않습니다.
         .filter(window.DampickPaymentsVisibility.hasActiveRequest)
         .sort(
           function (a, b) {
@@ -409,9 +381,7 @@
     function getActiveRequests(
       customer
     ) {
-      return customer.requests.filter(
-        window.DampickPaymentsVisibility.isActiveRequest
-      );
+      return window.DampickPaymentsVisibility.activeHomeRequests(customer);
     }
 
     function makeItemRequestMap(
@@ -458,35 +428,11 @@
     function getCustomerState(
       customer
     ) {
-      const itemMap =
-        makeItemRequestMap(
-          customer
-        );
-
-      const allItems =
-        customer.orders.flatMap(
-          function (order) {
-            return Array.isArray(
-              order.order_items
-            )
-              ? order.order_items
-              : [];
-          }
-        );
-
-      const defaultItems =
-        allItems.filter(
-          function (item) {
-            return !itemMap.has(
-              String(item.id)
-            );
-          }
-        );
-
       const activeRequests =
         getActiveRequests(
           customer
         );
+      const allItems = window.DampickPaymentsVisibility.homeItems(customer).map(({ item }) => item);
 
       const paymentWait =
         activeRequests.some(
@@ -505,20 +451,11 @@
           }
         );
 
-      const allOrdersComplete =
-        customer.orders.length > 0 &&
-        customer.orders.every(
-          function (order) {
-            return Boolean(
-              order.completed_at
-            );
-          }
-        );
+      const allOrdersComplete = activeRequests.length > 0 &&
+        activeRequests.every(request => isFulfillmentCompleted(request.fulfillment_status));
 
       return {
-        itemMap,
         allItems,
-        defaultItems,
         activeRequests,
         paymentWait,
         hasHome,
@@ -572,12 +509,6 @@
             getCustomerState(
               customer
             );
-
-          if (status === "default") {
-            return (
-              state.defaultItems.length > 0
-            );
-          }
 
           if (
             status ===
@@ -638,7 +569,7 @@
           function (sum, customer) {
             return (
               sum +
-              customer.orders.length
+              getActiveRequests(customer).length
             );
           },
           0
@@ -649,7 +580,7 @@
           function (sum, state) {
             return (
               sum +
-              state.defaultItems.length
+              state.allItems.length
             );
           },
           0
@@ -660,13 +591,8 @@
           function (sum, customer) {
             return (
               sum +
-              customer.orders.filter(
-                function (order) {
-                  return Boolean(
-                    order.completed_at
-                  );
-                }
-              ).length
+              getActiveRequests(customer).filter(request =>
+                isFulfillmentCompleted(request.fulfillment_status)).length
             );
           },
           0
@@ -709,38 +635,7 @@
           customer
         );
 
-      const total =
-        state.allItems.reduce(
-          function (sum, item) {
-            return (
-              sum +
-              Number(
-                item.line_total ??
-                (
-                  Number(
-                    item.unit_price || 0
-                  ) *
-                  Number(
-                    item.quantity || 0
-                  )
-                )
-              )
-            );
-          },
-          0
-        );
-
-      const ordersHtml =
-        customer.orders
-          .map(
-            function (order) {
-              return renderOrder(
-                order,
-                state.itemMap
-              );
-            }
-          )
-          .join("");
+      const total = window.DampickPaymentsVisibility.homeProductAmount(customer);
 
       const requestHtml =
         state.activeRequests.length
@@ -768,13 +663,13 @@
               </div>
 
               <div class="customer-meta">
-                주문 ${customer.orders.length}건 ·
+                신청 ${state.activeRequests.length}건 ·
                 상품 ${state.allItems.length}개
               </div>
             </div>
 
             <div class="customer-total">
-              <span>전체 주문금액</span>
+              <span>문고리 배송 상품금액</span>
               <strong>
                 ${formatWon(total)}
               </strong>
@@ -782,7 +677,6 @@
           </header>
 
           <div class="customer-body">
-            ${ordersHtml}
             ${requestHtml}
           </div>
         </article>
@@ -1164,6 +1058,11 @@
                 request.final_amount
               )}
             </div>
+          </div>
+
+          <div class="item-list">
+            ${(Array.isArray(request.checkout_request_items) ? request.checkout_request_items : [])
+              .map(item => renderItem(item, request)).join("")}
           </div>
 
           <div class="detail-grid">

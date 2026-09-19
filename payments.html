@@ -68,12 +68,11 @@
     >
       <div class="topbar">
         <div>
-          <h1>담픽 주문·결제·배송 통합 관리</h1>
+          <h1>담픽 문고리 배송 관리</h1>
 
           <p>
-            관리자가 등록한 모든 주문을 먼저 보여줍니다.
-            고객이 별도 신청하지 않은 상품은
-            ‘매장 픽업·픽업 시 결제’로 표시됩니다.
+            고객이 문고리 배송을 신청한 상품만 표시됩니다.
+            전체 회원 주문은 메인 관리자 4번에서 확인하세요.
           </p>
         </div>
 
@@ -129,11 +128,7 @@
 
             <select id="statusFilter">
               <option value="all">
-                전체 주문
-              </option>
-
-              <option value="default">
-                기본 매장 픽업
+                전체 문고리 배송 신청
               </option>
 
               <option value="payment-wait">
@@ -184,17 +179,17 @@
           </div>
 
           <div class="summary-box">
-            <span>표시 주문</span>
+            <span>표시 신청</span>
             <strong id="orderCount">0건</strong>
           </div>
 
           <div class="summary-box">
-            <span>기본 픽업 상품</span>
+            <span>신청 상품</span>
             <strong id="defaultItemCount">0개</strong>
           </div>
 
           <div class="summary-box">
-            <span>완료 주문</span>
+            <span>배송 완료 신청</span>
             <strong id="completedOrderCount">0건</strong>
           </div>
         </div>
@@ -220,9 +215,9 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="./assets/js/config.js"></script>
 
-  <script src="./assets/js/payments-visibility.js?v=20260901-request-only"></script>
+  <script src="./assets/js/payments-visibility.js?v=20260919-home-only"></script>
   <script src="./assets/js/delivery-schedule.js?v=20260914-delivery-export"></script>
-  <script src="./assets/js/payments-export.js?v=20260914-delivery-export"></script>
-  <script src="./assets/js/payments.js?v=20260914-compact-items"></script>
+  <script src="./assets/js/payments-export.js?v=20260919-home-items"></script>
+  <script src="./assets/js/payments.js?v=20260919-home-items"></script>
 </body>
 </html>
