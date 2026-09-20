@@ -246,6 +246,16 @@
       return window.DampickDelivery.schedule(group?.pickupDate)?.key || "OTHER";
     }
 
+    function getPickupDateKey(group) {
+      return String(group?.pickupDate || "").slice(0, 10);
+    }
+
+    function formatPickupDateLabel(value) {
+      const date = String(value || "").slice(0, 10);
+      const weekday = getPickupWeekday(date);
+      return date && weekday ? `픽업 ${date} (${weekday})` : "픽업 날짜 미정";
+    }
+
     function formatCustomerDeliveryLabel(label) {
       return (label || "배송 일정 확인 필요").replace("수요일 새벽 배송", "수요일 오전 8시 이전 배송");
     }
@@ -341,34 +351,41 @@
       });
       const buckets = new Map();
       productGroups.forEach((group, index) => {
-        const key = getDeliveryGroup(group);
+        const key = getPickupDateKey(group);
         if (!buckets.has(key)) buckets.set(key, []);
         buckets.get(key).push(index);
       });
       results.innerHTML = Array.from(buckets).map(([key, indexes]) => {
-        const available = indexes.filter(i => !productGroups[i].checkout && productGroups[i].itemIds.length && key !== "OTHER");
+        const available = indexes.filter(i => !productGroups[i].checkout && productGroups[i].itemIds.length && getDeliveryGroup(productGroups[i]) !== "OTHER");
         const info = window.DampickDelivery.schedule(productGroups[indexes[0]].pickupDate);
         const bucketTotal = indexes.reduce((sum, i) => sum + Number(productGroups[i].lineTotal || 0), 0);
         const allAssigned = available.length === 0 && indexes.every(i => Boolean(productGroups[i].checkout));
-        return `<section class="delivery-bucket" data-bucket="${key}">
+        return `<section class="delivery-bucket" data-bucket="${escapeHtml(key)}">
           <div class="delivery-bucket-heading">
-            <div class="delivery-bucket-heading-top"><span class="delivery-date-pill">📅 ${escapeHtml(formatCustomerDeliveryLabel(info?.label))}</span><span class="delivery-state-pill">${key === "OTHER" ? "일정 확인 필요" : allAssigned ? "신청 완료" : "배송 선택 가능"}</span></div>
+            <div class="delivery-bucket-heading-top"><span class="delivery-date-pill">📅 ${escapeHtml(formatPickupDateLabel(key))}</span><span class="delivery-state-pill">${!info ? "일정 확인 필요" : allAssigned ? "신청 완료" : "배송 선택 가능"}</span></div>
             <div class="delivery-customer">👤 ${escapeHtml(nicknameInput.value.trim())}님</div>
             <p>${escapeHtml(info?.pickupLabel || "주말·미정 상품은 관리자에게 문의해주세요.")}</p>
           </div>
           <div class="delivery-items">${indexes.map(i => cards[i]).join("")}</div>
           <div class="delivery-bucket-footer">
-            ${available.length ? `<label class="select-all-box"><input type="checkbox" class="bucket-select-all" data-delivery-group="${key}"><span>이 묶음 전체 선택</span></label>` : ""}
+            ${available.length ? `<label class="select-all-box"><input type="checkbox" class="bucket-select-all" data-pickup-date="${escapeHtml(key)}"><span>이 묶음 전체 선택</span></label>` : ""}
             <div class="delivery-total"><span>상품 합계</span><strong>${formatWon(bucketTotal)}</strong></div>
           </div>
-          ${available.length ? `<button type="button" class="bucket-checkout primary-button" data-delivery-group="${key}" disabled>문고리 배송 결제하기</button>` : ""}
+          ${available.length ? `<button type="button" class="bucket-checkout primary-button" data-pickup-date="${escapeHtml(key)}" disabled>문고리 배송 결제하기</button>` : ""}
         </section>`;
       }).join("");
       results.querySelectorAll(".bucket-select-all").forEach(control => {
         control.addEventListener("change", () => {
           if (checkoutBusy) return;
+          const bucket = control.closest(".delivery-bucket");
+          const bucketChecks = Array.from(bucket.querySelectorAll(".product-check:not(:disabled)"));
+          const targetGroup = bucketChecks[0]?.dataset.deliveryGroup;
           document.querySelectorAll(".product-check:not(:disabled)").forEach(checkbox => {
-            checkbox.checked = control.checked && checkbox.dataset.deliveryGroup === control.dataset.deliveryGroup;
+            if (bucket.contains(checkbox)) {
+              checkbox.checked = control.checked;
+            } else if (control.checked && checkbox.checked && checkbox.dataset.deliveryGroup !== targetGroup) {
+              checkbox.checked = false;
+            }
             toggleProductCard(checkbox);
           });
           clearMessage();
@@ -420,13 +437,13 @@
     function syncSelectAll() {
       const checkboxes = Array.from(document.querySelectorAll(".product-check:not(:disabled)"));
       document.querySelectorAll(".bucket-select-all").forEach(control => {
-        const available = checkboxes.filter(item => item.dataset.deliveryGroup === control.dataset.deliveryGroup);
+        const available = checkboxes.filter(item => getPickupDateKey(productGroups[Number(item.dataset.groupIndex)]) === control.dataset.pickupDate);
         const checked = available.filter(item => item.checked);
         control.checked = available.length > 0 && checked.length === available.length;
         control.indeterminate = checked.length > 0 && checked.length < available.length;
       });
       document.querySelectorAll(".bucket-checkout").forEach(button => {
-        const selected = checkboxes.filter(item => item.checked && item.dataset.deliveryGroup === button.dataset.deliveryGroup);
+        const selected = checkboxes.filter(item => item.checked && getPickupDateKey(productGroups[Number(item.dataset.groupIndex)]) === button.dataset.pickupDate);
         button.disabled = checkoutBusy || selected.length === 0;
         button.textContent = "문고리 배송 결제하기";
       });
