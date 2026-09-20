@@ -361,7 +361,7 @@
             ${available.length ? `<label class="select-all-box"><input type="checkbox" class="bucket-select-all" data-delivery-group="${key}"><span>이 묶음 전체 선택</span></label>` : ""}
             <div class="delivery-total"><span>상품 합계</span><strong>${formatWon(bucketTotal)}</strong></div>
           </div>
-          ${available.length ? `<button type="button" class="bucket-checkout primary-button" data-delivery-group="${key}" disabled>선택 상품 결제하기</button>` : ""}
+          ${available.length ? `<button type="button" class="bucket-checkout primary-button" data-delivery-group="${key}" disabled>문고리 배송 결제하기</button>` : ""}
         </section>`;
       }).join("");
       results.querySelectorAll(".bucket-select-all").forEach(control => {
@@ -428,7 +428,7 @@
       document.querySelectorAll(".bucket-checkout").forEach(button => {
         const selected = checkboxes.filter(item => item.checked && item.dataset.deliveryGroup === button.dataset.deliveryGroup);
         button.disabled = checkoutBusy || selected.length === 0;
-        button.textContent = selected.length ? `선택 ${selected.length}종 결제하기` : "상품을 선택해주세요";
+        button.textContent = "문고리 배송 결제하기";
       });
     }
 
