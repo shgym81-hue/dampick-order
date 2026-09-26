@@ -83,10 +83,26 @@ test('rendered mixed customer card contains only the home-requested apple and it
     getActiveRequests:c=>visibility.activeHomeRequests(c), isPaymentCompleted:s=>s==='결제 완료',
     isFulfillmentCompleted:s=>s==='배송 완료', formatWon:n=>`${Number(n).toLocaleString('ko-KR')}원`,
     escapeHtml:s=>String(s ?? ''), getReceiptLabel:()=> '문고리 배송', getPaymentLabel:()=> '계좌이체',
+    getFulfillmentStatusLabel:s=>String(s || '').includes('배송 준비') ? '배송 대기' : String(s || ''),
     formatDate:()=>'', formatDateTime:()=>''
   };
   const html = vm.runInNewContext(parts.join('\n') + '\nrenderCustomer(customer)', context);
   assert.match(html, /사과/);
   assert.match(html, /5,000원/);
+  assert.match(html, /배송 대기/);
+  assert.doesNotMatch(html, /배송 준비|delivery-ready/);
+  assert.match(html, /delivery-complete/);
+  assert.match(html, /변경 신청 취소/);
   assert.doesNotMatch(html, /class="item-name">\s*배\s*<|7,000원|기본: 매장 픽업/);
+});
+
+test('home delivery cards skip ready step and enable completion immediately after payment', () => {
+  const payments = fs.readFileSync(path.join(__dirname, '../assets/js/payments.js'), 'utf8');
+  const requestCard = payments.slice(payments.indexOf('function renderRequest('), payments.indexOf('async function handleAction('));
+  const page = fs.readFileSync(path.join(__dirname, '../payments.html'), 'utf8');
+  assert.doesNotMatch(requestCard, /delivery-ready|배송 준비/);
+  assert.match(requestCard, /delivery-complete/);
+  assert.match(requestCard, /\$\{isPaid && !isCompleted[\s\S]*?\? ""[\s\S]*?: "disabled"\}/);
+  assert.doesNotMatch(page, /배송 준비 신청/);
+  assert.match(page, /결제 완료 신청/);
 });

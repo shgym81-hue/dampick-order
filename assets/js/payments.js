@@ -586,13 +586,13 @@
           0
         );
 
-      const readyCount =
+      const paidCount =
         filtered.reduce(
           function (sum, customer) {
             return (
               sum +
               getActiveRequests(customer).filter(request =>
-                String(request.fulfillment_status || "").includes("배송 준비")).length
+                isPaymentCompleted(request.payment_status)).length
             );
           },
           0
@@ -624,7 +624,7 @@
           "completedOrderCount"
         )
         .textContent =
-          readyCount + "건";
+          paidCount + "건";
     }
 
     function renderCustomer(
@@ -957,8 +957,7 @@
                   : ""}
               ">
                 ${escapeHtml(
-                  request.fulfillment_status ||
-                  ""
+                  getFulfillmentStatusLabel(request.fulfillment_status)
                 )}
               </span>
             </div>
@@ -1046,8 +1045,7 @@
                     : ""}
                 ">
                   ${escapeHtml(
-                    request.fulfillment_status ||
-                    ""
+                    getFulfillmentStatusLabel(request.fulfillment_status)
                   )}
                 </span>
               </div>
@@ -1222,19 +1220,6 @@
             ${
               isHome
                 ? `
-                  <button
-                    class="button"
-                    type="button"
-                    data-action="
-                      delivery-ready
-                    "
-                    ${isPaid && !isCompleted
-                      ? ""
-                      : "disabled"}
-                  >
-                    배송 준비
-                  </button>
-
                   <button
                     class="
                       button
@@ -1453,6 +1438,11 @@
           "배송 완료"
         )
       );
+    }
+
+    function getFulfillmentStatusLabel(status) {
+      const value = String(status || "");
+      return value.includes("배송 준비") ? "배송 대기" : value;
     }
 
     function getReceiptLabel(
