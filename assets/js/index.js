@@ -91,11 +91,15 @@
           throw error;
         }
 
-        currentOrders = normalizeOrders(data);
+        const allOrders = normalizeOrders(data);
+        currentOrders = filterRecentOrders(allOrders);
         productGroups = buildProductGroups(currentOrders);
 
         if (!productGroups.length) {
-          showMessage("해당 닉네임으로 등록된 주문상품이 없습니다.", "error");
+          showMessage(
+            allOrders.length ? "최근 주문 내역이 없습니다." : "해당 닉네임으로 등록된 주문상품이 없습니다.",
+            allOrders.length ? "success" : "error"
+          );
           return;
         }
 
@@ -147,6 +151,61 @@
       return [];
     }
 
+    function normalizedStatus(value) {
+      return String(value || "").trim().toLowerCase().replace(/[\s_-]+/g, "");
+    }
+
+    function isDeliveryCompletedStatus(value) {
+      const status = normalizedStatus(value);
+      return status.includes("배송완료") || ["delivered", "complete", "completed", "deliverycompleted"].includes(status);
+    }
+
+    function getItemCompletionStatus(order, item) {
+      const checkout = item?.checkout || order?.checkout || null;
+      const deliveryStatuses = [
+        item?.fulfillment_status, item?.delivery_status, item?.status,
+        checkout?.fulfillment_status, checkout?.delivery_status, checkout?.status,
+        order?.order_status
+      ];
+      if (deliveryStatuses.some(isDeliveryCompletedStatus)) return "배송 완료";
+
+      const orderStatus = normalizedStatus(order?.order_status);
+      const itemStatus = normalizedStatus(item?.status);
+      if ([orderStatus, itemStatus].some(status => ["픽업완료", "pickupcompleted"].includes(status))) return "픽업 완료";
+      if (order?.completed_at && checkout?.receipt_method !== "home") return "픽업 완료";
+      return "";
+    }
+
+    function validMonthKey(value) {
+      const text = String(value || "");
+      const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) return "";
+      const date = new Date(`${match[1]}-${match[2]}-${match[3]}T00:00:00`);
+      if (Number.isNaN(date.getTime()) || localDateKey(date) !== match[0]) return "";
+      return `${match[1]}-${match[2]}`;
+    }
+
+    function recentMonthKeys(today = new Date()) {
+      const current = new Date(today.getFullYear(), today.getMonth(), 1);
+      const previous = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      return new Set([localDateKey(current).slice(0, 7), localDateKey(previous).slice(0, 7)]);
+    }
+
+    function isRecentOrderItem(order, item, today = new Date()) {
+      const month = [item?.pickup_date, order?.order_date, order?.created_at]
+        .map(validMonthKey)
+        .find(Boolean);
+      return Boolean(month) && recentMonthKeys(today).has(month);
+    }
+
+    function filterRecentOrders(orders, today = new Date()) {
+      return (orders || []).map(function (order) {
+        const items = (Array.isArray(order?.items) ? order.items : [])
+          .filter(item => isRecentOrderItem(order, item, today));
+        return { ...order, items };
+      }).filter(order => order.items.length > 0);
+    }
+
     function buildProductGroups(orders) {
       const groupMap = new Map();
 
@@ -155,6 +214,7 @@
 
         items.forEach(function (item) {
           const checkout = item.checkout || null;
+          const completionStatus = getItemCompletionStatus(order, item);
 
           const productIdentity = String(
             item.product_id ||
@@ -167,7 +227,8 @@
             String(item.product_name || ""),
             String(item.unit_price || 0),
             String(item.unit_name || "개"),
-            String(item.pickup_date || "")
+            String(item.pickup_date || ""),
+            completionStatus
           ].join("::");
 
           const checkoutKey = checkout
@@ -190,7 +251,8 @@
               quantity: 0,
               lineTotal: 0,
               itemIds: [],
-              checkout
+              checkout,
+              completionStatus
             });
           }
 
@@ -270,6 +332,7 @@
 
     function isGroupSelectable(group) {
       return !group?.checkout &&
+        !group?.completionStatus &&
         isPickupDateAvailable(group?.pickupDate) &&
         getDeliveryGroup(group) !== "OTHER" &&
         Array.isArray(group?.itemIds) && group.itemIds.length > 0;
@@ -318,6 +381,7 @@
       const initialDeliveryGroup = "";
       const cards = productGroups.map(function (group, index) {
         const assigned = Boolean(group.checkout);
+        const completed = Boolean(group.completionStatus);
         const deliveryGroup = getDeliveryGroup(group);
         const pickupAvailable = isPickupDateAvailable(group.pickupDate);
 
@@ -333,7 +397,9 @@
               group.checkout.payment_status || "처리 중"
             ].join(" · ")
           : "";
-        const statusLabel = assigned
+        const statusLabel = completed
+          ? group.completionStatus
+          : assigned
           ? group.checkout.payment_status || "신청 완료"
           : !pickupAvailable
             ? "배송 불가"
@@ -343,7 +409,7 @@
 
         return `
           <article
-            class="product-card ${assigned ? "assigned" : shouldCheck ? "selected" : ""}"
+            class="product-card ${assigned || completed ? "assigned" : shouldCheck ? "selected" : ""}"
             data-group-index="${index}"
             data-delivery-group="${deliveryGroup}"
           >
@@ -368,7 +434,7 @@
                   <span>픽업 ${formatDate(group.pickupDate)}</span>
                 </div>
                 <div class="product-status-row">
-                  <span class="status-badge ${assigned ? "is-assigned" : "is-pending"}">${escapeHtml(statusLabel)}</span>
+                  <span class="status-badge ${assigned || completed ? "is-assigned" : "is-pending"}">${escapeHtml(statusLabel)}</span>
                   ${assigned ? `<span class="product-payment-detail">${escapeHtml(statusText)}</span>` : ""}
                 </div>
               </div>
@@ -388,7 +454,7 @@
         const info = window.DampickDelivery.schedule(productGroups[indexes[0]].pickupDate);
         const pickupAvailable = isPickupDateAvailable(productGroups[indexes[0]].pickupDate);
         const bucketTotal = indexes.reduce((sum, i) => sum + Number(productGroups[i].lineTotal || 0), 0);
-        const allAssigned = available.length === 0 && indexes.every(i => Boolean(productGroups[i].checkout));
+        const allAssigned = available.length === 0 && indexes.every(i => Boolean(productGroups[i].checkout || productGroups[i].completionStatus));
         const stateText = allAssigned ? "신청 완료" : !pickupAvailable ? "배송 불가" : !info ? "일정 확인 필요" : "배송 선택 가능";
         return `<section class="delivery-bucket" data-bucket="${escapeHtml(key)}">
           <div class="delivery-bucket-heading">

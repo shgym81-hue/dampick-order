@@ -28,6 +28,7 @@ function render(items, today = '2026-09-01T12:00:00') {
   };
   vm.createContext(context);
   vm.runInContext([
+    section('normalizedStatus', 'buildProductGroups'),
     section('buildProductGroups', 'getPickupWeekday'),
     section('getPickupWeekday', 'formatCustomerDeliveryLabel'),
     section('renderProductGroups', 'handleProductSelection'),
@@ -132,4 +133,74 @@ test('expired checked data is excluded defensively from selected groups and amou
   ].join('\n'), context);
   assert.equal(context.getSelectedGroups().length, 1);
   assert.equal(context.getProductAmount(), 11000);
+});
+
+test('customer history keeps only current and previous month by pickup date', () => {
+  const context = { Date };
+  vm.createContext(context);
+  vm.runInContext([
+    section('normalizedStatus', 'buildProductGroups'),
+    section('buildProductGroups', 'getPickupWeekday'),
+    section('getPickupDateKey', 'formatCustomerDeliveryLabel')
+  ].join('\n'), context);
+  const order = dates => [{ order_date: '2020-01-01', items: dates.map((pickup_date, id) => ({ id, pickup_date })) }];
+  assert.deepEqual(
+    context.filterRecentOrders(order(['2026-09-24', '2026-08-15', '2026-07-31']), new Date('2026-09-26T12:00:00'))[0].items.map(item => item.pickup_date),
+    ['2026-09-24', '2026-08-15']
+  );
+  assert.deepEqual(
+    context.filterRecentOrders(order(['2026-10-01', '2026-09-20', '2026-08-31']), new Date('2026-10-03T12:00:00'))[0].items.map(item => item.pickup_date),
+    ['2026-10-01', '2026-09-20']
+  );
+});
+
+test('history date falls back to order date and hides missing or invalid dates', () => {
+  const context = { Date };
+  vm.createContext(context);
+  vm.runInContext([
+    section('normalizedStatus', 'buildProductGroups'),
+    section('getPickupDateKey', 'formatCustomerDeliveryLabel')
+  ].join('\n'), context);
+  const today = new Date('2026-09-26T12:00:00');
+  assert.equal(context.isRecentOrderItem({ order_date: '2026-08-02' }, { pickup_date: '' }, today), true);
+  assert.equal(context.isRecentOrderItem({ created_at: '2026-09-01T09:00:00Z' }, { pickup_date: 'bad' }, today), true);
+  assert.equal(context.isRecentOrderItem({}, { pickup_date: 'bad' }, today), false);
+  assert.equal(context.filterRecentOrders([{ items: [{ pickup_date: '2026-07-31' }] }], today).length, 0);
+});
+
+test('completed delivery and pickup statuses render on customer product cards', () => {
+  const delivered = item('delivery', '2026-09-24');
+  delivered.checkout = { fulfillment_status: '배송 완료', payment_status: '결제 완료' };
+  const deliveryHtml = render([delivered], '2026-09-26T12:00:00');
+  assert.match(deliveryHtml, /status-badge is-assigned">배송 완료/);
+
+  const pickupContext = { Date };
+  vm.createContext(pickupContext);
+  vm.runInContext([
+    section('normalizedStatus', 'buildProductGroups'),
+    section('buildProductGroups', 'getPickupWeekday')
+  ].join('\n'), pickupContext);
+  const groups = pickupContext.buildProductGroups([{ order_status: '픽업 완료', items: [item('pickup', '2026-09-24')] }]);
+  assert.equal(groups[0].completionStatus, '픽업 완료');
+  const completedAtGroups = pickupContext.buildProductGroups([{
+    completed_at: '2026-09-24T10:00:00Z',
+    items: [{ ...item('pickup2', '2026-09-24'), checkout: { receipt_method: 'pickup' } }]
+  }]);
+  assert.equal(completedAtGroups[0].completionStatus, '픽업 완료');
+});
+
+test('unfinished recent items remain selectable while old items are removed', () => {
+  const context = { Date };
+  vm.createContext(context);
+  vm.runInContext([
+    section('normalizedStatus', 'buildProductGroups'),
+    section('buildProductGroups', 'getPickupWeekday'),
+    section('getPickupDateKey', 'formatCustomerDeliveryLabel')
+  ].join('\n'), context);
+  const orders = [{ items: [item('recent', '2026-09-28'), item('old', '2026-07-31')] }];
+  const recent = context.filterRecentOrders(orders, new Date('2026-09-26T12:00:00'));
+  const groups = context.buildProductGroups(recent);
+  assert.equal(groups.length, 1);
+  assert.equal(groups[0].productName, '상품recent');
+  assert.equal(groups[0].completionStatus, '');
 });
