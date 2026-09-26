@@ -10,10 +10,15 @@ function section(start, end) {
   return source.slice(source.indexOf(`function ${start}(`), source.indexOf(`function ${end}(`));
 }
 
-function render(items) {
+function render(items, today = '2026-09-01T12:00:00') {
+  const NativeDate = Date;
+  class FixedDate extends NativeDate {
+    constructor(value) { super(value === undefined ? today : value); }
+    static now() { return new NativeDate(today).getTime(); }
+  }
   const results = { innerHTML: '', querySelectorAll: () => [] };
   const context = {
-    window: { DampickDelivery }, results, items,
+    window: { DampickDelivery }, results, items, Date: FixedDate,
     document: { querySelectorAll: () => [] },
     nicknameInput: { value: '테스트' }, checkoutBusy: false,
     escapeHtml: value => String(value),
@@ -83,4 +88,48 @@ test('each pickup card tracks its own select-all and checkout button', () => {
   assert.deepEqual(controls.map(control => control.checked), [true, true, false]);
   assert.deepEqual(buttons.map(button => button.disabled), [false, false, true]);
   assert.ok(buttons.every(button => button.textContent === '문고리 배송 결제하기'));
+});
+
+test('past and invalid pickup dates are unavailable using the browser local date', () => {
+  const context = { Date };
+  vm.createContext(context);
+  vm.runInContext(section('getPickupDateKey', 'formatCustomerDeliveryLabel'), context);
+  const today = new Date('2026-09-26T18:30:00');
+  assert.equal(context.isPickupDateAvailable('2026-09-24', today), false);
+  assert.equal(context.isPickupDateAvailable('2026-09-26', today), true);
+  assert.equal(context.isPickupDateAvailable('2026-09-27', today), true);
+  assert.equal(context.isPickupDateAvailable('', today), false);
+  assert.equal(context.isPickupDateAvailable('not-a-date', today), false);
+  assert.equal(context.isPickupDateAvailable('2026-02-30', today), false);
+});
+
+test('past unrequested card is disabled, marked unavailable and has no checkout controls', () => {
+  const html = render([item('past', '2026-09-24')], '2026-09-26T12:00:00');
+  assert.match(html, /delivery-state-pill is-unavailable">배송 불가/);
+  assert.match(html, /class="product-check"[\s\S]*?disabled/);
+  assert.doesNotMatch(html, /bucket-select-all/);
+  assert.doesNotMatch(html, /bucket-checkout/);
+});
+
+test('expired checked data is excluded defensively from selected groups and amount', () => {
+  const context = {
+    Date,
+    productGroups: [
+      { pickupDate: '2026-09-24', lineTotal: 9000 },
+      { pickupDate: '2026-09-28', lineTotal: 11000 }
+    ],
+    document: { querySelectorAll: () => [
+      { dataset: { groupIndex: '0' } },
+      { dataset: { groupIndex: '1' } }
+    ] }
+  };
+  vm.createContext(context);
+  vm.runInContext([
+    section('getPickupDateKey', 'formatCustomerDeliveryLabel'),
+    section('getSelectedGroups', 'getSelectedItemIds'),
+    section('getProductAmount', 'getReceiptMethod'),
+    'Date = class extends Date { constructor(value) { super(value === undefined ? "2026-09-26T12:00:00" : value); } };'
+  ].join('\n'), context);
+  assert.equal(context.getSelectedGroups().length, 1);
+  assert.equal(context.getProductAmount(), 11000);
 });

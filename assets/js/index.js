@@ -103,7 +103,7 @@
         setProgress(2);
 
         const availableCount = productGroups.filter(function (group) {
-          return !group.checkout;
+          return isGroupSelectable(group);
         }).length;
 
         if (availableCount) {
@@ -250,6 +250,31 @@
       return String(group?.pickupDate || "").slice(0, 10);
     }
 
+    function localDateKey(value) {
+      const date = value instanceof Date ? value : new Date(value);
+      if (Number.isNaN(date.getTime())) return "";
+      return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+      ].join("-");
+    }
+
+    function isPickupDateAvailable(value, today = new Date()) {
+      const pickupKey = String(value || "").slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(pickupKey)) return false;
+      const pickupDate = new Date(pickupKey + "T00:00:00");
+      if (Number.isNaN(pickupDate.getTime()) || localDateKey(pickupDate) !== pickupKey) return false;
+      return pickupKey >= localDateKey(today);
+    }
+
+    function isGroupSelectable(group) {
+      return !group?.checkout &&
+        isPickupDateAvailable(group?.pickupDate) &&
+        getDeliveryGroup(group) !== "OTHER" &&
+        Array.isArray(group?.itemIds) && group.itemIds.length > 0;
+    }
+
     function formatPickupDateLabel(value) {
       const date = String(value || "").slice(0, 10);
       const weekday = getPickupWeekday(date);
@@ -294,6 +319,7 @@
       const cards = productGroups.map(function (group, index) {
         const assigned = Boolean(group.checkout);
         const deliveryGroup = getDeliveryGroup(group);
+        const pickupAvailable = isPickupDateAvailable(group.pickupDate);
 
         const shouldCheck =
           !assigned &&
@@ -309,7 +335,9 @@
           : "";
         const statusLabel = assigned
           ? group.checkout.payment_status || "신청 완료"
-          : deliveryGroup === "OTHER" || !group.itemIds.length
+          : !pickupAvailable
+            ? "배송 불가"
+            : deliveryGroup === "OTHER" || !group.itemIds.length
             ? "일정 확인 필요"
             : "미신청";
 
@@ -325,7 +353,7 @@
                 type="checkbox"
                 data-group-index="${index}"
                 data-delivery-group="${deliveryGroup}"
-                ${assigned || deliveryGroup === "OTHER" || !group.itemIds.length ? "disabled" : ""}
+                ${!isGroupSelectable(group) ? "disabled" : ""}
                 ${shouldCheck ? "checked" : ""}
                 aria-label="${escapeHtml(group.productName)} 선택"
               >
@@ -356,13 +384,15 @@
         buckets.get(key).push(index);
       });
       results.innerHTML = Array.from(buckets).map(([key, indexes]) => {
-        const available = indexes.filter(i => !productGroups[i].checkout && productGroups[i].itemIds.length && getDeliveryGroup(productGroups[i]) !== "OTHER");
+        const available = indexes.filter(i => isGroupSelectable(productGroups[i]));
         const info = window.DampickDelivery.schedule(productGroups[indexes[0]].pickupDate);
+        const pickupAvailable = isPickupDateAvailable(productGroups[indexes[0]].pickupDate);
         const bucketTotal = indexes.reduce((sum, i) => sum + Number(productGroups[i].lineTotal || 0), 0);
         const allAssigned = available.length === 0 && indexes.every(i => Boolean(productGroups[i].checkout));
+        const stateText = allAssigned ? "신청 완료" : !pickupAvailable ? "배송 불가" : !info ? "일정 확인 필요" : "배송 선택 가능";
         return `<section class="delivery-bucket" data-bucket="${escapeHtml(key)}">
           <div class="delivery-bucket-heading">
-            <div class="delivery-bucket-heading-top"><span class="delivery-date-pill">📅 ${escapeHtml(formatPickupDateLabel(key))}</span><span class="delivery-state-pill">${!info ? "일정 확인 필요" : allAssigned ? "신청 완료" : "배송 선택 가능"}</span></div>
+            <div class="delivery-bucket-heading-top"><span class="delivery-date-pill">📅 ${escapeHtml(formatPickupDateLabel(key))}</span><span class="delivery-state-pill${!pickupAvailable && !allAssigned ? " is-unavailable" : ""}">${stateText}</span></div>
             <div class="delivery-customer">👤 ${escapeHtml(nicknameInput.value.trim())}님</div>
             <p>${escapeHtml(info?.pickupLabel || "주말·미정 상품은 관리자에게 문의해주세요.")}</p>
           </div>
@@ -458,7 +488,9 @@
             Number(checkbox.dataset.groupIndex)
           ];
         })
-        .filter(Boolean);
+        .filter(function (group) {
+          return Boolean(group) && isPickupDateAvailable(group.pickupDate);
+        });
     }
 
     function getSelectedItemIds() {
@@ -528,7 +560,7 @@
         : "배송받을 상품을 선택해 주세요";
       document.getElementById("stickyAmountText").textContent = formatWon(finalAmount);
       stickyCheckoutButton.disabled = checkoutBusy || selectedCount === 0;
-      stickyCheckout.classList.toggle("show", productGroups.some(group => !group.checkout));
+      stickyCheckout.classList.toggle("show", productGroups.some(isGroupSelectable));
       setProgress(selectedCount ? 3 : productGroups.length ? 2 : 1);
       const guide = document.getElementById("deliveryGuide");
 
