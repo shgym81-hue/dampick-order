@@ -19,6 +19,7 @@
     let currentOrders = [];
     let productGroups = [];
     let checkoutBusy = false;
+    let lastCheckoutResult = null;
 
     restoreNickname();
 
@@ -49,6 +50,38 @@
       });
     }
 
+    function clearCheckoutComplete() {
+      lastCheckoutResult = null;
+      const completeBox = document.getElementById("checkoutComplete");
+      completeBox.classList.remove("show");
+      completeBox.innerHTML = "";
+    }
+
+    function renderCheckoutComplete() {
+      if (!lastCheckoutResult) return;
+      const result = lastCheckoutResult;
+      const completeBox = document.getElementById("checkoutComplete");
+      const nextGuide =
+        "하나은행 412-910821-25107, 예금주 담픽으로 " +
+        formatWon(result.final_amount) +
+        "을 입금해주세요.";
+      completeBox.innerHTML = `
+        <div class="complete-title"><span aria-hidden="true">✓</span><strong>문고리 배송 신청이 완료되었습니다.</strong></div>
+        <div class="complete-details">
+          신청번호: ${escapeHtml(result.request_code || "")}<br>
+          선택 상품 합계: ${formatWon(result.product_amount)}<br>
+          배송비: ${
+            Number(result.delivery_fee || 0) === 0
+              ? "무료"
+              : formatWon(result.delivery_fee)
+          }<br>
+          이번 결제금액: <strong class="complete-amount">${formatWon(result.final_amount)}</strong><br>
+          ${escapeHtml(nextGuide)}
+        </div>
+      `;
+      completeBox.classList.add("show");
+    }
+
     async function lookupOrder(options = {}) {
       const nickname = nicknameInput.value.trim();
 
@@ -63,9 +96,8 @@
       stickyCheckout.classList.remove("show");
       setProgress(1);
 
-      if (!options.keepComplete) {
-        document.getElementById("checkoutComplete").classList.remove("show");
-      }
+      if (!options.keepComplete) clearCheckoutComplete();
+      else renderCheckoutComplete();
 
       if (!nickname) {
         showMessage("닉네임을 입력해주세요.", "error");
@@ -756,30 +788,8 @@
           return;
         }
 
-        const completeBox =
-          document.getElementById("checkoutComplete");
-
-        const nextGuide =
-          "하나은행 412-910821-25107, 예금주 담픽으로 " +
-          formatWon(result.final_amount) +
-          "을 입금해주세요.";
-
-        completeBox.innerHTML = `
-          <div class="complete-title"><span aria-hidden="true">✓</span><strong>문고리 배송 신청이 저장되었습니다.</strong></div>
-          <div class="complete-details">
-            신청번호: ${escapeHtml(result.request_code || "")}<br>
-            선택 상품 합계: ${formatWon(result.product_amount)}<br>
-            배송비: ${
-              Number(result.delivery_fee || 0) === 0
-                ? "무료"
-                : formatWon(result.delivery_fee)
-            }<br>
-            이번 결제금액: <strong class="complete-amount">${formatWon(result.final_amount)}</strong><br>
-            ${escapeHtml(nextGuide)}
-          </div>
-        `;
-
-        completeBox.classList.add("show");
+        lastCheckoutResult = result;
+        renderCheckoutComplete();
         await lookupOrder({
           keepComplete: true,
           keepMessage: true
@@ -788,7 +798,7 @@
         setProgress(4);
         stickyCheckout.classList.remove("show");
 
-        checkoutCard.scrollIntoView({
+        document.getElementById("checkoutComplete").scrollIntoView({
           behavior: "smooth",
           block: "start"
         });

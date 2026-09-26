@@ -33,14 +33,39 @@ test('all browser JavaScript parses', () => {
 test('customer checkout completion keeps details and uses emphasized success styles', () => {
   const customer = read('assets/js/index.js');
   const styles = read('assets/css/index.css');
-  for (const text of ['문고리 배송 신청이 저장되었습니다.', '신청번호:', '선택 상품 합계:', '배송비:', '이번 결제금액:']) {
+  const html = read('index.html');
+  for (const text of ['문고리 배송 신청이 완료되었습니다.', '신청번호:', '선택 상품 합계:', '배송비:', '이번 결제금액:', '하나은행 412-910821-25107', '예금주 담픽']) {
     assert.match(customer, new RegExp(text));
   }
+  assert.ok(html.indexOf('id="checkoutComplete"') < html.indexOf('id="checkoutCard"'));
+  assert.equal([...html.matchAll(/id="checkoutComplete"/g)].length, 1);
   assert.match(customer, /class="complete-title"/);
   assert.match(customer, /class="complete-details"/);
   assert.match(customer, /class="complete-amount"/);
+  assert.match(customer, /let lastCheckoutResult = null/);
+  assert.match(customer, /else renderCheckoutComplete\(\)/);
   assert.match(styles, /\.complete-box\s*\{[^}]*border:\s*2px solid #22c55e[^}]*background:\s*#ecfdf3/s);
   assert.match(styles, /\.complete-title\s*\{[^}]*color:\s*#15803d[^}]*font-size:\s*clamp\(18px,/s);
+});
+
+test('customer checkout success box rerenders from memory after order refresh', () => {
+  const source = read('assets/js/index.js');
+  const functions = source.slice(source.indexOf('function clearCheckoutComplete()'), source.indexOf('async function lookupOrder('));
+  const box = { innerHTML: '', classList: { shown: false, add() { this.shown = true; }, remove() { this.shown = false; } } };
+  const context = {
+    document: { getElementById: () => box },
+    formatWon: value => `${Number(value).toLocaleString('ko-KR')}원`,
+    escapeHtml: value => String(value)
+  };
+  vm.createContext(context);
+  vm.runInContext(`let lastCheckoutResult = { request_code: 'DP-123', product_amount: 32200, delivery_fee: 500, final_amount: 32700 }; ${functions} renderCheckoutComplete();`, context);
+  assert.equal(box.classList.shown, true);
+  assert.match(box.innerHTML, /문고리 배송 신청이 완료되었습니다/);
+  assert.match(box.innerHTML, /DP-123/);
+  assert.match(box.innerHTML, /32,200원/);
+  assert.match(box.innerHTML, /500원/);
+  assert.match(box.innerHTML, /32,700원/);
+  assert.match(box.innerHTML, /하나은행 412-910821-25107, 예금주 담픽/);
 });
 
 test('inventory migration is transactional and non-destructive', () => {
