@@ -51,6 +51,15 @@ test('same pickup date shares one card and blue label shows pickup date', () => 
   assert.doesNotMatch(html, /delivery-date-pill">[^<]*배송/);
 });
 
+test('customer name appears once above cards and pickup group replaces repeated names', () => {
+  const html = render([item('mon', '2026-09-14'), item('thu', '2026-09-17')]);
+  assert.equal([...html.matchAll(/<strong>테스트<\/strong>님의 주문 상품/g)].length, 1);
+  assert.doesNotMatch(html, /delivery-customer/);
+  assert.doesNotMatch(html, /👤/);
+  assert.equal([...html.matchAll(/월·화 픽업 상품/g)].length, 1);
+  assert.equal([...html.matchAll(/수·목·금 픽업 상품/g)].length, 1);
+});
+
 test('different pickup dates make separate cards even within one delivery group', () => {
   const html = render([item('mon', '2026-09-14'), item('tue', '2026-09-15')]);
   assert.equal([...html.matchAll(/class="delivery-bucket"/g)].length, 2);

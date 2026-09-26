@@ -449,7 +449,7 @@
         if (!buckets.has(key)) buckets.set(key, []);
         buckets.get(key).push(index);
       });
-      results.innerHTML = Array.from(buckets).map(([key, indexes]) => {
+      const bucketHtml = Array.from(buckets).map(([key, indexes]) => {
         const available = indexes.filter(i => isGroupSelectable(productGroups[i]));
         const info = window.DampickDelivery.schedule(productGroups[indexes[0]].pickupDate);
         const pickupAvailable = isPickupDateAvailable(productGroups[indexes[0]].pickupDate);
@@ -459,8 +459,7 @@
         return `<section class="delivery-bucket" data-bucket="${escapeHtml(key)}">
           <div class="delivery-bucket-heading">
             <div class="delivery-bucket-heading-top"><span class="delivery-date-pill">📅 ${escapeHtml(formatPickupDateLabel(key))}</span><span class="delivery-state-pill${!pickupAvailable && !allAssigned ? " is-unavailable" : ""}">${stateText}</span></div>
-            <div class="delivery-customer">👤 ${escapeHtml(nicknameInput.value.trim())}님</div>
-            <p>${escapeHtml(info?.pickupLabel || "주말·미정 상품은 관리자에게 문의해주세요.")}</p>
+            <p class="delivery-pickup-group">${escapeHtml(info?.pickupLabel || "주말·미정 상품은 관리자에게 문의해주세요.")}</p>
           </div>
           <div class="delivery-items">${indexes.map(i => cards[i]).join("")}</div>
           <div class="delivery-bucket-footer">
@@ -470,6 +469,10 @@
           ${available.length ? `<button type="button" class="bucket-checkout primary-button" data-pickup-date="${escapeHtml(key)}" disabled>문고리 배송 결제하기</button>` : ""}
         </section>`;
       }).join("");
+      results.innerHTML = `
+        <div class="results-customer-title"><strong>${escapeHtml(nicknameInput.value.trim())}</strong>님의 주문 상품</div>
+        ${bucketHtml}
+      `;
       results.querySelectorAll(".bucket-select-all").forEach(control => {
         control.addEventListener("change", () => {
           if (checkoutBusy) return;
