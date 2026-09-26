@@ -30,6 +30,19 @@ test('all browser JavaScript parses', () => {
   new vm.Script(read('service-worker.js'));
 });
 
+test('customer checkout completion keeps details and uses emphasized success styles', () => {
+  const customer = read('assets/js/index.js');
+  const styles = read('assets/css/index.css');
+  for (const text of ['문고리 배송 신청이 저장되었습니다.', '신청번호:', '선택 상품 합계:', '배송비:', '이번 결제금액:']) {
+    assert.match(customer, new RegExp(text));
+  }
+  assert.match(customer, /class="complete-title"/);
+  assert.match(customer, /class="complete-details"/);
+  assert.match(customer, /class="complete-amount"/);
+  assert.match(styles, /\.complete-box\s*\{[^}]*border:\s*2px solid #22c55e[^}]*background:\s*#ecfdf3/s);
+  assert.match(styles, /\.complete-title\s*\{[^}]*color:\s*#15803d[^}]*font-size:\s*clamp\(18px,/s);
+});
+
 test('inventory migration is transactional and non-destructive', () => {
   const sql = read('database/003_inventory_management.sql');
   const admin = read('assets/js/admin.js');

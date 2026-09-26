@@ -579,15 +579,22 @@
     .complete-box {
       display: none;
       margin-top: 16px;
-      padding: 18px;
-      border: 1px solid #afe0c5;
+      padding: 19px;
+      border: 2px solid #22c55e;
       border-radius: 17px;
       color: #155e39;
-      background: #effbf4;
+      background: #ecfdf3;
       line-height: 1.75;
+      overflow-wrap: anywhere;
+      box-shadow: 0 10px 24px rgb(21 128 61 / 10%);
     }
 
     .complete-box.show { display: block; }
+    .complete-title { display: flex; align-items: flex-start; gap: 9px; color: #15803d; font-size: clamp(18px, 4.5vw, 22px); font-weight: 950; line-height: 1.35; word-break: keep-all; }
+    .complete-title > span { display: inline-grid; flex: 0 0 auto; width: 27px; height: 27px; place-items: center; margin-top: 1px; border-radius: 50%; color: #fff; background: #22c55e; font-size: 17px; line-height: 1; }
+    .complete-title strong { font-weight: 950; }
+    .complete-details { margin-top: 12px; font-size: 14px; line-height: 1.8; }
+    .complete-amount { color: #15803d; font-size: 18px; font-weight: 950; }
 
     .privacy-note {
       display: flex;

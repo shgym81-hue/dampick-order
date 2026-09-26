@@ -765,20 +765,18 @@
           "을 입금해주세요.";
 
         completeBox.innerHTML = `
-          <strong>문고리 배송 신청이 저장되었습니다.</strong><br>
-          신청번호:
-          ${escapeHtml(result.request_code || "")}<br>
-          선택 상품 합계:
-          ${formatWon(result.product_amount)}<br>
-          배송비:
-          ${
-            Number(result.delivery_fee || 0) === 0
-              ? "무료"
-              : formatWon(result.delivery_fee)
-          }<br>
-          이번 결제금액:
-          <strong>${formatWon(result.final_amount)}</strong><br>
-          ${escapeHtml(nextGuide)}
+          <div class="complete-title"><span aria-hidden="true">✓</span><strong>문고리 배송 신청이 저장되었습니다.</strong></div>
+          <div class="complete-details">
+            신청번호: ${escapeHtml(result.request_code || "")}<br>
+            선택 상품 합계: ${formatWon(result.product_amount)}<br>
+            배송비: ${
+              Number(result.delivery_fee || 0) === 0
+                ? "무료"
+                : formatWon(result.delivery_fee)
+            }<br>
+            이번 결제금액: <strong class="complete-amount">${formatWon(result.final_amount)}</strong><br>
+            ${escapeHtml(nextGuide)}
+          </div>
         `;
 
         completeBox.classList.add("show");
